@@ -98,7 +98,8 @@ return [
     | specify a specific custom language line for a given attribute rule.
     |
     */
-
+    'strength' => 'The password :attribute is too weak and must contain one or more uppercase, lowercase, numeric, and special character (!@#$%^&*).',
+    
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
