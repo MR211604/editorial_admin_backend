@@ -36,7 +36,7 @@ class PublishingController extends Controller
                 ->paginate($limit);
 
             return response()->json([
-                'success' => true,
+                'ok' => true,                    
                 'data' => $publishings->items(),                
                 'pagination' => [
                     'current_page' => $publishings->currentPage(),
@@ -50,7 +50,7 @@ class PublishingController extends Controller
             
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'ok' => false,
                 'message' => 'Error al obtener las publicaciones',
                 'error' => $e->getMessage()
             ], 500);
