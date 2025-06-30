@@ -19,3 +19,19 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/publishings', 'PublishingController@index');
 Route::post('/publishings', 'PublishingController@create');
+
+//Creando un grupo
+Route::group(['prefix' => 'users'], function () {
+    Route::get('/getUsers', 'UserController@index');
+    Route::post('/createUser', 'UserController@create');
+    Route::put('/updateUser/{id}', 'UserController@update');
+    Route::delete('/deleteUser/{id}', 'UserController@delete');
+});
+
+//Creando un grupo para los roles
+Route::group(['prefix' => 'rol'], function () {
+    Route::get('/getRol', 'RolController@index');
+    Route::post('/createRol', 'RolController@create');
+    Route::put('/updateRol/{id}', 'RolController@update');
+    Route::delete('/deleteRol/{id}', 'RolController@delete');
+});
