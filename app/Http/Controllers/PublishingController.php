@@ -26,13 +26,18 @@ class PublishingController extends Controller
                 ], 422);
             }
 
+            $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
             $page = $request->query('page', 1);
             $limit = $request->query('limit', 10);
             $publishing_type = $request->query('publishing_type', null);
+            $search = $request->query('search', null);
 
-            $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
+            $query = Publishing::with(['type', 'authors']);
 
-            $query = Publishing::with(['type']);
+            if ($search) {
+                $query->where('title', 'like', '%' . $search . '%');
+                      
+            }
 
             if ($publishing_type) {
                 $query->where('publishing_type', $publishing_type);
@@ -63,7 +68,7 @@ class PublishingController extends Controller
                 // Ordenamiento por defecto
                 $query->orderBy('id', 'desc');
             }
-            
+
             $publishings = $query->paginate($limit);
 
             return response()->json([
