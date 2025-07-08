@@ -13,23 +13,28 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
 
 Route::get('/publishings', 'PublishingController@index');
 Route::post('/publishings', 'PublishingController@create');
 
-//Creando un grupo
-Route::group(['prefix' => 'users'], function () {
-    Route::get('/getUsers', 'UserController@index');
-    Route::post('/createUser', 'UserController@create');
-    Route::put('/updateUser/{id}', 'UserController@update');
-    Route::delete('/deleteUser/{id}', 'UserController@delete');
+
+//Ruta para el login
+Route::post('/auth/login', 'AuthController@login');
+
+//Rutas para crear usuarios (protegida)
+//IMPORTANTE: require Bearer + Token en el header de la petición
+Route::group(['middleware' => ['api'], 'prefix' => 'auth'], function () {
+    Route::get('/renew', 'AuthController@renew');
+});
+
+Route::group(['middleware' => ['api'], 'prefix' => 'users'], function () {
+    Route::get('getUsers', 'UserController@index');
+    Route::post('createUser', 'UserController@create');
 });
 
 //Creando un grupo para los roles
-Route::group(['prefix' => 'rol'], function () {
+Route::group(['middleware' => ['api'], 'prefix' => 'rol'], function () {
     Route::get('/getRol', 'RolController@index');
     Route::post('/createRol', 'RolController@create');
     Route::put('/updateRol/{id}', 'RolController@update');

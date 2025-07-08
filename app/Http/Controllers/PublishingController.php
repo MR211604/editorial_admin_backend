@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Publishing;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Validator;
 
 class PublishingController extends Controller
