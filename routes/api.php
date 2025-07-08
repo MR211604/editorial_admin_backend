@@ -26,6 +26,7 @@ Route::post('/auth/login', 'AuthController@login');
 //IMPORTANTE: require Bearer + Token en el header de la petición
 Route::group(['middleware' => ['api'], 'prefix' => 'auth'], function () {
     Route::get('/renew', 'AuthController@renew');
+    Route::post('/logout', 'AuthController@logout');
 });
 
 Route::group(['middleware' => ['api'], 'prefix' => 'users'], function () {

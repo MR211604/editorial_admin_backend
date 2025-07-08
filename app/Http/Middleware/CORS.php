@@ -4,7 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class CORS {
+class CORS
+{
 
     /**
      * Handle an incoming request.
@@ -13,9 +14,12 @@ class CORS {
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next) {
-//        return $next($request);
-        header("Access-Control-Allow-Origin: *");
+    public function handle($request, Closure $next)
+    {
+        //        return $next($request);
+
+        header("Access-Control-Allow-Origin: http://localhost:5173");
+        header("Access-Control-Allow-Credentials: true");
 
         // ALLOW OPTIONS METHOD
         $headers = [
