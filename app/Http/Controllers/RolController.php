@@ -13,7 +13,7 @@ class RolController extends Controller
 
     public function __construct()
     {
-        $this->middleware('api:auth');
+        $this->middleware('auth:api');
     }
     public function index(Request $request)
     {
@@ -28,7 +28,6 @@ class RolController extends Controller
                 return $this->validationResponse($validator->errors(), 'Parámetros inválidos');
             }
 
-            $page = $request->query('page', 1);
             $limit = $request->query('limit', 10);
 
             $roles = Rol::paginate($limit);
@@ -45,7 +44,7 @@ class RolController extends Controller
                 ]
             ];
 
-            return $this->successResponse($data, 'Roles obtenidos exitosamente');
+            return $this->successResponse($data['roles'], 'Roles obtenidos exitosamente', $data['pagination']);
 
         } catch (\Exception $e) {
             return $this->errorResponse('Error al obtener los roles: ' . $e->getMessage(), 500);

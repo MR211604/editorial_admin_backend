@@ -7,12 +7,13 @@ trait ApiResponse
     /**
      * Respuesta exitosa
      */
-    public function successResponse($data = null, $message = 'Operación exitosa', $code = 200)
+    public function successResponse($data = null, $message = 'Operación exitosa', $pagination = null, $code = 200)
     {
         return response()->json([
-            'success' => true,
+            'ok' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
+            'pagination' => $pagination
         ], $code);
     }
 
@@ -22,7 +23,7 @@ trait ApiResponse
     public function errorResponse($message = 'Ha ocurrido un error', $code = 400, $errors = null)
     {
         $response = [
-            'success' => false,
+            'ok' => false,
             'error' => $message,
             'message' => $message
         ];
@@ -40,7 +41,7 @@ trait ApiResponse
     public function unauthorizedResponse($message = 'No autorizado')
     {
         return response()->json([
-            'success' => false,
+            'ok' => false,
             'error' => 'No autorizado',
             'message' => $message,
             'hint' => 'Incluye el header: Authorization: Bearer {token}'
@@ -53,7 +54,7 @@ trait ApiResponse
     public function forbiddenResponse($message = 'Acceso prohibido')
     {
         return response()->json([
-            'success' => false,
+            'ok' => false,
             'error' => 'Acceso prohibido',
             'message' => $message
         ], 403);
@@ -65,7 +66,7 @@ trait ApiResponse
     public function notFoundResponse($message = 'Recurso no encontrado')
     {
         return response()->json([
-            'success' => false,
+            'ok' => false,
             'error' => 'No encontrado',
             'message' => $message
         ], 404);
@@ -77,7 +78,7 @@ trait ApiResponse
     public function validationResponse($errors, $message = 'Datos inválidos')
     {
         return response()->json([
-            'success' => false,
+            'ok' => false,
             'error' => 'Validación fallida',
             'message' => $message,
             'errors' => $errors

@@ -15,9 +15,6 @@ use Illuminate\Http\Request;
 
 
 
-Route::get('/publishings', 'PublishingController@index');
-Route::post('/publishings', 'PublishingController@create');
-
 
 //Ruta para el login
 Route::post('/auth/login', 'AuthController@login');
@@ -34,10 +31,24 @@ Route::group(['middleware' => ['api'], 'prefix' => 'users'], function () {
     Route::post('createUser', 'UserController@create');
 });
 
+//Creando grupo para las publicaciones
+Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
+    Route::get('getPublishings', 'PublishingController@index');
+    Route::post('createPublishing', 'PublishingController@create');
+});
+
+
 //Creando un grupo para los roles
 Route::group(['middleware' => ['api'], 'prefix' => 'rol'], function () {
     Route::get('/getRol', 'RolController@index');
     Route::post('/createRol', 'RolController@create');
     Route::put('/updateRol/{id}', 'RolController@update');
     Route::delete('/deleteRol/{id}', 'RolController@delete');
+});
+
+Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
+    Route::get('getAuthors', 'AuthorController@index');
+    Route::post('createAuthor', 'AuthorController@create');
+    Route::put('updateAuthor/{id}', 'AuthorController@update');
+    Route::delete('deleteAuthor/{id}', 'AuthorController@delete');
 });

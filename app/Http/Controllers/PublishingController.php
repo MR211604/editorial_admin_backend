@@ -11,7 +11,7 @@ class PublishingController extends Controller
     public function index(Request $request)
     {
         try {
-            $validator = \Validator::make($request->all(), [
+            $validator = Validator::make($request->all(), [
                 'page' => 'integer|min:1',
                 'limit' => 'integer|min:10',
                 'publishing_type' => 'integer'
@@ -19,14 +19,14 @@ class PublishingController extends Controller
 
             if ($validator->fails()) {
                 return response()->json([
-                    'success' => false,
+                    'ok' => false,
                     'message' => 'Parámetros inválidos',
                     'errors' => $validator->errors()
                 ], 422);
             }
 
             $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
-            $page = $request->query('page', 1);
+            // $page = $request->query('page', 1);
             $limit = $request->query('limit', 10);
             $publishing_type = $request->query('publishing_type', null);
             $search = $request->query('search', null);
