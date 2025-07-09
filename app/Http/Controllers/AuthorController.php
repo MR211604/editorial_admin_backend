@@ -82,4 +82,45 @@ class AuthorController extends Controller
       return $this->errorResponse('Error al obtener los autores', 500);
     }
   }
+
+  public function find($id)
+  {
+    try {
+      $author = Author::find($id);
+
+      if (!$author) {
+        return $this->errorResponse('Autor no encontrado', 404);
+      }
+
+      return $this->successResponse($author, 'Autor obtenido exitosamente');
+    } catch (\Exception $e) {
+      return $this->errorResponse('Error al obtener el autor', 500);
+    }
+  }
+
+  public function create(Request $request)
+  {
+    try {
+
+      $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'lastname' => 'required|string|max:255',
+      ]);
+
+      if ($validator->fails()) {
+        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+      }
+
+      if (Author::alreadyExists($request->input('name'), $request->input('lastname'))) {
+        return $this->errorResponse('El autor enviado ya existe', 409);
+      }
+
+      $author = Author::create($request->only('name', 'lastname'));
+
+      return $this->successResponse($author, 'Autor creado exitosamente', 201);
+
+    } catch (\Exception $e) {
+      return $this->errorResponse('Error al crear el autor: ' . $e->getMessage(), 500);
+    }
+  }
 }

@@ -40,14 +40,15 @@ Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
 
 //Creando un grupo para los roles
 Route::group(['middleware' => ['api'], 'prefix' => 'rol'], function () {
-    Route::get('/getRol', 'RolController@index');
-    Route::post('/createRol', 'RolController@create');
-    Route::put('/updateRol/{id}', 'RolController@update');
-    Route::delete('/deleteRol/{id}', 'RolController@delete');
+    Route::get('getRol', 'RolController@index');
+    Route::post('createRol', 'RolController@create');
+    Route::put('updateRol/{id}', 'RolController@update');
+    Route::delete('deleteRol/{id}', 'RolController@delete');
 });
 
 Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
     Route::get('getAuthors', 'AuthorController@index');
+    Route::get('getAuthor/{id}', 'AuthorController@find');
     Route::post('createAuthor', 'AuthorController@create');
     Route::put('updateAuthor/{id}', 'AuthorController@update');
     Route::delete('deleteAuthor/{id}', 'AuthorController@delete');
