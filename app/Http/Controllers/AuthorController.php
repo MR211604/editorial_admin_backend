@@ -24,7 +24,7 @@ class AuthorController extends Controller
       $validator = Validator::make($request->all(), [
         'page' => 'integer|min:1',
         'limit' => 'integer|min:10',
-        'search' => 'string'
+        'search' => 'string|nullable'
       ]);
 
       if ($validator->fails()) {
@@ -34,7 +34,7 @@ class AuthorController extends Controller
       $limit = $request->query('limit', 10);
       $search = $request->query('search', null);
 
-      $query = Author::getModel();
+      $query = Author::with([]);
 
       if ($search) {
         $query->where('name', 'like', '%' . $search . '%');

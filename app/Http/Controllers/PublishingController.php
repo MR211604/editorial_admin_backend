@@ -34,8 +34,7 @@ class PublishingController extends Controller
             $query = Publishing::with(['type', 'authors']);
 
             if ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
-                      
+                $query->where('title', 'like', '%' . $search . '%');                      
             }
 
             if ($publishing_type) {

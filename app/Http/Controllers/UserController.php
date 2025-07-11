@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\ApiResponse;
+use App\Http\Traits\SearchFilter;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+
+    use SearchFilter;
+    use ApiResponse;
 
     public function __construct()
     {
@@ -23,42 +28,55 @@ class UserController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Parámetros inválidos',
-                    'errors' => $validator->errors()
-                ], 422);
+                return $this->errorResponse(
+                    'Parámetros inválidos',
+                    422,
+                    $validator->errors()
+                );
             }
 
-            $page = $request->query('page', 1);
             $limit = $request->query('limit', 10);
             $rol_id = $request->query('rol_id', null);
+            $search = $request->query('search', null);
 
-            $users = User::with(['rol'])
+            $query = User::with(['rol'])
                 ->when($rol_id, function ($query) use ($rol_id) {
                     return $query->where('rol_id', $rol_id);
-                })
-                ->paginate($limit);
+                });
+            $allowedSortFields = ['id', 'name', 'rol_id'];
 
-            return response()->json([
-                'ok' => true,
-                'data' => $users->items(),
-                'pagination' => [
-                    'current_page' => $users->currentPage(),
-                    'last_page' => $users->lastPage(),
-                    'per_page' => $users->perPage(),
-                    'total' => $users->total(),
-                    'from' => $users->firstItem(),
-                    'to' => $users->lastItem(),
-                ]
-            ]);
+            if ($search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            }
+
+            if ($request->has('sort')) {
+                $this->search($request, $query, $allowedSortFields);
+            } else {
+                $query->orderBy('id', 'desc');
+            }
+
+            $users = $query->paginate($limit);
+
+            $pagination = [
+                'total' => $users->total(),
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem()
+            ];
+
+            return $this->successResponse(
+                $users->items(),
+                'Usuarios obtenidos exitosamente',
+                $pagination
+            );
 
         } catch (\Exception $e) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Error al obtener los usuarios',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse(
+                'Error al obtener los usuarios',
+                500
+            );
         }
     }
 
