@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\ApiResponse;
+use App\Http\Traits\SearchFilter;
 use Illuminate\Http\Request;
 use App\Publishing;
 use Illuminate\Support\Facades\Validator;
 
 class PublishingController extends Controller
 {
+
+    use ApiResponse;
+    use SearchFilter;
+
     public function index(Request $request)
     {
         try {
@@ -30,11 +36,16 @@ class PublishingController extends Controller
             $limit = $request->query('limit', 10);
             $publishing_type = $request->query('publishing_type', null);
             $search = $request->query('search', null);
+            $category = $request->query('category', null);
 
-            $query = Publishing::with(['type', 'authors']);
+            $query = Publishing::with(['type', 'authors', 'details']);
 
             if ($search) {
-                $query->where('title', 'like', '%' . $search . '%');                      
+                $query->where('title', 'like', '%' . $search . '%');
+            }
+
+            if ($category) {
+                $query->where('category_id', $category);
             }
 
             if ($publishing_type) {
@@ -42,26 +53,7 @@ class PublishingController extends Controller
             }
 
             if ($request->has('sort')) {
-                $sorts = explode(',', $request->input('sort'));
-                $directions = $request->has('direction')
-                    ? explode(',', $request->input('direction'))
-                    : [];
-
-                foreach ($sorts as $index => $sortField) {
-                    if (!in_array($sortField, $allowedSortFields)) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => "Campo de ordenamiento no permitido: {$sortField}",
-                            'allowed_fields' => $allowedSortFields
-                        ], 422);
-                    }
-
-                    $direction = isset($directions[$index])
-                        ? (strtolower($directions[$index]) === 'desc' ? 'desc' : 'asc')
-                        : 'asc';
-
-                    $query->orderBy($sortField, $direction);
-                }
+                $this->search($request, $query, $allowedSortFields);
             } else {
                 // Ordenamiento por defecto
                 $query->orderBy('id', 'desc');
@@ -69,25 +61,19 @@ class PublishingController extends Controller
 
             $publishings = $query->paginate($limit);
 
-            return response()->json([
-                'ok' => true,
-                'data' => $publishings->items(),
-                'pagination' => [
-                    'current_page' => $publishings->currentPage(),
-                    'last_page' => $publishings->lastPage(),
-                    'per_page' => $publishings->perPage(),
-                    'total' => $publishings->total(),
-                    'from' => $publishings->firstItem(),
-                    'to' => $publishings->lastItem(),
-                ]
-            ]);
+            $pagination = [
+                'total' => $publishings->total(),
+                'current_page' => $publishings->currentPage(),
+                'last_page' => $publishings->lastPage(),
+                'per_page' => $publishings->perPage(),
+                'from' => $publishings->firstItem(),
+                'to' => $publishings->lastItem(),
+            ];
+
+            return $this->successResponse($publishings->items(), 'Publicaciones obtenidas correctamente', $pagination, 200);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Error al obtener las publicaciones',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Error al obtener las publicaciones', 500);
         }
     }
 

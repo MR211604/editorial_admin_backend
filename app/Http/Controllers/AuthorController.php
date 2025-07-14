@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Author;
+use App\Http\Traits\SearchFilter;
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Support\Facades\Validator;
@@ -12,7 +13,7 @@ class AuthorController extends Controller
 {
 
   use ApiResponse;
-
+  use SearchFilter;
   public function __construct()
   {
     $this->middleware('auth:api');
@@ -37,31 +38,16 @@ class AuthorController extends Controller
       $query = Author::with([]);
 
       if ($search) {
-        $query->where('name', 'like', '%' . $search . '%');
+        $query->where(function ($q) use ($search) {
+          $q->where('name', 'like', '%' . $search . '%')
+            ->orWhere('lastname', 'like', '%' . $search . '%');            
+        });
       }
 
       $allowedSortFields = ['id', 'name', 'lastname'];
 
       if ($request->has('sort')) {
-        $sorts = explode(',', $request->input('sort'));
-        $directions = $request->has('direction')
-          ? explode(',', $request->input('direction'))
-          : [];
-        foreach ($sorts as $index => $sortField) {
-          if (!in_array($sortField, $allowedSortFields)) {
-            return response()->json([
-              'success' => false,
-              'message' => "Campo de ordenamiento no permitido: {$sortField}",
-              'allowed_fields' => $allowedSortFields
-            ], 422);
-          }
-
-          $direction = isset($directions[$index])
-            ? (strtolower($directions[$index]) === 'desc' ? 'desc' : 'asc')
-            : 'asc';
-
-          $query->orderBy($sortField, $direction);
-        }
+        $this->search($request, $query, $allowedSortFields);
       } else {
         $query->orderBy('id', 'desc');
       }
@@ -121,6 +107,39 @@ class AuthorController extends Controller
 
     } catch (\Exception $e) {
       return $this->errorResponse('Error al crear el autor: ' . $e->getMessage(), 500);
+    }
+  }
+
+  public function update(Request $request)
+  {
+    try {
+
+      $validator = Validator::make($request->all(), [
+        'id' => 'required|integer|exists:authors,id',
+        'name' => 'required|string|max:255',
+        'lastname' => 'required|string|max:255',
+      ]);
+
+      if ($validator->fails()) {
+        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+      }
+
+      $author = Author::find($request->input('id'));
+
+      if (!$author) {
+        return $this->errorResponse('Autor no encontrado', 404);
+      }
+
+      if (Author::alreadyExists($request->input('name'), $request->input('lastname'))) {
+        return $this->errorResponse('El autor enviado ya existe', 409);
+      }
+
+      $author->update($request->only('name', 'lastname'));
+
+      return $this->successResponse($author, 'Autor actualizado exitosamente');
+
+    } catch (\Exception $e) {
+      return $this->errorResponse('Error al actualizar el autor: ' . $e->getMessage(), 500);
     }
   }
 }

@@ -19,4 +19,8 @@ class Publishing extends Model
         return $this->belongsTo('App\PublishingType', 'publishing_type');
     }
 
+    public function details() {
+        return $this->hasOne('App\PublishingDetail', 'publishing_id');
+    }
+
 }
