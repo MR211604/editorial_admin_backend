@@ -26,3 +26,21 @@ Y por ultimo instalaremos las dependencias usando composer
 composer install
 ```
 Nuestro servidor estara listo para ser accedido de forma local en el puerto ```http://localhost:8080```.
+
+## Cómo ejecutar el proyecto mediante Docker
+
+*IMPORTANTE: este contenedor unicamente ha sido probado con exito en sistemas operativos Windows 10+*
+
+Dentro de la carpeta ```/docker``` se encuentra el archivo ```docker-compose.yml``` y tambien las configuraciones del ```Dockerfile```. Si ya tenemos Docker instalado dentro de nuestro dispositivo, entonces dentro de esta carpeta usamos el siguiente comando:
+
+```
+docker-compose up -d
+```
+
+Luego, dentro de nuestro contenedor, nos dirigiremos a la carpeta ```/var/www/html``` y haremos uso de:
+
+```
+git clone https://github.com/MR211604/cms-udb-editorial.git .
+```
+
+Esto copiara todos los archivos directamente a la carpeta ```/html```, y en nuestra maquina anfitrion podremos acceder desde ```http://localhost:8080```. Una vez hecho esto, repetiremos los pasos vistos en [Cómo ejecutar el proyecto de manera local](readme.md).
