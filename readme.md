@@ -43,4 +43,4 @@ Luego, dentro de nuestro contenedor, nos dirigiremos a la carpeta ```/var/www/ht
 git clone https://github.com/MR211604/cms-udb-editorial.git .
 ```
 
-Esto copiara todos los archivos directamente a la carpeta ```/html```, y en nuestra maquina anfitrion podremos acceder desde ```http://localhost:8080```. Una vez hecho esto, repetiremos los pasos vistos en [Cómo ejecutar el proyecto de manera local](readme.md).
+Esto copiara todos los archivos directamente a la carpeta ```/html```, y en nuestra maquina anfitrion podremos acceder desde ```http://localhost:8080```. Una vez hecho esto, repetiremos los pasos vistos en [Cómo ejecutar el proyecto de manera local](#cómo-ejecutar-el-proyecto-de-manera-local).
