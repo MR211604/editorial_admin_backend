@@ -53,3 +53,13 @@ Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
     Route::post('updateAuthor', 'AuthorController@update');
     Route::delete('deleteAuthor/{id}', 'AuthorController@delete');
 });
+
+
+
+Route::group(['middleware' => ['api'], 'prefix' => 'privileges'], function () {
+    Route::get('getPrivileges', 'UserPrivilegeController@index');
+    Route::get('getPrivilege/{id}', 'UserPrivilegeController@find');
+    Route::post('createPrivilege', 'UserPrivilegeController@create');
+    Route::post('updatePrivilege', 'UserPrivilegeController@update');
+    Route::delete('deletePrivilege/{id}', 'UserPrivilegeController@delete');
+});
