@@ -7,19 +7,37 @@ use Illuminate\Database\Eloquent\Model;
 class Publishing extends Model
 {
 
-    public function category() {
+    protected $fillable = [
+        'title',
+        'publish_date',
+        'publish_code',
+        'age',
+        'age_number',
+        'volume',
+        'is_new_arrival',
+        'category_id',
+        'publishing_type'
+    ];
+
+    public $timestamps = false;
+
+    public function category()
+    {
         return $this->belongsTo('App\Category', 'category_id');
     }
 
-    public function authors() {
+    public function authors()
+    {
         return $this->belongsToMany('App\Author', 'authors_publishings', 'publishing_id', 'author_id');
     }
 
-    public function type() {
+    public function type()
+    {
         return $this->belongsTo('App\PublishingType', 'publishing_type');
     }
 
-    public function details() {
+    public function details()
+    {
         return $this->hasOne('App\PublishingDetail', 'publishing_id');
     }
 

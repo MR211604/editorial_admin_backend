@@ -6,6 +6,7 @@ use App\Http\Traits\ApiResponse;
 use App\UserPrivilege;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserPrivilegeController extends Controller
 {
@@ -46,6 +47,24 @@ class UserPrivilegeController extends Controller
 
     } catch (\Exception $e) {
       return $this->errorResponse('Error retrieving privileges: ' . $e->getMessage(), 500);
+    }
+  }
+
+  public function find($id = null) {
+    try {
+      // Validar si el ID está presente y no está vacío
+      if (empty($id) || !is_numeric($id)) {
+        return $this->errorResponse('El numero de ID es requerido', 400);
+      }
+
+      if(!UserPrivilege::where('id', $id)->exists()) {
+        return $this->errorResponse('Privilegio no encontrado', 404);
+      }
+
+      $privilege = UserPrivilege::findOrFail($id);
+      return $this->successResponse($privilege, 'Privilegio obtenido exitosamente');
+    } catch (\Exception $e) {
+      return $this->errorResponse('Error obteniendo privilegio: ' . $e->getMessage(), 500);
     }
   }
 }

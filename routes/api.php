@@ -34,7 +34,9 @@ Route::group(['middleware' => ['api'], 'prefix' => 'users'], function () {
 //Creando grupo para las publicaciones
 Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
     Route::get('getPublishings', 'PublishingController@index');
+    Route::get('getPublishing/{id?}', 'PublishingController@find');
     Route::post('createPublishing', 'PublishingController@create');
+    Route::post('updatePublishing/{id?}', 'PublishingController@update');
 });
 
 
@@ -58,7 +60,7 @@ Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
 
 Route::group(['middleware' => ['api'], 'prefix' => 'privileges'], function () {
     Route::get('getPrivileges', 'UserPrivilegeController@index');
-    Route::get('getPrivilege/{id}', 'UserPrivilegeController@find');
+    Route::get('getPrivilege/{id?}', 'UserPrivilegeController@find');
     Route::post('createPrivilege', 'UserPrivilegeController@create');
     Route::post('updatePrivilege', 'UserPrivilegeController@update');
     Route::delete('deletePrivilege/{id}', 'UserPrivilegeController@delete');
