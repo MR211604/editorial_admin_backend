@@ -116,7 +116,7 @@ class PublishingController extends Controller
                 'title' => 'required|string|max:255',
                 'pages' => 'required|integer|min:1',
                 'publish_date' => 'required|date',
-                'publish_code' => 'required|string|max:50',
+                'publish_code' => 'required|integer|min:1',
                 'age' => 'nullable|integer|min:1',
                 'age_number' => 'nullable|integer|min:1',
                 'volume' => 'nullable|integer|min:1',
@@ -152,8 +152,8 @@ class PublishingController extends Controller
 
                 // Actualizar detalles de la publicación
                 // Si ya existe un detalle, actualizarlo; si no, crear uno nuevo
-                if ($publishing->details) {
-                    $publishing->details->update(['pages' => $request->input('pages')]);
+                if ($publishing->details()) {
+                    $publishing->details()->update(['pages' => $request->input('pages')]);
                 } else {
                     $publishing->details()->create(['pages' => $request->input('pages')]);
                 }
