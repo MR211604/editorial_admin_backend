@@ -38,7 +38,7 @@ class Publishing extends Model
 
     public function details()
     {
-        return $this->hasOne('App\PublishingDetail', 'publishing_id');
+        return $this->hasMany('App\PublishingDetail', 'publishing_id');
     }
 
 }

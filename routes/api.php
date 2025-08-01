@@ -13,9 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-
-
-
 //Ruta para el login
 Route::post('/auth/login', 'AuthController@login');
 
@@ -56,12 +53,16 @@ Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
     Route::delete('deleteAuthor/{id}', 'AuthorController@delete');
 });
 
-
-
 Route::group(['middleware' => ['api'], 'prefix' => 'privileges'], function () {
     Route::get('getPrivileges', 'UserPrivilegeController@index');
     Route::get('getPrivilege/{id?}', 'UserPrivilegeController@find');
     Route::post('createPrivilege', 'UserPrivilegeController@create');
     Route::post('updatePrivilege', 'UserPrivilegeController@update');
     Route::delete('deletePrivilege/{id}', 'UserPrivilegeController@delete');
+});
+
+Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
+    Route::get('getCategories', 'CategoryController@index');
+    Route::get('getCategory/{id?}', 'CategoryController@find');
+    Route::post('createCategory', 'CategoryController@create');
 });

@@ -144,20 +144,13 @@ class PublishingController extends Controller
                     'publish_code',
                     'age',
                     'age_number',
+                    'pages',
                     'volume',
                     'is_new_arrival',
                     'category_id',
                     'publishing_type'
                 ]));
-
-                // Actualizar detalles de la publicación
-                // Si ya existe un detalle, actualizarlo; si no, crear uno nuevo
-                if ($publishing->details()) {
-                    $publishing->details()->update(['pages' => $request->input('pages')]);
-                } else {
-                    $publishing->details()->create(['pages' => $request->input('pages')]);
-                }
-
+                
                 // Sincronizar autores
                 $publishing->authors()->sync($request->input('authors'));
 
