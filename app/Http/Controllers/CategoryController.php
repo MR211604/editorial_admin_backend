@@ -12,14 +12,18 @@ class CategoryController extends Controller
 
   use ApiResponse;
 
-  public function index()
+  public function index(Request $request)
   {
     try {
 
       $query = Category::getModel();
 
       //Obteniendo las categorías padres con las hijas
-      $categories = $query->whereNull('main_category')->with('children')->get();
+      $categories = $request->query('getAll') === '1'
+        ? $query->get(['id', 'title', 'description'])
+        : $query->whereNull('main_category')
+          ->with(['children:id,title,description,main_category'])
+          ->get(['id', 'title', 'description']);
 
       return $this->successResponse($categories, 'Categorías obtenidas correctamente');
 
