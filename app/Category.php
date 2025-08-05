@@ -31,6 +31,10 @@ class Category extends Model
     {
         return $this->hasMany(self::class, 'id', 'main_category');
     }
+    
+    public function childrenRecursive() {
+        return $this->children()->with('childrenRecursive');
+    }
 
     public static function alreadyExists($title)
     {

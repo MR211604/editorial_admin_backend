@@ -206,7 +206,7 @@ class PublishingController extends Controller
                 });
             }
 
-            return $this->successResponse($updatedPublishing, 'Publicación actualizada exitosamente', 200);
+            return $this->successResponse($updatedPublishing, 'Publicación actualizada exitosamente', null, 200);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->errorResponse('Publicación no encontrada', 404);

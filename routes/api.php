@@ -65,4 +65,5 @@ Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
     Route::get('getCategories', 'CategoryController@index');
     Route::get('getCategory/{id?}', 'CategoryController@find');
     Route::post('createCategory', 'CategoryController@create');
+    Route::post('updateCategory/{id?}', 'CategoryController@update');
 });
