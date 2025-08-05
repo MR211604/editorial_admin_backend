@@ -67,3 +67,8 @@ Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
     Route::post('createCategory', 'CategoryController@create');
     Route::post('updateCategory/{id?}', 'CategoryController@update');
 });
+
+Route::group(['middleware' => ['api'], 'prefix' => 'publishingDetails'], function () {
+    Route::post('createPublishingDetail', 'PublishingDetailController@create');
+    Route::post('updatePublishingDetail/{id?}', 'PublishingDetailController@update');
+});
