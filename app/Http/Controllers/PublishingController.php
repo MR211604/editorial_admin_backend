@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Traits\ApiResponse;
 use App\Http\Traits\SearchFilter;
 use DB;
+use Exception;
 use Illuminate\Http\Request;
 use App\Publishing;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +15,10 @@ class PublishingController extends Controller
 
     use ApiResponse;
     use SearchFilter;
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
 
     public function index(Request $request)
     {
@@ -89,14 +94,50 @@ class PublishingController extends Controller
 
             return $this->successResponse($publishing, 'Publicación obtenida exitosamente');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse('Error al obtener la publicación: ' . $e->getMessage(), 500);
         }
     }
 
     public function create(Request $request)
     {
-        return $this->errorResponse('Método no implementado', 501);
+        try {
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'URL' => 'nullable|string',
+                'category_id' => 'nullable|integer|exists:categories,id',
+                'publishing_type' => 'required|integer|exists:publishing_types,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+            }
+
+            $publishing = Publishing::create([
+                'title' => $request->input('title'),
+                'URL' => $request->input('URL'),
+                'category_id' => $request->input('category_id'),
+                'cover' => null,
+                'age' => null,
+                'volume' => null,
+                'volume_date' => null,
+                'publish_code' => null,
+                'is_new_arrival' => 0,
+                'publish_date' => null,
+                'publisher' => null,
+                'stock' => null,
+                'author_id' => null,
+                'language_id' => null,
+                'publishing_type' => $request->input('publishing_type'),
+                'age_number' => null,
+                'pages' => null,
+            ]);
+
+            return $this->successResponse($publishing, 'Publicacion creada exitosamente', null, 200);
+
+        } catch (Exception $e) {
+            return $this->errorResponse('Error al obtener la publicación: ' . $e->getMessage(), 500);
+        }
     }
 
     public function update(Request $request, $id = null)
