@@ -4,10 +4,16 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Http\Traits\ApiResponse;
 
 class Handler extends ExceptionHandler
 {
+    use ApiResponse;
     /**
      * A list of the exception types that should not be reported.
      *
@@ -44,12 +50,60 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        // Manejo de excepciones para APIs
+        // API friendly JSON responses
         if ($exception instanceof AuthenticationException) {
             return $this->unauthenticated($request, $exception);
         }
-        
-        return parent::render($request, $exception);
+
+        if ($exception instanceof AuthorizationException) {
+            return $this->forbiddenResponse('Acceso prohibido');
+        }
+
+        if ($exception instanceof ValidationException) {
+            return $this->validationResponse($exception->errors(), 'Datos inválidos');
+        }
+
+        if ($exception instanceof ModelNotFoundException) {
+            return $this->notFoundResponse('Recurso no encontrado');
+        }
+
+        if ($exception instanceof ApiException) {
+            return $this->errorResponse($exception->getUserMessage(), $exception->getStatusCode(), $exception->getErrors());
+        }
+
+        if ($exception instanceof HttpException) {
+            $status = $exception->getStatusCode();
+            $message = 'Ha ocurrido un error';
+            switch ($status) {
+                case 400:
+                    $message = 'Solicitud inválida';
+                    break;
+                case 401:
+                    $message = 'No autorizado';
+                    break;
+                case 403:
+                    $message = 'Acceso prohibido';
+                    break;
+                case 404:
+                    $message = 'Recurso no encontrado';
+                    break;
+                case 409:
+                    $message = 'Conflicto';
+                    break;
+                case 422:
+                    $message = 'Datos inválidos';
+                    break;
+            }
+            return $this->errorResponse($message, $status);
+        }
+
+        // Fallback genérico: no filtrar mensajes internos al usuario
+        $debug = config('app.debug');
+        if ($debug) {
+            return $this->errorResponse($exception->getMessage(), 500);
+        }
+
+        return $this->errorResponse('Ha ocurrido un error', 500);
     }
 
     /**
@@ -61,10 +115,6 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return response()->json([
-            'error' => 'No autorizado',
-            'message' => 'Acceso denegado. Se requiere autenticación válida.',
-            'hint' => 'Incluye el header: Authorization: Bearer {token}'
-        ], 401);
+        return $this->unauthorizedResponse('Acceso denegado. Se requiere autenticación válida.');
     }
 }

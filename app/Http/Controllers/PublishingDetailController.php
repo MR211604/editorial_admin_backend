@@ -7,6 +7,9 @@ use App\Http\Traits\ApiResponse;
 use App\PublishingDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ServerErrorException;
 
 
 class PublishingDetailController extends Controller
@@ -31,16 +34,18 @@ class PublishingDetailController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+        throw ValidationException::withMessages($validator->errors()->toArray());
       }
 
       $data = $request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']);
 
       $publishingDetail = PublishingDetail::create($data);
 
-      return $this->successResponse($publishingDetail, 201);
+      return $this->successResponse($publishingDetail, 'Detalle de publicación creado', null, 201);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error al crear el detalle de la publicación', 500, $e->getMessage());
+      throw new ServerErrorException('Error al crear el detalle de la publicación', null, $e);
     }
   }
 
@@ -56,20 +61,22 @@ class PublishingDetailController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+        throw ValidationException::withMessages($validator->errors()->toArray());
       }
 
       $publishingDetail = PublishingDetail::find($id);
 
       if (!$publishingDetail) {
-        return $this->errorResponse('Detalle de publicación no encontrado', 404);
+        throw new NotFoundException('Detalle de publicación no encontrado');
       }
 
       $publishingDetail->update($request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']));
 
       return $this->successResponse($publishingDetail);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error al actualizar el detalle de la publicación', 500, $e->getMessage());
+      throw new ServerErrorException('Error al actualizar el detalle de la publicación', null, $e);
     }
   }
 

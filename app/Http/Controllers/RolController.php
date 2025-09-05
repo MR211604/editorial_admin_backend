@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Rol;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Traits\ApiResponse;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\ServerErrorException;
 
 class RolController extends Controller
 {
@@ -25,7 +27,7 @@ class RolController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return $this->validationResponse($validator->errors(), 'Parámetros inválidos');
+                throw ValidationException::withMessages($validator->errors()->toArray());
             }
 
             $limit = $request->query('limit', 10);
@@ -46,8 +48,10 @@ class RolController extends Controller
 
             return $this->successResponse($data['roles'], 'Roles obtenidos exitosamente', $data['pagination']);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener los roles: ' . $e->getMessage(), 500);
+            throw new ServerErrorException('Error al obtener los roles', null, $e);
         }
     }
 

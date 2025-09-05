@@ -11,6 +11,7 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Exceptions\ServerErrorException;
 
 class AuthController extends Controller
 {
@@ -48,7 +49,7 @@ class AuthController extends Controller
         'last_login' => $user->last_login_at
       ]);
     } catch (\Exception $e) {
-      return response()->json(['error' => $e->getMessage()], 401);
+      throw new ServerErrorException('No se pudo iniciar sesión', null, $e);
     }
   }
 
@@ -106,15 +107,11 @@ class AuthController extends Controller
       return response()->json([
         'ok' => false,
         'error' => 'Error de token',
-        'message' => 'Error al procesar el token: ' . $e->getMessage()
+        'message' => 'Error al procesar el token'
       ], 500);
       
     } catch (\Exception $e) {
-      return response()->json([
-        'ok' => false,
-        'error' => 'Error interno',
-        'message' => 'No se pudo renovar el token: ' . $e->getMessage()
-      ], 500);
+      throw new ServerErrorException('No se pudo renovar el token', null, $e);
     }
   }
 

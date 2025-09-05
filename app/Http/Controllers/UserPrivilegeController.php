@@ -7,6 +7,10 @@ use App\UserPrivilege;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\BadRequestException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ServerErrorException;
 
 class UserPrivilegeController extends Controller
 {
@@ -28,7 +32,7 @@ class UserPrivilegeController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->validationResponse($validator->errors(), 'Parámetros inválidos');
+        throw ValidationException::withMessages($validator->errors()->toArray());
       }
       $limit = $request->query('limit', 10);
 
@@ -45,8 +49,10 @@ class UserPrivilegeController extends Controller
 
       return $this->successResponse($privileges->items(), 'Autorizaciones obtenidas exitosamente', $pagination);
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error retrieving privileges: ' . $e->getMessage(), 500);
+      throw new ServerErrorException('Error al obtener las autorizaciones', null, $e);
     }
   }
 
@@ -54,17 +60,19 @@ class UserPrivilegeController extends Controller
     try {
       // Validar si el ID está presente y no está vacío
       if (empty($id) || !is_numeric($id)) {
-        return $this->errorResponse('El numero de ID es requerido', 400);
+        throw new BadRequestException('El numero de ID es requerido');
       }
 
       if(!UserPrivilege::where('id', $id)->exists()) {
-        return $this->errorResponse('Privilegio no encontrado', 404);
+        throw new NotFoundException('Privilegio no encontrado');
       }
 
       $privilege = UserPrivilege::findOrFail($id);
       return $this->successResponse($privilege, 'Privilegio obtenido exitosamente');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error obteniendo privilegio: ' . $e->getMessage(), 500);
+      throw new ServerErrorException('Error al obtener el privilegio', null, $e);
     }
   }
 }
