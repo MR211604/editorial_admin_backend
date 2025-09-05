@@ -34,7 +34,7 @@ class PublishingController extends Controller
             ]);
 
             if ($validator->fails()) {
-                throw ValidationException::withMessages($validator->errors()->toArray());
+                throw new ValidationException($validator);
             }
 
             $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
@@ -80,6 +80,9 @@ class PublishingController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
+            throw $e;
         } catch (\Exception $e) {
             throw new ServerErrorException('Error al obtener las publicaciones', null, $e);
         }
@@ -104,6 +107,9 @@ class PublishingController extends Controller
             throw new NotFoundException('Publicación no encontrada');
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
+            throw $e;
         } catch (Exception $e) {
             throw new ServerErrorException('Error al obtener la publicación', null, $e);
         }
@@ -120,7 +126,7 @@ class PublishingController extends Controller
             ]);
 
             if ($validator->fails()) {
-                throw ValidationException::withMessages($validator->errors()->toArray());
+                throw new ValidationException($validator);
             }
 
             $publishing = Publishing::create([
@@ -146,6 +152,9 @@ class PublishingController extends Controller
             return $this->successResponse($publishing, 'Publicacion creada exitosamente', null, 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (Exception $e) {
             throw new ServerErrorException('Error al crear la publicación', null, $e);
@@ -183,7 +192,7 @@ class PublishingController extends Controller
                 ]);
 
                 if ($validator->fails()) {
-                    throw ValidationException::withMessages($validator->errors()->toArray());
+                    throw new ValidationException($validator);
                 }
 
                 DB::transaction(function () use ($id, $request) {
@@ -232,7 +241,7 @@ class PublishingController extends Controller
                 ]);
 
                 if ($validator->fails()) {
-                    throw ValidationException::withMessages($validator->errors()->toArray());
+                    throw new ValidationException($validator);
                 }
 
                 // Usar transacción para asegurar integridad de datos
@@ -264,6 +273,9 @@ class PublishingController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             throw new NotFoundException('Publicación no encontrada');
         } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (\Exception $e) {
             throw new ServerErrorException('Error al actualizar la publicación', null, $e);

@@ -33,7 +33,7 @@ class AuthorController extends Controller
       ]);
 
       if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
+        throw new ValidationException($validator);
       }
 
       $limit = $request->query('limit', 10);
@@ -70,6 +70,9 @@ class AuthorController extends Controller
 
     } catch (\Illuminate\Validation\ValidationException $e) {
       throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
+      throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al obtener los autores', null, $e);
     }
@@ -87,6 +90,9 @@ class AuthorController extends Controller
       return $this->successResponse($author, 'Autor obtenido exitosamente');
     } catch (\Illuminate\Validation\ValidationException $e) {
       throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
+      throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al obtener el autor', null, $e);
     }
@@ -102,7 +108,7 @@ class AuthorController extends Controller
       ]);
 
       if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
+        throw new ValidationException($validator);
       }
 
       if (Author::alreadyExists($request->input('name'), $request->input('lastname'))) {
@@ -114,6 +120,9 @@ class AuthorController extends Controller
       return $this->successResponse($author, 'Autor creado exitosamente', null, 201);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
       throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al crear el autor', null, $e);
@@ -131,7 +140,7 @@ class AuthorController extends Controller
       ]);
 
       if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
+        throw new ValidationException($validator);
       }
 
       $author = Author::find($request->input('id'));
@@ -149,6 +158,9 @@ class AuthorController extends Controller
       return $this->successResponse($author, 'Autor actualizado exitosamente');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
       throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al actualizar el autor', null, $e);

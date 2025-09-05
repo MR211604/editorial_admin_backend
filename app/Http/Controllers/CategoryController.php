@@ -40,6 +40,9 @@ class CategoryController extends Controller
 
     } catch (\Illuminate\Validation\ValidationException $e) {
       throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
     } catch (Exception $e) {
       throw new ServerErrorException('Error al obtener las categorías', null, $e);
     }
@@ -52,6 +55,9 @@ class CategoryController extends Controller
       return $this->successResponse($category, 'Categoría obtenida correctamente');
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
       throw new \App\Exceptions\NotFoundException('Categoría no encontrada');
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
     } catch (Exception $e) {
       throw new ServerErrorException('Error al obtener la categoría', null, $e);
     }
@@ -70,7 +76,7 @@ class CategoryController extends Controller
       ]);
 
       if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
+        throw new ValidationException($validator);
       }
 
       if (Category::alreadyExists($request->input('title'))) {
@@ -90,6 +96,9 @@ class CategoryController extends Controller
       return $this->successResponse($category, 'Categoría creada correctamente');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
       throw $e;
     } catch (Exception $e) {
       throw new ServerErrorException('Error al crear la categoría', null, $e);
@@ -122,7 +131,7 @@ class CategoryController extends Controller
       ]);
 
       if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
+        throw new ValidationException($validator);
       }
 
       DB::transaction(function () use ($id, $request) {
@@ -166,6 +175,9 @@ class CategoryController extends Controller
       return $this->successResponse($updatedCategory, 'Categoría actualizada correctamente');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
       throw $e;
     } catch (Exception $e) {
       throw new ServerErrorException('Error al actualizar la categoría', null, $e);

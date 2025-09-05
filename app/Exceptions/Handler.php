@@ -60,7 +60,11 @@ class Handler extends ExceptionHandler
         }
 
         if ($exception instanceof ValidationException) {
-            return $this->validationResponse($exception->errors(), 'Datos inválidos');
+            // Compatibilidad de versiones: obtener errores desde el validador si no existe errors()
+            $errors = method_exists($exception, 'errors')
+                ? $exception->errors()
+                : (isset($exception->validator) ? $exception->validator->errors()->toArray() : null);
+            return $this->validationResponse($errors, 'Datos inválidos');
         }
 
         if ($exception instanceof ModelNotFoundException) {

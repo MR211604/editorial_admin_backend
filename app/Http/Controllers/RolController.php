@@ -27,7 +27,7 @@ class RolController extends Controller
             ]);
 
             if ($validator->fails()) {
-                throw ValidationException::withMessages($validator->errors()->toArray());
+                throw new ValidationException($validator);
             }
 
             $limit = $request->query('limit', 10);
@@ -49,6 +49,9 @@ class RolController extends Controller
             return $this->successResponse($data['roles'], 'Roles obtenidos exitosamente', $data['pagination']);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (\Exception $e) {
             throw new ServerErrorException('Error al obtener los roles', null, $e);

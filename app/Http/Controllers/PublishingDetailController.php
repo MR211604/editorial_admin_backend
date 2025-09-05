@@ -33,9 +33,9 @@ class PublishingDetailController extends Controller
         'publishing_id' => 'required|integer|exists:publishings,id',
       ]);
 
-      if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
-      }
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
 
       $data = $request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']);
 
@@ -60,9 +60,9 @@ class PublishingDetailController extends Controller
         'publishing_id' => 'required|integer|exists:publishings,id',
       ]);
 
-      if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
-      }
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
 
       $publishingDetail = PublishingDetail::find($id);
 

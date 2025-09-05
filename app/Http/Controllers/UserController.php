@@ -29,9 +29,9 @@ class UserController extends Controller
                 'rol_id' => 'integer'
             ]);
 
-            if ($validator->fails()) {
-                throw ValidationException::withMessages($validator->errors()->toArray());
-            }
+                if ($validator->fails()) {
+                    throw new ValidationException($validator);
+                }
 
             $limit = $request->query('limit', 10);
             $rol_id = $request->query('rol_id', null);
@@ -86,9 +86,9 @@ class UserController extends Controller
                 'rol_id' => 'required|integer|exists:rol,id'
             ]);
 
-            if ($validator->fails()) {
-                throw ValidationException::withMessages($validator->errors()->toArray());
-            }
+                if ($validator->fails()) {
+                    throw new ValidationException($validator);
+                }
 
             $user = User::create([
                 'name' => $request->input('name'),

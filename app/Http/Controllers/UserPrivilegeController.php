@@ -32,7 +32,7 @@ class UserPrivilegeController extends Controller
       ]);
 
       if ($validator->fails()) {
-        throw ValidationException::withMessages($validator->errors()->toArray());
+        throw new ValidationException($validator);
       }
       $limit = $request->query('limit', 10);
 
@@ -50,6 +50,9 @@ class UserPrivilegeController extends Controller
       return $this->successResponse($privileges->items(), 'Autorizaciones obtenidas exitosamente', $pagination);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
       throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al obtener las autorizaciones', null, $e);
@@ -70,6 +73,9 @@ class UserPrivilegeController extends Controller
       $privilege = UserPrivilege::findOrFail($id);
       return $this->successResponse($privilege, 'Privilegio obtenido exitosamente');
     } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
       throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al obtener el privilegio', null, $e);
