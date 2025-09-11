@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Http\Traits\ApiResponse;
 use Exception;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\ConflictException;
+use App\Exceptions\BadRequestException;
+use App\Exceptions\ServerErrorException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
@@ -34,8 +38,13 @@ class CategoryController extends Controller
 
       return $this->successResponse($categories, 'Categorías obtenidas correctamente');
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
     } catch (Exception $e) {
-      return $this->errorResponse('Error al obtener las categorías', 500, $e->getMessage());
+      throw new ServerErrorException('Error al obtener las categorías', null, $e);
     }
   }
 
@@ -44,8 +53,13 @@ class CategoryController extends Controller
     try {
       $category = Category::with(['detail'])->findOrFail($id);
       return $this->successResponse($category, 'Categoría obtenida correctamente');
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      throw new \App\Exceptions\NotFoundException('Categoría no encontrada');
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
     } catch (Exception $e) {
-      return $this->errorResponse('Error al obtener la categoría', 404, $e->getMessage());
+      throw new ServerErrorException('Error al obtener la categoría', null, $e);
     }
   }
 
@@ -62,11 +76,11 @@ class CategoryController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+        throw new ValidationException($validator);
       }
 
       if (Category::alreadyExists($request->input('title'))) {
-        return $this->errorResponse('La categoría ya existe', 409);
+        throw new ConflictException('La categoría ya existe');
       }
 
       $category = Category::create([
@@ -81,8 +95,13 @@ class CategoryController extends Controller
 
       return $this->successResponse($category, 'Categoría creada correctamente');
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
     } catch (Exception $e) {
-      return $this->errorResponse('Error al crear la categoría ' . $e->getMessage(), 500);
+      throw new ServerErrorException('Error al crear la categoría', null, $e);
     }
 
   }
@@ -92,7 +111,7 @@ class CategoryController extends Controller
     try {
 
       if (empty($id) || !is_numeric($id)) {
-        return $this->errorResponse('El numero de ID es requerido', 400);
+        throw new BadRequestException('El numero de ID es requerido');
       }
 
       $updatedCategory = Category::with(['detail'])->findOrFail($id);
@@ -112,7 +131,7 @@ class CategoryController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+        throw new ValidationException($validator);
       }
 
       DB::transaction(function () use ($id, $request) {
@@ -155,8 +174,13 @@ class CategoryController extends Controller
 
       return $this->successResponse($updatedCategory, 'Categoría actualizada correctamente');
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
     } catch (Exception $e) {
-      return $this->errorResponse('Error al actualizar la categoría', 500, $e->getMessage());
+      throw new ServerErrorException('Error al actualizar la categoría', null, $e);
     }
   }
 

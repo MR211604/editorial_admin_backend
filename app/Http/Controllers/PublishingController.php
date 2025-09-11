@@ -6,6 +6,10 @@ use App\Http\Traits\ApiResponse;
 use App\Http\Traits\SearchFilter;
 use DB;
 use Exception;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\BadRequestException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ServerErrorException;
 use Illuminate\Http\Request;
 use App\Publishing;
 use Illuminate\Support\Facades\Validator;
@@ -30,7 +34,7 @@ class PublishingController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+                throw new ValidationException($validator);
             }
 
             $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
@@ -74,8 +78,13 @@ class PublishingController extends Controller
 
             return $this->successResponse($publishings->items(), 'Publicaciones obtenidas correctamente', $pagination, 200);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
+            throw $e;
         } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener las publicaciones', 500);
+            throw new ServerErrorException('Error al obtener las publicaciones', null, $e);
         }
     }
 
@@ -83,19 +92,26 @@ class PublishingController extends Controller
     {
         try {
             if (empty($id) || !is_numeric($id)) {
-                return $this->errorResponse('El numero de ID es requerido', 400);
+                throw new BadRequestException('El numero de ID es requerido');
             }
 
             if (!Publishing::where('id', $id)->exists()) {
-                return $this->errorResponse('Publicación no encontrada', 404);
+                throw new NotFoundException('Publicación no encontrada');
             }
 
             $publishing = Publishing::with(['type', 'authors', 'details'])->findOrFail($id);
 
             return $this->successResponse($publishing, 'Publicación obtenida exitosamente');
 
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundException('Publicación no encontrada');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
+            throw $e;
         } catch (Exception $e) {
-            return $this->errorResponse('Error al obtener la publicación: ' . $e->getMessage(), 500);
+            throw new ServerErrorException('Error al obtener la publicación', null, $e);
         }
     }
 
@@ -110,7 +126,7 @@ class PublishingController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+                throw new ValidationException($validator);
             }
 
             $publishing = Publishing::create([
@@ -135,8 +151,13 @@ class PublishingController extends Controller
 
             return $this->successResponse($publishing, 'Publicacion creada exitosamente', null, 200);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
+            throw $e;
         } catch (Exception $e) {
-            return $this->errorResponse('Error al obtener la publicación: ' . $e->getMessage(), 500);
+            throw new ServerErrorException('Error al crear la publicación', null, $e);
         }
     }
 
@@ -146,7 +167,7 @@ class PublishingController extends Controller
         try {
 
             if (empty($id) || !is_numeric($id)) {
-                return $this->errorResponse('El numero de ID es requerido', 400);
+                throw new BadRequestException('El numero de ID es requerido');
             }
 
             $updatedPublishing = Publishing::with(['authors', 'category', 'type', 'details'])->findOrFail($id);
@@ -154,7 +175,7 @@ class PublishingController extends Controller
             //Operacion para los libros            
             if ($request->has('publishing_type') && $request->input('publishing_type') == 1) {
                 if (!Publishing::where('id', $id)->where('publishing_type', 1)->exists()) {
-                    return $this->errorResponse('Publicación no encontrada', 404);
+                    throw new NotFoundException('Publicación no encontrada');
                 }
 
                 $validator = Validator::make($request->all(), [
@@ -171,7 +192,7 @@ class PublishingController extends Controller
                 ]);
 
                 if ($validator->fails()) {
-                    return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+                    throw new ValidationException($validator);
                 }
 
                 DB::transaction(function () use ($id, $request) {
@@ -201,7 +222,7 @@ class PublishingController extends Controller
 
                 //Esta validacion asegura que la publicación sea del tipo revista
                 if (!Publishing::where('id', $id)->where('publishing_type', 2)->exists()) {
-                    return $this->errorResponse('Publicación no encontrada', 404);
+                    throw new NotFoundException('Publicación no encontrada');
                 }
 
                 $validator = Validator::make($request->all(), [
@@ -220,7 +241,7 @@ class PublishingController extends Controller
                 ]);
 
                 if ($validator->fails()) {
-                    return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+                    throw new ValidationException($validator);
                 }
 
                 // Usar transacción para asegurar integridad de datos
@@ -250,9 +271,14 @@ class PublishingController extends Controller
             return $this->successResponse($updatedPublishing, 'Publicación actualizada exitosamente', null, 200);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->errorResponse('Publicación no encontrada', 404);
+            throw new NotFoundException('Publicación no encontrada');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
+            throw $e;
         } catch (\Exception $e) {
-            return $this->errorResponse('Error al actualizar la publicación: ' . $e->getMessage(), 500);
+            throw new ServerErrorException('Error al actualizar la publicación', null, $e);
         }
     }
 

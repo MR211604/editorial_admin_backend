@@ -7,6 +7,8 @@ use App\Http\Traits\SearchFilter;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\ServerErrorException;
 
 class UserController extends Controller
 {
@@ -27,13 +29,9 @@ class UserController extends Controller
                 'rol_id' => 'integer'
             ]);
 
-            if ($validator->fails()) {
-                return $this->errorResponse(
-                    'Parámetros inválidos',
-                    422,
-                    $validator->errors()
-                );
-            }
+                if ($validator->fails()) {
+                    throw new ValidationException($validator);
+                }
 
             $limit = $request->query('limit', 10);
             $rol_id = $request->query('rol_id', null);
@@ -72,11 +70,10 @@ class UserController extends Controller
                 $pagination
             );
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return $this->errorResponse(
-                'Error al obtener los usuarios',
-                500
-            );
+            throw new ServerErrorException('Error al obtener los usuarios', null, $e);
         }
     }
 
@@ -89,13 +86,9 @@ class UserController extends Controller
                 'rol_id' => 'required|integer|exists:rol,id'
             ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Parámetros inválidos',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+                if ($validator->fails()) {
+                    throw new ValidationException($validator);
+                }
 
             $user = User::create([
                 'name' => $request->input('name'),
@@ -112,12 +105,10 @@ class UserController extends Controller
                 'data' => $user
             ], 201);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Error al crear el usuario',
-                'error' => $e->getMessage()
-            ], 500);
+            throw new ServerErrorException('Error al crear el usuario', null, $e);
         }
     }
 }

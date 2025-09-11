@@ -8,6 +8,10 @@ use App\Http\Traits\SearchFilter;
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\ConflictException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ServerErrorException;
 
 class AuthorController extends Controller
 {
@@ -29,7 +33,7 @@ class AuthorController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+        throw new ValidationException($validator);
       }
 
       $limit = $request->query('limit', 10);
@@ -64,8 +68,13 @@ class AuthorController extends Controller
 
       return $this->successResponse($authors->items(), 'Autores obtenidos exitosamente', $pagination);
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error al obtener los autores', 500);
+      throw new ServerErrorException('Error al obtener los autores', null, $e);
     }
   }
 
@@ -75,12 +84,17 @@ class AuthorController extends Controller
       $author = Author::find($id);
 
       if (!$author) {
-        return $this->errorResponse('Autor no encontrado', 404);
+        throw new NotFoundException('Autor no encontrado');
       }
 
       return $this->successResponse($author, 'Autor obtenido exitosamente');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error al obtener el autor', 500);
+      throw new ServerErrorException('Error al obtener el autor', null, $e);
     }
   }
 
@@ -94,19 +108,24 @@ class AuthorController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+        throw new ValidationException($validator);
       }
 
       if (Author::alreadyExists($request->input('name'), $request->input('lastname'))) {
-        return $this->errorResponse('El autor enviado ya existe', 409);
+        throw new ConflictException('El autor enviado ya existe');
       }
 
       $author = Author::create($request->only('name', 'lastname'));
 
-      return $this->successResponse($author, 'Autor creado exitosamente', 201);
+      return $this->successResponse($author, 'Autor creado exitosamente', null, 201);
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error al crear el autor: ' . $e->getMessage(), 500);
+      throw new ServerErrorException('Error al crear el autor', null, $e);
     }
   }
 
@@ -121,25 +140,30 @@ class AuthorController extends Controller
       ]);
 
       if ($validator->fails()) {
-        return $this->errorResponse('Parámetros inválidos', 422, $validator->errors());
+        throw new ValidationException($validator);
       }
 
       $author = Author::find($request->input('id'));
 
       if (!$author) {
-        return $this->errorResponse('Autor no encontrado', 404);
+        throw new NotFoundException('Autor no encontrado');
       }
 
       if (Author::alreadyExists($request->input('name'), $request->input('lastname'))) {
-        return $this->errorResponse('El autor enviado ya existe', 409);
+        throw new ConflictException('El autor enviado ya existe');
       }
 
       $author->update($request->only('name', 'lastname'));
 
       return $this->successResponse($author, 'Autor actualizado exitosamente');
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las ApiException se manejen en el Handler
+      throw $e;
     } catch (\Exception $e) {
-      return $this->errorResponse('Error al actualizar el autor: ' . $e->getMessage(), 500);
+      throw new ServerErrorException('Error al actualizar el autor', null, $e);
     }
   }
 }
