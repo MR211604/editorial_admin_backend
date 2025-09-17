@@ -29,9 +29,9 @@ class UserController extends Controller
                 'rol_id' => 'integer'
             ]);
 
-                if ($validator->fails()) {
-                    throw new ValidationException($validator);
-                }
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
 
             $limit = $request->query('limit', 10);
             $rol_id = $request->query('rol_id', null);
@@ -41,11 +41,14 @@ class UserController extends Controller
                 ->when($rol_id, function ($query) use ($rol_id) {
                     return $query->where('rol_id', $rol_id);
                 });
-            $allowedSortFields = ['id', 'name', 'rol_id'];
 
             if ($search) {
-                $query->where('name', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
             }
+
+            $allowedSortFields = ['id', 'name', 'token'];
 
             if ($request->has('sort')) {
                 $this->search($request, $query, $allowedSortFields);
@@ -70,7 +73,7 @@ class UserController extends Controller
                 $pagination
             );
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
             throw new ServerErrorException('Error al obtener los usuarios', null, $e);
@@ -86,9 +89,9 @@ class UserController extends Controller
                 'rol_id' => 'required|integer|exists:rol,id'
             ]);
 
-                if ($validator->fails()) {
-                    throw new ValidationException($validator);
-                }
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
 
             $user = User::create([
                 'name' => $request->input('name'),

@@ -44,7 +44,7 @@ class AuthorController extends Controller
       if ($search) {
         $query->where(function ($q) use ($search) {
           $q->where('name', 'like', '%' . $search . '%')
-            ->orWhere('lastname', 'like', '%' . $search . '%');            
+            ->orWhere('lastname', 'like', '%' . $search . '%');
         });
       }
 
@@ -68,7 +68,7 @@ class AuthorController extends Controller
 
       return $this->successResponse($authors->items(), 'Autores obtenidos exitosamente', $pagination);
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
       throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler
