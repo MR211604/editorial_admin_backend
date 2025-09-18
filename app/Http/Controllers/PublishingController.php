@@ -183,7 +183,11 @@ class PublishingController extends Controller
                     'title' => 'required|string|max:255',
                     'pages' => 'required|integer|min:1',
                     'publish_date' => 'required|date',
-                    'publish_code' => 'required|integer|min:1',
+                    'publish_code' => [
+                        'required',
+                        'string',
+                        'regex:/^\d{3}-\d{2}-\d{4}-\d{3}-\d$/'
+                    ],
                     'category_id' => 'nullable|exists:categories,id',
                     'is_new_arrival' => 'boolean',
                     'URL' => 'nullable|string',
@@ -229,7 +233,11 @@ class PublishingController extends Controller
                     'title' => 'required|string|max:255',
                     'pages' => 'required|integer|min:1',
                     'publish_date' => 'required|date',
-                    'publish_code' => 'required|integer|min:1',
+                    'publish_code' => [
+                        'required',
+                        'string',
+                        'regex:/^\d{3}-\d{2}-\d{4}-\d{3}-\d$/'
+                    ],
                     'age' => 'nullable|integer|min:1',
                     'age_number' => 'nullable|integer|min:1',
                     'volume' => 'nullable|integer|min:1',
