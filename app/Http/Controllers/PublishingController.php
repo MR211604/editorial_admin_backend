@@ -290,4 +290,26 @@ class PublishingController extends Controller
         }
     }
 
+     //Resumen para dashboard: totales de libros y revistas.
+     //Endpoint consumido por el frontend /api/dashboard/summary.
+
+        public function summary()
+    {
+        try {
+            $row = DB::table('publishings')
+                ->selectRaw('SUM(CASE WHEN publishing_type = 1 THEN 1 ELSE 0 END) AS books')
+                ->selectRaw('SUM(CASE WHEN publishing_type = 2 THEN 1 ELSE 0 END) AS magazines')
+                ->first();
+
+            $data = [
+                'books' => isset($row->books) ? (int) $row->books : 0,
+                'magazines' => isset($row->magazines) ? (int) $row->magazines : 0,
+            ];
+
+            return $this->successResponse($data, 'Resumen del dashboard obtenido correctamente', null, 200);
+        } catch (\Exception $e) {
+            throw new ServerErrorException('Error al obtener el resumen del dashboard', null, $e);
+        }
+    }
+
 }

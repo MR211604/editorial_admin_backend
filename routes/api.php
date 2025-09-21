@@ -72,3 +72,8 @@ Route::group(['middleware' => ['api'], 'prefix' => 'publishingDetails'], functio
     Route::post('createPublishingDetail', 'PublishingDetailController@create');
     Route::post('updatePublishingDetail/{id?}', 'PublishingDetailController@update');
 });
+
+//   Retorna totales de libros y revistas consumido por el frontend del panel de control
+Route::group(['middleware' => ['api'], 'prefix' => 'dashboard'], function () {
+    Route::get('summary', 'PublishingController@summary');
+});
