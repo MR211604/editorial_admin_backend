@@ -34,8 +34,9 @@ Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
     Route::get('getPublishing/{id?}', 'PublishingController@find');
     Route::post('createPublishing', 'PublishingController@create');
     Route::post('updatePublishing/{id?}', 'PublishingController@update');
+    Route::post('updateStatus/{id?}', 'PublishingController@toggleStatus');
+    Route::get('summary', 'PublishingController@summary');
 });
-
 
 //Creando un grupo para los roles
 Route::group(['middleware' => ['api'], 'prefix' => 'rol'], function () {
@@ -71,9 +72,4 @@ Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
 Route::group(['middleware' => ['api'], 'prefix' => 'publishingDetails'], function () {
     Route::post('createPublishingDetail', 'PublishingDetailController@create');
     Route::post('updatePublishingDetail/{id?}', 'PublishingDetailController@update');
-});
-
-//   Retorna totales de libros y revistas consumido por el frontend del panel de control
-Route::group(['middleware' => ['api'], 'prefix' => 'dashboard'], function () {
-    Route::get('summary', 'PublishingController@summary');
 });

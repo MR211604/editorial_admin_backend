@@ -12,12 +12,13 @@ class Publishing extends Model
         'publish_date',
         'publish_code',
         'age',
-        'pages',        
+        'pages',
         'age_number',
         'volume',
         'is_new_arrival',
         'category_id',
         'publishing_type',
+        'is_archived',
         'URL'
     ];
 

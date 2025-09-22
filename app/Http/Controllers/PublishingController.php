@@ -40,9 +40,10 @@ class PublishingController extends Controller
             $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
             // $page = $request->query('page', 1);
             $limit = $request->query('limit', 10);
-            $publishing_type = $request->query('publishing_type', null);
+            $publishingType = $request->query('publishing_type', null);
             $search = $request->query('search', null);
             $category = $request->query('category', null);
+            $isArchived = $request->has('is_archived') ? (int) $request->query('is_archived') : null;
 
             $query = Publishing::with(['type', 'authors', 'details']);
 
@@ -50,12 +51,16 @@ class PublishingController extends Controller
                 $query->where('title', 'like', '%' . $search . '%');
             }
 
+            if ($isArchived !== null) {
+                $query->where('is_archived', $isArchived);
+            }
+
             if ($category) {
                 $query->where('category_id', $category);
             }
 
-            if ($publishing_type) {
-                $query->where('publishing_type', $publishing_type);
+            if ($publishingType) {
+                $query->where('publishing_type', $publishingType);
             }
 
             if ($request->has('sort')) {
@@ -78,12 +83,11 @@ class PublishingController extends Controller
 
             return $this->successResponse($publishings->items(), 'Publicaciones obtenidas correctamente', $pagination, 200);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             throw $e;
         } catch (\App\Exceptions\ApiException $e) {
-            // Dejar que las excepciones de API lleguen al Handler
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException('Error al obtener las publicaciones', null, $e);
         }
     }
@@ -290,24 +294,51 @@ class PublishingController extends Controller
         }
     }
 
-     //Resumen para dashboard: totales de libros y revistas.
-     //Endpoint consumido por el frontend /api/dashboard/summary.
-
-        public function summary()
+    //Actualizando el estado de la publicacion 
+    // 1 - Archivado
+    // 0 - No archivado
+    public function toggleStatus(Request $request, $id = null)
     {
         try {
-            $row = DB::table('publishings')
-                ->selectRaw('SUM(CASE WHEN publishing_type = 1 THEN 1 ELSE 0 END) AS books')
-                ->selectRaw('SUM(CASE WHEN publishing_type = 2 THEN 1 ELSE 0 END) AS magazines')
-                ->first();
+
+            if (empty($id) || !is_numeric($id)) {
+                throw new BadRequestException('El ID de publicación es requerido');
+            }
+
+            $validator = Validator::make($request->all(), [
+                'is_archived' => 'required|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $publishing = Publishing::findOrFail($id);
+            $updatedStatus = $request->input('is_archived');
+            $publishing->update(['is_archived' => $updatedStatus]);
+
+            $message = $updatedStatus ? 'Publicación archivada exitosamente' : 'Publicación reactivada exitosamente';
+
+            return $this->successResponse(null, $message, null, 200);
+
+        } catch (Exception $e) {
+            throw new ServerErrorException('Error al actualizar el estado de la publicación', null, $e);
+        }
+    }
+
+    public function summary()
+    {
+        try {
+            $booksCount = Publishing::where('publishing_type', 1)->count();
+            $magazinesCount = Publishing::where('publishing_type', 2)->count();
 
             $data = [
-                'books' => isset($row->books) ? (int) $row->books : 0,
-                'magazines' => isset($row->magazines) ? (int) $row->magazines : 0,
+                'books' => $booksCount,
+                'magazines' => $magazinesCount,
             ];
 
             return $this->successResponse($data, 'Resumen del dashboard obtenido correctamente', null, 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException('Error al obtener el resumen del dashboard', null, $e);
         }
     }
