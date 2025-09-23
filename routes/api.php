@@ -35,6 +35,7 @@ Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
     Route::post('createPublishing', 'PublishingController@create');
     Route::post('updatePublishing/{id?}', 'PublishingController@update');
     Route::post('updateStatus/{id?}', 'PublishingController@toggleStatus');
+    Route::post('deletePublishing/{id?}', 'PublishingController@delete');
     Route::get('summary', 'PublishingController@summary');
 });
 

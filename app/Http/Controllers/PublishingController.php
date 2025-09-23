@@ -343,4 +343,35 @@ class PublishingController extends Controller
         }
     }
 
+    public function delete($id = null)
+    {
+        try {
+            if (empty($id) || !is_numeric($id)) {
+                throw new BadRequestException('El ID de publicación es requerido');
+            }
+
+            $publishing = Publishing::findOrFail($id);
+
+            //Si el campo is_archived es 0, no se puede eliminar
+            if ($publishing->is_archived == 0) {
+                throw new BadRequestException('La publicación debe estar archivada para poder eliminarla');
+            }
+
+            DB::transaction(function () use ($publishing) {
+                $publishing->authors()->detach();
+                $publishing->details()->delete();
+                $publishing->delete();
+            });
+
+            return $this->successResponse(null, 'Publicación eliminada exitosamente', null, 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundException('Publicación no encontrada');
+        } catch (\App\Exceptions\ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new ServerErrorException('Error al eliminar la publicación', null, $e);
+        }
+    }
+
 }
