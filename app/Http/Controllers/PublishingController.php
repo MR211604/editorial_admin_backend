@@ -24,6 +24,82 @@ class PublishingController extends Controller
         $this->middleware('auth:api');
     }
 
+    private function deleteCoverImage($coverPath)
+    {
+        try {
+            if ($coverPath) {
+                $fullPath = public_path($coverPath);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
+            }
+        } catch (Exception $e) {
+            // Log del error pero no detener la ejecución
+            \Log::warning("No se pudo eliminar la imagen: {$coverPath}");
+        }
+    }
+
+    private function sanitizeFileName($name)
+    {
+        // Convertir a minúsculas
+        $name = mb_strtolower($name, 'UTF-8');
+
+        // Reemplazar caracteres especiales
+        $name = str_replace(
+            ['á', 'é', 'í', 'ó', 'ú', 'ñ', ' ', '/', '\\', '&'],
+            ['a', 'e', 'i', 'o', 'u', 'n', '_', '_', '_', 'y'],
+            $name
+        );
+
+        // Eliminar caracteres no permitidos
+        $name = preg_replace('/[^a-z0-9_-]/', '', $name);
+
+        // Limitar longitud
+        return substr($name, 0, 50);
+    }
+
+    private function storeCoverImage($file, $publishingType, $categoryId, $title)
+    {
+        try {
+            // Determinar tipo de publicación
+            $typeFolder = $publishingType == 1 ? 'libros' : 'revistas';
+
+            // Obtener nombre de categoría
+            $categoryFolder = 'sin_categoria';
+            if ($categoryId) {
+                $category = \App\Category::find($categoryId);
+                if ($category) {
+                    $categoryFolder = $this->sanitizeFileName($category->name);
+                }
+            }
+
+            // Sanitizar nombre de la publicación
+            $titleFolder = $this->sanitizeFileName($title);
+
+            // Generar nombre único para el archivo
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time() . '_' . uniqid() . '.' . $extension;
+
+            // Ruta completa: editorial_files/libros|revistas/categoria/titulo/imagen.jpg
+            $relativePath = "editorial_files/{$typeFolder}/{$categoryFolder}/{$titleFolder}";
+            $fullPath = public_path($relativePath);
+
+            // Crear directorio si no existe
+            if (!file_exists($fullPath)) {
+                mkdir($fullPath, 0755, true);
+            }
+
+            // Mover archivo
+            $file->move($fullPath, $fileName);
+
+            // Retornar ruta relativa para guardar en BD
+            return "{$relativePath}/{$fileName}";
+
+        } catch (Exception $e) {
+            throw new ServerErrorException('Error al almacenar la imagen', null, $e);
+        }
+    }
+
     public function index(Request $request)
     {
         try {
@@ -176,7 +252,7 @@ class PublishingController extends Controller
 
             $updatedPublishing = Publishing::with(['authors', 'category', 'type', 'details'])->findOrFail($id);
 
-            //Operacion para los libros            
+            //! Operacion para los libros
             if ($request->has('publishing_type') && $request->input('publishing_type') == 1) {
                 if (!Publishing::where('id', $id)->where('publishing_type', 1)->exists()) {
                     throw new NotFoundException('Publicación no encontrada');
@@ -197,6 +273,7 @@ class PublishingController extends Controller
                     'URL' => 'nullable|string',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
+                    'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 ]);
 
                 if ($validator->fails()) {
@@ -206,6 +283,21 @@ class PublishingController extends Controller
                 DB::transaction(function () use ($id, $request) {
                     // Buscar la publicación con algunas relaciones
                     $publishing = Publishing::with(['category', 'type', 'details'])->findOrFail($id);
+
+                    if ($request->hasFile('cover')) {
+                        // Eliminar imagen anterior si existe
+                        if ($publishing->cover) {
+                            $this->deleteCoverImage($publishing->cover);
+                        }
+                        $coverPath = $this->storeCoverImage(
+                            $request->file('cover'),
+                            $request->input('publishing_type'),
+                            $request->input('category_id'),
+                            $request->input('title')
+                        );
+
+                        $publishing->cover = $coverPath;
+                    }
 
                     // Actualizar atributos principales
                     $publishing->update($request->only([
@@ -225,7 +317,7 @@ class PublishingController extends Controller
 
             }
 
-            //Operacion para las revistas
+            //? Operacion para las revistas
             if ($request->has('publishing_type') && $request->input('publishing_type') == 2) {
 
                 //Esta validacion asegura que la publicación sea del tipo revista
@@ -250,6 +342,7 @@ class PublishingController extends Controller
                     'publishing_type' => 'required|integer|exists:publishing_types,id',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
+                    'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 ]);
 
                 if ($validator->fails()) {
@@ -260,6 +353,22 @@ class PublishingController extends Controller
                 DB::transaction(function () use ($id, $request) {
                     // Buscar la publicación con algunas relaciones
                     $publishing = Publishing::with(['category', 'type', 'details'])->findOrFail($id);
+
+                    if ($request->hasFile('cover')) {
+                        // Eliminar imagen anterior si existe
+                        if ($publishing->cover) {
+                            $this->deleteCoverImage($publishing->cover);
+                        }
+
+                        $coverPath = $this->storeCoverImage(
+                            $request->file('cover'),
+                            $request->input('publishing_type'),
+                            $request->input('category_id'),
+                            $request->input('title')
+                        );
+
+                        $publishing->cover = $coverPath;
+                    }
 
                     // Actualizar atributos principales
                     $publishing->update($request->only([
@@ -358,6 +467,11 @@ class PublishingController extends Controller
             }
 
             DB::transaction(function () use ($publishing) {
+
+                if ($publishing->cover) {
+                    $this->deleteCoverImage($publishing->cover);
+                }
+
                 $publishing->authors()->detach();
                 $publishing->details()->delete();
                 $publishing->delete();

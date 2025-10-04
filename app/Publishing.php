@@ -19,7 +19,8 @@ class Publishing extends Model
         'category_id',
         'publishing_type',
         'is_archived',
-        'URL'
+        'URL',
+        'cover'
     ];
 
     public $timestamps = false;
