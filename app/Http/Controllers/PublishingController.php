@@ -69,7 +69,7 @@ class PublishingController extends Controller
             if ($categoryId) {
                 $category = \App\Category::find($categoryId);
                 if ($category) {
-                    $categoryFolder = $this->sanitizeFileName($category->name);
+                    $categoryFolder = $this->sanitizeFileName($category->title);
                 }
             }
 
@@ -81,7 +81,7 @@ class PublishingController extends Controller
             $fileName = time() . '_' . uniqid() . '.' . $extension;
 
             // Ruta completa: editorial_files/libros|revistas/categoria/titulo/imagen.jpg
-            $relativePath = "editorial_files/{$typeFolder}/{$categoryFolder}/{$titleFolder}";
+            $relativePath = "editorial_files/{$typeFolder}/{$categoryFolder}";
             $fullPath = public_path($relativePath);
 
             // Crear directorio si no existe
@@ -273,7 +273,7 @@ class PublishingController extends Controller
                     'URL' => 'nullable|string',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
-                    'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                    'cover' => 'nullable',
                 ]);
 
                 if ($validator->fails()) {
@@ -342,7 +342,7 @@ class PublishingController extends Controller
                     'publishing_type' => 'required|integer|exists:publishing_types,id',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
-                    'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                    'cover' => 'nullable',
                 ]);
 
                 if ($validator->fails()) {

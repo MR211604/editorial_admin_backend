@@ -10,7 +10,7 @@ class Category extends Model
     protected $table = "categories";
     public $timestamps = false;
 
-    protected $fillable = ['title', 'description', 'main_category', 'state', 'is_featured', 'language_id', 'category_type'];
+    protected $fillable = ['id', 'title', 'description', 'main_category', 'state', 'is_featured', 'language_id', 'category_type'];
 
     public function detail()
     {
@@ -31,8 +31,9 @@ class Category extends Model
     {
         return $this->hasMany(self::class, 'id', 'main_category');
     }
-    
-    public function childrenRecursive() {
+
+    public function childrenRecursive()
+    {
         return $this->children()->with('childrenRecursive');
     }
 
