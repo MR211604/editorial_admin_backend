@@ -36,6 +36,13 @@ EOF
 
 # 4. Configurar directorio de trabajo y permisos
 WORKDIR /var/www/html
+
+# Clonar el repositorio (reemplaza con tu URL)
+RUN git clone https://github.com/MR211604/cms-udb-editorial . && \
+    composer install --no-dev --optimize-autoloader && \
+    cp .env.example .env && \
+    php artisan key:generate
+
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html \
     chown -R www-data:www-data /var/www/html/storage \
