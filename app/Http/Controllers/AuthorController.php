@@ -13,6 +13,11 @@ use App\Exceptions\ConflictException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ServerErrorException;
 
+/**
+ * @resource Authors
+ *
+ * Gestión de autores del sistema editorial.
+ */
 class AuthorController extends Controller
 {
 
@@ -22,9 +27,65 @@ class AuthorController extends Controller
   {
     $this->middleware('auth:api');
   }
-
+ /**
+     * Listar autores
+     *
+     * Devuelve un listado paginado de autores con opciones de búsqueda y ordenamiento.
+     *
+     * @group Authors
+     * @queryParam page integer Número de página a mostrar. Example: 1
+     * @queryParam limit integer Cantidad de resultados por página (mínimo 10). Example: 15
+     * @queryParam search string Termino a buscar en nombre o apellido. Example: García
+     * @queryParam sort string Campo de ordenamiento permitido (`id`, `name`, `lastname`), se puede acompañar de sufijo `:desc`. Example: name:asc
+     *
+     * @response {
+     *   "ok": true,
+     *   "message": "Autores obtenidos exitosamente",
+     *   "data": [
+     *     {
+     *       "id": 114,
+     *       "name": "asdasd",
+     *       "lastname": "asdasdssss"
+     *     },
+     *     {
+     *       "id": 113,
+     *       "name": "Dross",
+     *       "lastname": "Rotzank"
+     *     },
+     *     {
+     *       "id": 109,
+     *       "name": "Emilio",
+     *       "lastname": "Delgado Chavarría"
+     *     },
+     *     {
+     *       "id": 108,
+     *       "name": "Humberto",
+     *       "lastname": "Flores"
+     *     },
+     *     {
+     *       "id": 106,
+     *       "name": "René",
+     *       "lastname": "Mauricio Valdéz"
+     *     },
+     *     {
+     *       "id": 105,
+     *       "name": "Claudia",
+     *       "lastname": "Urbina"
+     *     }
+     *   ],
+     *   "pagination": {
+     *     "total": 114,
+     *     "current_page": 1,
+     *     "last_page": 12,
+     *     "per_page": "10",
+     *     "from": 1,
+     *     "to": 10
+     *   }
+     * }
+     */
   public function index(Request $request)
   {
+   
     try {
       $validator = Validator::make($request->all(), [
         'page' => 'integer|min:1',
@@ -77,9 +138,33 @@ class AuthorController extends Controller
       throw new ServerErrorException('Error al obtener los autores', null, $e);
     }
   }
-
+ /**
+     * Obtener autor
+     *
+     * Devuelve la información de un autor específico.
+     *
+     * @group Authors
+     * @urlParam id integer required Identificador del autor. Example: 5
+     *
+     * @response {
+     *  "ok": true,
+     *  "message": "Autor obtenido exitosamente",
+     *  "data": {
+     *      "id": 1,
+     *      "name": "Ana Cecilia equisde",
+     *      "lastname": "de Méndez"
+     *  },
+     *  "pagination": null
+     * }
+     * @response 404 {
+     *   "ok": false,
+     *   "error": "NotFoundException",
+     *   "message": "Autor no encontrado"
+     * }
+     */
   public function find($id)
   {
+   
     try {
       $author = Author::find($id);
 
@@ -97,7 +182,40 @@ class AuthorController extends Controller
       throw new ServerErrorException('Error al obtener el autor', null, $e);
     }
   }
-
+ /**
+     * Crear autor
+     *
+     * Registra un nuevo autor.
+     * > Body Esperado
+     *
+     * Body esperado:
+     * ```json
+     * {
+     *   "name": "Julio",
+     *   "lastname": "Cortázar"
+     * }
+     * ```
+     *  
+     * @group Authors
+     * @bodyParam name string required Nombre del autor. Example: Julio
+     * @bodyParam lastname string required Apellido del autor. Example: Cortázar
+     *
+     * @response {
+     *    "ok": true,
+     *    "message": "Autor creado exitosamente",
+     *    "data": {
+     *        "name": "Robert",
+     *        "lastname": "Martin",
+     *        "id": 115
+     *    },
+     *    "pagination": null
+     * }
+     * @response 409 {
+     *   "ok": false,
+     *   "error": "ConflictException",
+     *   "message": "El autor enviado ya existe"
+     * }
+     */
   public function create(Request $request)
   {
     try {
@@ -131,6 +249,42 @@ class AuthorController extends Controller
 
   public function update(Request $request)
   {
+    /**
+     * Actualizar autor
+     *
+     * Modifica los datos de un autor existente.
+     * > Body Esperado
+     *
+     * Body esperado
+     * ```json
+     * {
+     *   "id": 1,
+     *   "name": "Robert C.",
+     *   "lastname": "Martin"
+     * }
+     * ```
+     *
+     * @group Authors
+     * @bodyParam id integer required Identificador del autor. Example: 12
+     * @bodyParam name string required Nombre del autor. Example: Laura
+     * @bodyParam lastname string required Apellido del autor. Example: Esquivel
+     *
+     * @response {
+     *  "ok": true,
+     *  "message": "Autor actualizado exitosamente",
+     *  "data": {
+     *      "id": 1,
+     *      "name": "Robert C.",
+     *      "lastname": "Martin"
+     *  },
+     *  "pagination": null
+     * }
+     * @response 404 {
+     *   "ok": false,
+     *   "error": "NotFoundException",
+     *   "message": "Autor no encontrado"
+     * }
+     */
     try {
 
       $validator = Validator::make($request->all(), [
@@ -169,6 +323,19 @@ class AuthorController extends Controller
 
   public function delete($id)
     {
+        /**
+         * Eliminar autor
+         *
+         * Endpoint reservado para completar la eliminación de autores.
+         *
+         * @group Authors
+         * @urlParam id integer required Identificador del autor. Example: 8
+         *
+         * @response 501 {
+         *   "ok": false,
+         *   "message": "Función no implementada aún."
+         * }
+         */
         return $this->errorResponse('Función no implementada aún.', 501);
     }
 }
