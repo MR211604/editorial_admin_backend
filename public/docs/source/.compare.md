@@ -20,15 +20,23 @@ Welcome to the generated API reference.
 
 <!-- END_INFO -->
 
-#general
+#Auth
+
+Endpoints de autenticación (login, renovación de token y logout).
+Usa JWT en el header: `Authorization: Bearer {token}`.
 <!-- START_a925a8d22b3615f12fca79456d286859 -->
-## api/auth/login
+## Iniciar sesión
+
+Autentica con credenciales y devuelve un **JWT** (Bearer).
+> Este endpoint **no** requiere autenticación previa.
 
 > Example request:
 
 ```bash
 curl -X POST "http://localhost/api/auth/login" \
-    -H "Accept: application/json"
+    -H "Accept: application/json" \
+    -d "token"="eveniet" \
+        -d "password"="eveniet" 
 ```
 
 ```javascript
@@ -37,39 +45,10 @@ var settings = {
     "crossDomain": true,
     "url": "http://localhost/api/auth/login",
     "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`POST api/auth/login`
-
-
-<!-- END_a925a8d22b3615f12fca79456d286859 -->
-
-<!-- START_a72455bc9968f52ac7e1d8518d843eb6 -->
-## api/auth/renew
-
-> Example request:
-
-```bash
-curl -X GET -G "http://localhost/api/auth/renew" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/auth/renew",
-    "method": "GET",
+    "data": {
+        "token": "eveniet",
+        "password": "eveniet"
+    },
     "headers": {
         "accept": "application/json"
     }
@@ -83,31 +62,58 @@ $.ajax(settings).done(function (response) {
 > Example response:
 
 ```json
-null
+{
+    "ok": true,
+    "message": "Usuario conectado correctamente",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N.....",
+    "user": {
+        "id": 2,
+        "name": "testnameupdate",
+        "active": 1,
+        "join_date": "2025-06-29 19:42:59",
+        "last_login_date": "2025-10-23 10:34:31",
+        "rol_id": 2,
+        "token": "testnameupdate"
+    },
+    "first_login": null,
+    "last_login": null
+}
 ```
 
 ### HTTP Request
-`GET api/auth/renew`
+`POST api/auth/login`
 
+#### Parameters
 
-<!-- END_a72455bc9968f52ac7e1d8518d843eb6 -->
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    token | string |  required  | 
+    password | string |  required  | 
 
-<!-- START_19ff1b6f8ce19d3c444e9b518e8f7160 -->
-## api/auth/logout
+<!-- END_a925a8d22b3615f12fca79456d286859 -->
+
+<!-- START_a72455bc9968f52ac7e1d8518d843eb6 -->
+## Renovar token
+
+Recibe el **Bearer Token** actual y devuelve un **nuevo token** válido.
 
 > Example request:
 
 ```bash
-curl -X POST "http://localhost/api/auth/logout" \
-    -H "Accept: application/json"
+curl -X GET -G "http://localhost/api/auth/renew" \
+    -H "Accept: application/json" \
+    -d "token"="enim" 
 ```
 
 ```javascript
 var settings = {
     "async": true,
     "crossDomain": true,
-    "url": "http://localhost/api/auth/logout",
-    "method": "POST",
+    "url": "http://localhost/api/auth/renew",
+    "method": "GET",
+    "data": {
+        "token": "enim"
+    },
     "headers": {
         "accept": "application/json"
     }
@@ -118,13 +124,88 @@ $.ajax(settings).done(function (response) {
 });
 ```
 
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Token renovado correctamente",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N.....",
+    "user": {
+        "id": 2,
+        "name": "testnameupdate",
+        "active": 1,
+        "join_date": "2025-06-29 19:42:59",
+        "last_login_date": "2025-10-23 10:34:31",
+        "rol_id": 2,
+        "token": "testnameupdate"
+    }
+}
+```
+
+### HTTP Request
+`GET api/auth/renew`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    token | string |  required  | 
+
+<!-- END_a72455bc9968f52ac7e1d8518d843eb6 -->
+
+<!-- START_19ff1b6f8ce19d3c444e9b518e8f7160 -->
+## Cerrar sesión
+
+Invalida el **Bearer Token** actual.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/auth/logout" \
+    -H "Accept: application/json" \
+    -d "token"="earum" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/auth/logout",
+    "method": "POST",
+    "data": {
+        "token": "earum"
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "message": "Usuario desconectado correctamente"
+}
+```
 
 ### HTTP Request
 `POST api/auth/logout`
 
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    token | string |  required  | 
 
 <!-- END_19ff1b6f8ce19d3c444e9b518e8f7160 -->
 
+#general
 <!-- START_61b568955dfc112d52401a1ac60333a2 -->
 ## api/users/getUsers
 
