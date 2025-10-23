@@ -166,4 +166,9 @@ class AuthorController extends Controller
       throw new ServerErrorException('Error al actualizar el autor', null, $e);
     }
   }
+
+  public function delete($id)
+    {
+        return $this->errorResponse('Función no implementada aún.', 501);
+    }
 }

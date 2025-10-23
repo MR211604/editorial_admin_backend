@@ -58,4 +58,19 @@ class RolController extends Controller
         }
     }
 
+    public function create(Request $request)
+    {
+        return $this->errorResponse('Función no implementada aún.', 501);
+    }
+
+    public function update(Request $request, $id)
+    {
+        return $this->errorResponse('Función no implementada aún.', 501);
+    }
+
+    public function delete($id)
+    {
+        return $this->errorResponse('Función no implementada aún.', 501);
+    }
+
 }

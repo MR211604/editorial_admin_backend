@@ -81,4 +81,19 @@ class UserPrivilegeController extends Controller
       throw new ServerErrorException('Error al obtener el privilegio', null, $e);
     }
   }
+
+  public function create(Request $request)
+  {
+    return $this->errorResponse('Función no implementada aún.', 501);
+  }
+
+  public function update(Request $request)
+  {
+    return $this->errorResponse('Función no implementada aún.', 501);
+  }
+
+  public function delete($id)
+  {
+    return $this->errorResponse('Función no implementada aún.', 501);
+  }
 }
