@@ -205,6 +205,346 @@ Parameter | Type | Status | Description
 
 <!-- END_19ff1b6f8ce19d3c444e9b518e8f7160 -->
 
+#Authors
+
+Gestión de autores del sistema editorial.
+<!-- START_b9db63505163eb92403717250ed1745e -->
+## Listar autores
+
+Devuelve un listado paginado de autores con opciones de búsqueda y ordenamiento.
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/authors/getAuthors" \
+    -H "Accept: application/json" \
+    -d "page"="1687728440" \
+        -d "limit"="1687728442" \
+        -d "search"="repellendus" \
+        -d "sort"="repellendus" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/getAuthors",
+    "method": "GET",
+    "data": {
+        "page": 1687728440,
+        "limit": 1687728442,
+        "search": "repellendus",
+        "sort": "repellendus"
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autores obtenidos exitosamente",
+    "data": [
+        {
+            "id": 114,
+            "name": "asdasd",
+            "lastname": "asdasdssss"
+        },
+        {
+            "id": 113,
+            "name": "Dross",
+            "lastname": "Rotzank"
+        },
+        {
+            "id": 109,
+            "name": "Emilio",
+            "lastname": "Delgado Chavarría"
+        },
+        {
+            "id": 108,
+            "name": "Humberto",
+            "lastname": "Flores"
+        },
+        {
+            "id": 106,
+            "name": "René",
+            "lastname": "Mauricio Valdéz"
+        },
+        {
+            "id": 105,
+            "name": "Claudia",
+            "lastname": "Urbina"
+        }
+    ],
+    "pagination": {
+        "total": 114,
+        "current_page": 1,
+        "last_page": 12,
+        "per_page": "10",
+        "from": 1,
+        "to": 10
+    }
+}
+```
+
+### HTTP Request
+`GET api/authors/getAuthors`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    page | integer |  optional  | Minimum: `1`
+    limit | integer |  optional  | Minimum: `10`
+    search | string |  optional  | 
+    sort | string |  optional  | 
+
+<!-- END_b9db63505163eb92403717250ed1745e -->
+
+<!-- START_04ae12876e1e048741bb9d37b4ca3457 -->
+## Obtener autor
+
+Devuelve la información de un autor específico.
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/authors/getAuthor/{id}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/getAuthor/{id}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autor obtenido exitosamente",
+    "data": {
+        "id": 1,
+        "name": "Ana Cecilia equisde",
+        "lastname": "de Méndez"
+    },
+    "pagination": null
+}
+```
+
+### HTTP Request
+`GET api/authors/getAuthor/{id}`
+
+
+<!-- END_04ae12876e1e048741bb9d37b4ca3457 -->
+
+<!-- START_4b1b0caf286ea71c299b0389a6525a2c -->
+## Crear autor
+
+Registra un nuevo autor.
+> Body Esperado
+
+Body esperado:
+```json
+{
+  "name": "Julio",
+  "lastname": "Cortázar"
+}
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/authors/createAuthor" \
+    -H "Accept: application/json" \
+    -d "name"="enim" \
+        -d "lastname"="enim" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/createAuthor",
+    "method": "POST",
+    "data": {
+        "name": "enim",
+        "lastname": "enim"
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autor creado exitosamente",
+    "data": {
+        "name": "Robert",
+        "lastname": "Martin",
+        "id": 115
+    },
+    "pagination": null
+}
+```
+
+### HTTP Request
+`POST api/authors/createAuthor`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    name | string |  required  | Maximum: `255`
+    lastname | string |  required  | Maximum: `255`
+
+<!-- END_4b1b0caf286ea71c299b0389a6525a2c -->
+
+<!-- START_e26ff161ef208a2517bd182fa36d07ef -->
+## Actualizar autor
+
+Modifica los datos de un autor existente.
+> Body Esperado
+
+Body esperado
+```json
+{
+  "id": 1,
+  "name": "Robert C.",
+  "lastname": "Martin"
+}
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/authors/updateAuthor" \
+    -H "Accept: application/json" \
+    -d "id"="1" \
+        -d "name"="ab" \
+        -d "lastname"="ab" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/updateAuthor",
+    "method": "POST",
+    "data": {
+        "id": 1,
+        "name": "ab",
+        "lastname": "ab"
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autor actualizado exitosamente",
+    "data": {
+        "id": 12,
+        "name": "Laura",
+        "lastname": "Esquivel"
+    },
+    "pagination": null
+}
+```
+
+### HTTP Request
+`POST api/authors/updateAuthor`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    id | integer |  required  | Valid author id
+    name | string |  required  | Maximum: `255`
+    lastname | string |  required  | Maximum: `255`
+
+<!-- END_e26ff161ef208a2517bd182fa36d07ef -->
+
+<!-- START_2531cf2dd315bde2e0853bdd0a05eabb -->
+## Eliminar autor
+
+Endpoint reservado para completar la eliminación de autores.
+
+> Example request:
+
+```bash
+curl -X DELETE "http://localhost/api/authors/deleteAuthor/{id}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/deleteAuthor/{id}",
+    "method": "DELETE",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": false,
+    "message": "Función no implementada aún."
+}
+```
+
+### HTTP Request
+`DELETE api/authors/deleteAuthor/{id}`
+
+
+<!-- END_2531cf2dd315bde2e0853bdd0a05eabb -->
+
 #general
 <!-- START_61b568955dfc112d52401a1ac60333a2 -->
 ## api/users/getUsers
@@ -659,181 +999,6 @@ $.ajax(settings).done(function (response) {
 
 
 <!-- END_d765e5042c1d26a3a027d6aeda631bbd -->
-
-<!-- START_b9db63505163eb92403717250ed1745e -->
-## api/authors/getAuthors
-
-> Example request:
-
-```bash
-curl -X GET -G "http://localhost/api/authors/getAuthors" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/authors/getAuthors",
-    "method": "GET",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-> Example response:
-
-```json
-null
-```
-
-### HTTP Request
-`GET api/authors/getAuthors`
-
-
-<!-- END_b9db63505163eb92403717250ed1745e -->
-
-<!-- START_04ae12876e1e048741bb9d37b4ca3457 -->
-## api/authors/getAuthor/{id}
-
-> Example request:
-
-```bash
-curl -X GET -G "http://localhost/api/authors/getAuthor/{id}" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/authors/getAuthor/{id}",
-    "method": "GET",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-> Example response:
-
-```json
-null
-```
-
-### HTTP Request
-`GET api/authors/getAuthor/{id}`
-
-
-<!-- END_04ae12876e1e048741bb9d37b4ca3457 -->
-
-<!-- START_4b1b0caf286ea71c299b0389a6525a2c -->
-## api/authors/createAuthor
-
-> Example request:
-
-```bash
-curl -X POST "http://localhost/api/authors/createAuthor" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/authors/createAuthor",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`POST api/authors/createAuthor`
-
-
-<!-- END_4b1b0caf286ea71c299b0389a6525a2c -->
-
-<!-- START_e26ff161ef208a2517bd182fa36d07ef -->
-## api/authors/updateAuthor
-
-> Example request:
-
-```bash
-curl -X POST "http://localhost/api/authors/updateAuthor" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/authors/updateAuthor",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`POST api/authors/updateAuthor`
-
-
-<!-- END_e26ff161ef208a2517bd182fa36d07ef -->
-
-<!-- START_2531cf2dd315bde2e0853bdd0a05eabb -->
-## api/authors/deleteAuthor/{id}
-
-> Example request:
-
-```bash
-curl -X DELETE "http://localhost/api/authors/deleteAuthor/{id}" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/authors/deleteAuthor/{id}",
-    "method": "DELETE",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`DELETE api/authors/deleteAuthor/{id}`
-
-
-<!-- END_2531cf2dd315bde2e0853bdd0a05eabb -->
 
 <!-- START_dd0177d887ba52822ffb3d90a24e1a69 -->
 ## api/privileges/getPrivileges

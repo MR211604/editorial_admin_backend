@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 
 use App\Author;
+use App\Http\Requests\Author\AuthorIndexRequest;
+use App\Http\Requests\Author\AuthorStoreRequest;
+use App\Http\Requests\Author\AuthorUpdateRequest;
 use App\Http\Traits\SearchFilter;
-use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use App\Exceptions\ConflictException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ServerErrorException;
@@ -83,20 +83,9 @@ class AuthorController extends Controller
      *   }
      * }
      */
-  public function index(Request $request)
+  public function index(AuthorIndexRequest $request)
   {
-   
     try {
-      $validator = Validator::make($request->all(), [
-        'page' => 'integer|min:1',
-        'limit' => 'integer|min:10',
-        'search' => 'string|nullable'
-      ]);
-
-      if ($validator->fails()) {
-        throw new ValidationException($validator);
-      }
-
       $limit = $request->query('limit', 10);
       $search = $request->query('search', null);
 
@@ -129,8 +118,6 @@ class AuthorController extends Controller
 
       return $this->successResponse($authors->items(), 'Autores obtenidos exitosamente', $pagination);
 
-    } catch (ValidationException $e) {
-      throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler
       throw $e;
@@ -173,8 +160,6 @@ class AuthorController extends Controller
       }
 
       return $this->successResponse($author, 'Autor obtenido exitosamente');
-    } catch (\Illuminate\Validation\ValidationException $e) {
-      throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler
       throw $e;
@@ -182,53 +167,43 @@ class AuthorController extends Controller
       throw new ServerErrorException('Error al obtener el autor', null, $e);
     }
   }
- /**
-     * Crear autor
-     *
-     * Registra un nuevo autor.
+  /**
+   * Crear autor
+   *
+   * Registra un nuevo autor.
      * > Body Esperado
-     *
-     * Body esperado:
-     * ```json
-     * {
-     *   "name": "Julio",
-     *   "lastname": "Cortázar"
-     * }
-     * ```
-     *  
+   *
+   * Body esperado:
+   * ```json
+   * {
+   *   "name": "Julio",
+   *   "lastname": "Cortázar"
+   * }
+   * ```
+   *
      * @group Authors
      * @bodyParam name string required Nombre del autor. Example: Julio
      * @bodyParam lastname string required Apellido del autor. Example: Cortázar
      *
      * @response {
-     *    "ok": true,
-     *    "message": "Autor creado exitosamente",
-     *    "data": {
-     *        "name": "Robert",
+   *    "ok": true,
+   *    "message": "Autor creado exitosamente",
+   *    "data": {
+   *        "name": "Robert",
      *        "lastname": "Martin",
      *        "id": 115
-     *    },
-     *    "pagination": null
-     * }
-     * @response 409 {
-     *   "ok": false,
-     *   "error": "ConflictException",
-     *   "message": "El autor enviado ya existe"
-     * }
-     */
-  public function create(Request $request)
+   *    },
+   *    "pagination": null
+   * }
+   * @response 409 {
+   *   "ok": false,
+   *   "error": "ConflictException",
+   *   "message": "El autor enviado ya existe"
+   * }
+   */
+  public function create(AuthorStoreRequest $request)
   {
     try {
-
-      $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255',
-        'lastname' => 'required|string|max:255',
-      ]);
-
-      if ($validator->fails()) {
-        throw new ValidationException($validator);
-      }
-
       if (Author::alreadyExists($request->input('name'), $request->input('lastname'))) {
         throw new ConflictException('El autor enviado ya existe');
       }
@@ -237,8 +212,6 @@ class AuthorController extends Controller
 
       return $this->successResponse($author, 'Autor creado exitosamente', null, 201);
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-      throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler
       throw $e;
@@ -246,13 +219,10 @@ class AuthorController extends Controller
       throw new ServerErrorException('Error al crear el autor', null, $e);
     }
   }
-
-  public function update(Request $request)
-  {
-    /**
-     * Actualizar autor
-     *
-     * Modifica los datos de un autor existente.
+  /**
+   * Actualizar autor
+   *
+   * Modifica los datos de un autor existente.
      * > Body Esperado
      *
      * Body esperado
@@ -263,40 +233,40 @@ class AuthorController extends Controller
      *   "lastname": "Martin"
      * }
      * ```
-     *
-     * @group Authors
-     * @bodyParam id integer required Identificador del autor. Example: 12
-     * @bodyParam name string required Nombre del autor. Example: Laura
-     * @bodyParam lastname string required Apellido del autor. Example: Esquivel
-     *
-     * @response {
-     *  "ok": true,
-     *  "message": "Autor actualizado exitosamente",
-     *  "data": {
-     *      "id": 1,
-     *      "name": "Robert C.",
-     *      "lastname": "Martin"
-     *  },
-     *  "pagination": null
-     * }
-     * @response 404 {
-     *   "ok": false,
-     *   "error": "NotFoundException",
-     *   "message": "Autor no encontrado"
-     * }
-     */
+   *
+   * @group Authors
+   * @bodyParam id integer required Identificador del autor. Example: 12
+   * @bodyParam name string required Nombre del autor. Example: Laura
+   * @bodyParam lastname string required Apellido del autor. Example: Esquivel
+   *
+   * Body esperado:
+   * ```json
+   * {
+   *   "id": 12,
+   *   "name": "Laura",
+   *   "lastname": "Esquivel"
+   * }
+   * ```
+   *
+   * @response {
+   *  "ok": true,
+   *  "message": "Autor actualizado exitosamente",
+   *  "data": {
+   *      "id": 12,
+   *      "name": "Laura",
+   *      "lastname": "Esquivel"
+   *  },
+   *  "pagination": null
+   * }
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "NotFoundException",
+   *   "message": "Autor no encontrado"
+   * }
+   */
+  public function update(AuthorUpdateRequest $request)
+  {
     try {
-
-      $validator = Validator::make($request->all(), [
-        'id' => 'required|integer|exists:authors,id',
-        'name' => 'required|string|max:255',
-        'lastname' => 'required|string|max:255',
-      ]);
-
-      if ($validator->fails()) {
-        throw new ValidationException($validator);
-      }
-
       $author = Author::find($request->input('id'));
 
       if (!$author) {
@@ -311,8 +281,6 @@ class AuthorController extends Controller
 
       return $this->successResponse($author, 'Autor actualizado exitosamente');
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-      throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler
       throw $e;
@@ -320,10 +288,7 @@ class AuthorController extends Controller
       throw new ServerErrorException('Error al actualizar el autor', null, $e);
     }
   }
-
-  public function delete($id)
-    {
-        /**
+/**
          * Eliminar autor
          *
          * Endpoint reservado para completar la eliminación de autores.
@@ -331,11 +296,14 @@ class AuthorController extends Controller
          * @group Authors
          * @urlParam id integer required Identificador del autor. Example: 8
          *
-         * @response 501 {
+         * @response {
          *   "ok": false,
          *   "message": "Función no implementada aún."
          * }
          */
+  public function delete($id)
+    {
+        
         return $this->errorResponse('Función no implementada aún.', 501);
     }
 }
