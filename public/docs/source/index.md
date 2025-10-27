@@ -545,6 +545,600 @@ $.ajax(settings).done(function (response) {
 
 <!-- END_2531cf2dd315bde2e0853bdd0a05eabb -->
 
+#Publicaciones
+
+Endpoints para gestionar publicaciones (libros, revistas y otros materiales).
+<!-- START_f32197e71cb96cfd48b93667b5eedf8c -->
+## Obtener lista de publicaciones.
+
+Devuelve una lista paginada de publicaciones con opciones de filtrado por
+tipo, categoría y término de búsqueda, así como ordenamiento dinámico.
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/getPublishings" \
+    -H "Accept: application/json" \
+    -d "page"="1075363769" \
+        -d "limit"="1075363773" \
+        -d "publishing_type"="96761" \
+        -d "category"="96761" \
+        -d "search"="et" \
+        -d "sort"="et" \
+        -d "is_archived"="1" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/getPublishings",
+    "method": "GET",
+    "data": {
+        "page": 1075363769,
+        "limit": 1075363773,
+        "publishing_type": 96761,
+        "category": 96761,
+        "search": "et",
+        "sort": "et",
+        "is_archived": "1"
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicaciones obtenidas correctamente",
+    "data": [
+        {
+            "id": 272,
+            "title": "Luna de pluton",
+            "cover": null,
+            "age": null,
+            "volume": null,
+            "volume_date": null,
+            "publish_code": "2112313333",
+            "is_new_arrival": 1,
+            "publish_date": "2023-02-05",
+            "state": null,
+            "publisher": null,
+            "stock": null,
+            "author_id": null,
+            "language_id": null,
+            "category_id": 8,
+            "publishing_type": 1,
+            "age_number": null,
+            "pages": 50,
+            "URL": "milibrolunadepluton",
+            "is_archived": 0,
+            "type": {
+                "id": 1,
+                "name": "Libro",
+                "description": "Publicacion de tipo libro, contiene autor"
+            },
+            "authors": [
+                {
+                    "id": 113,
+                    "name": "Dross",
+                    "lastname": "Rotzank",
+                    "pivot": {
+                        "publishing_id": 272,
+                        "author_id": 113
+                    }
+                }
+            ],
+            "details": []
+        }
+    ],
+    "pagination": {
+        "total": 25,
+        "current_page": 1,
+        "last_page": 3,
+        "per_page": 10,
+        "from": 1,
+        "to": 10
+    }
+}
+```
+
+### HTTP Request
+`GET api/publishings/getPublishings`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    page | integer |  optional  | Minimum: `1`
+    limit | integer |  optional  | Minimum: `10`
+    publishing_type | integer |  optional  | 
+    category | integer |  optional  | 
+    search | string |  optional  | 
+    sort | string |  optional  | 
+    is_archived | string |  optional  | `0` or `1`
+
+<!-- END_f32197e71cb96cfd48b93667b5eedf8c -->
+
+<!-- START_ad89b3f28c1bdbc089c08760b57e4f29 -->
+## Obtener una publicación por ID.
+
+Recupera la información completa de una publicación específica, incluyendo
+su tipo, autores y detalles asociados.
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/getPublishing/{id?}" \
+    -H "Accept: application/json" \
+    -d "id"="6" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/getPublishing/{id?}",
+    "method": "GET",
+    "data": {
+        "id": 6
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación obtenida exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Manual de laboratorio, Instalaciones de climatización",
+        "cover": null,
+        "age": null,
+        "volume": null,
+        "volume_date": null,
+        "publish_code": null,
+        "is_new_arrival": 0,
+        "publish_date": null,
+        "state": 0,
+        "publisher": "Editorial Universidad Don Bosco",
+        "stock": 62,
+        "author_id": null,
+        "language_id": 1,
+        "category_id": null,
+        "publishing_type": 3,
+        "age_number": null,
+        "pages": null,
+        "URL": null,
+        "is_archived": 0,
+        "type": {
+            "id": 3,
+            "name": "Manual",
+            "description": "Publicacion de tipo manual, contiene categoria"
+        },
+        "authors": [],
+        "details": []
+    },
+    "pagination": null
+}
+```
+
+### HTTP Request
+`GET api/publishings/getPublishing/{id?}`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    id | integer |  required  | Valid publishing id
+
+<!-- END_ad89b3f28c1bdbc089c08760b57e4f29 -->
+
+<!-- START_bd07c46bcd1ea465d2b325edab2a8edf -->
+## Crear una nueva publicación.
+
+Registra una publicación con datos básicos y la asocia a un tipo y, de ser
+necesario, a una categoría.
+
+Cuerpo JSON esperado:
+```json
+{
+  "title": "Introducción a Laravel",
+  "URL": "https://example.com/laravel",
+  "category_id": 4,
+  "publishing_type": 1
+}
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/createPublishing" \
+    -H "Accept: application/json" \
+    -d "title"="omnis" \
+        -d "URL"="omnis" \
+        -d "category_id"="3828763" \
+        -d "publishing_type"="3828763" \
+        -d "is_new_arrival"="1" \
+        -d "is_archived"="1" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/createPublishing",
+    "method": "POST",
+    "data": {
+        "title": "omnis",
+        "URL": "omnis",
+        "category_id": 3828763,
+        "publishing_type": 3828763,
+        "is_new_arrival": true,
+        "is_archived": true
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicacion creada exitosamente",
+    "data": {
+        "title": "Nueva Revista1",
+        "URL": "https:\/\/revistas\/1",
+        "category_id": 4,
+        "age": null,
+        "volume": null,
+        "publish_code": null,
+        "is_new_arrival": 0,
+        "publish_date": null,
+        "publishing_type": 1,
+        "age_number": null,
+        "pages": null,
+        "id": 275
+    },
+    "pagination": null
+}
+```
+
+### HTTP Request
+`POST api/publishings/createPublishing`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    title | string |  required  | Maximum: `255`
+    URL | string |  optional  | 
+    category_id | integer |  optional  | Valid category id
+    publishing_type | integer |  required  | Valid publishing_type id
+    is_new_arrival | boolean |  optional  | 
+    is_archived | boolean |  optional  | 
+
+<!-- END_bd07c46bcd1ea465d2b325edab2a8edf -->
+
+<!-- START_ef93a34472cbbf4adc14b6f2833ce65d -->
+## Actualizar una publicación existente.
+
+Permite modificar los datos de una publicación. Las reglas de validación
+varían según el tipo de publicación (`publishing_type`). Para libros (1)
+y revistas (2) se requieren campos específicos, y siempre se puede
+sincronizar la relación con autores.
+
+Cuerpo JSON esperado (libro):
+```json
+{
+ "publishing_type": 1,
+ "title": "Clean Architecture",
+  "pages":"15",
+  "publish_date": "2020-05-10",
+  "publish_code": 123456,
+  "category_id": {{category_id}},
+  "is_new_arrival": true,
+  "URL": "https://mi.biblio/libros/clean-architecture",
+  "authors": [1,2]
+}
+```
+
+Cuerpo JSON esperado (revista):
+```json
+{
+  "publishing_type": 2,
+  "title": "Revista Tech",
+  "pages": 48,
+  "publish_date": "2024-08-01",
+  "publish_code": 551,
+  "age": 12,
+  "age_number": 4,
+  "volume": 3,
+  "is_new_arrival": false,
+  "category_id": 5,
+  "authors": [7]
+}
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/updatePublishing/{id?}" \
+    -H "Accept: application/json" \
+    -d "id"="766548798" \
+        -d "publishing_type"="766548798" \
+        -d "category_id"="766548798" \
+        -d "is_new_arrival"="1" \
+        -d "URL"="recusandae" \
+        -d "authors"="recusandae" \
+        -d "cover"="recusandae" \
+        -d "authors.0"="766548798" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/updatePublishing/{id?}",
+    "method": "POST",
+    "data": {
+        "id": 766548798,
+        "publishing_type": 766548798,
+        "category_id": 766548798,
+        "is_new_arrival": true,
+        "URL": "recusandae",
+        "authors": "recusandae",
+        "cover": "recusandae",
+        "authors.0": 766548798
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación actualizada exitosamente",
+    "data": {
+        "id": 276,
+        "title": "Clean Architecture",
+        "cover": null,
+        "age": null,
+        "volume": null,
+        "volume_date": null,
+        "publish_code": 123456,
+        "is_new_arrival": 1,
+        "publish_date": "2020-05-10",
+        "state": null,
+        "publisher": null,
+        "stock": null,
+        "author_id": null,
+        "language_id": null,
+        "category_id": 1,
+        "publishing_type": 1,
+        "age_number": null,
+        "pages": 15,
+        "URL": "https:\/\/mi.biblio\/libros\/clean-architecture",
+        "is_archived": 0,
+        "authors": [],
+        "category": {
+            "id": 1,
+            "title": "Cientifica",
+            "description": "Categoria de libros cientificos",
+            "main_category": null,
+            "state": 0,
+            "is_featured": 0,
+            "language_id": 1,
+            "category_type": 1
+        },
+        "type": {
+            "id": 1,
+            "name": "Libro",
+            "description": "Publicacion de tipo libro, contiene autor"
+        },
+        "details": []
+    },
+    "pagination": null
+}
+```
+
+### HTTP Request
+`POST api/publishings/updatePublishing/{id?}`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    id | integer |  required  | Valid publishing id
+    publishing_type | integer |  required  | Valid publishing_type id
+    category_id | integer |  optional  | Valid category id
+    is_new_arrival | boolean |  optional  | 
+    URL | string |  optional  | 
+    authors | array |  optional  | Must be an array
+    cover | string |  optional  | 
+    authors.0 | integer |  optional  | Valid author id
+
+<!-- END_ef93a34472cbbf4adc14b6f2833ce65d -->
+
+<!-- START_4f71d50134a0a4c178582dc2fc2aa3e5 -->
+## Cambiar estado de archivo
+
+Marca una publicación como archivada o activa.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/updateStatus/{id?}" \
+    -H "Accept: application/json" \
+    -d "is_archived"="aut" 
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/updateStatus/{id?}",
+    "method": "POST",
+    "data": {
+        "is_archived": "aut"
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación archivada exitosamente",
+    "data": null,
+    "pagination": null
+}
+```
+
+### HTTP Request
+`POST api/publishings/updateStatus/{id?}`
+
+#### Parameters
+
+Parameter | Type | Status | Description
+--------- | ------- | ------- | ------- | -----------
+    is_archived | string |  required  | 
+
+<!-- END_4f71d50134a0a4c178582dc2fc2aa3e5 -->
+
+<!-- START_2ebc19a9c467323e08aee4aeb2bceeef -->
+## Eliminar publicación
+
+Elimina definitivamente una publicación archivada (y sus relaciones).
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/deletePublishing/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/deletePublishing/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación eliminada exitosamente",
+    "data": null,
+    "pagination": null
+}
+```
+
+### HTTP Request
+`POST api/publishings/deletePublishing/{id?}`
+
+
+<!-- END_2ebc19a9c467323e08aee4aeb2bceeef -->
+
+<!-- START_5d4088a4940540ba2e40f3f61016e478 -->
+## Resumen de publicaciones
+
+Devuelve estadísticas básicas para el dashboard (cantidad de libros y revistas).
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/summary" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/summary",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Resumen del dashboard obtenido correctamente",
+    "data": {
+        "books": 150,
+        "magazines": 61
+    },
+    "pagination": null
+}
+```
+
+### HTTP Request
+`GET api/publishings/summary`
+
+
+<!-- END_5d4088a4940540ba2e40f3f61016e478 -->
+
 #general
 <!-- START_61b568955dfc112d52401a1ac60333a2 -->
 ## api/users/getUsers
@@ -616,252 +1210,6 @@ $.ajax(settings).done(function (response) {
 
 
 <!-- END_bdad24daa8aa8effe5bff98edf583f1f -->
-
-<!-- START_f32197e71cb96cfd48b93667b5eedf8c -->
-## api/publishings/getPublishings
-
-> Example request:
-
-```bash
-curl -X GET -G "http://localhost/api/publishings/getPublishings" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/publishings/getPublishings",
-    "method": "GET",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-> Example response:
-
-```json
-null
-```
-
-### HTTP Request
-`GET api/publishings/getPublishings`
-
-
-<!-- END_f32197e71cb96cfd48b93667b5eedf8c -->
-
-<!-- START_ad89b3f28c1bdbc089c08760b57e4f29 -->
-## api/publishings/getPublishing/{id?}
-
-> Example request:
-
-```bash
-curl -X GET -G "http://localhost/api/publishings/getPublishing/{id?}" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/publishings/getPublishing/{id?}",
-    "method": "GET",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-> Example response:
-
-```json
-null
-```
-
-### HTTP Request
-`GET api/publishings/getPublishing/{id?}`
-
-
-<!-- END_ad89b3f28c1bdbc089c08760b57e4f29 -->
-
-<!-- START_bd07c46bcd1ea465d2b325edab2a8edf -->
-## api/publishings/createPublishing
-
-> Example request:
-
-```bash
-curl -X POST "http://localhost/api/publishings/createPublishing" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/publishings/createPublishing",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`POST api/publishings/createPublishing`
-
-
-<!-- END_bd07c46bcd1ea465d2b325edab2a8edf -->
-
-<!-- START_ef93a34472cbbf4adc14b6f2833ce65d -->
-## api/publishings/updatePublishing/{id?}
-
-> Example request:
-
-```bash
-curl -X POST "http://localhost/api/publishings/updatePublishing/{id?}" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/publishings/updatePublishing/{id?}",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`POST api/publishings/updatePublishing/{id?}`
-
-
-<!-- END_ef93a34472cbbf4adc14b6f2833ce65d -->
-
-<!-- START_4f71d50134a0a4c178582dc2fc2aa3e5 -->
-## api/publishings/updateStatus/{id?}
-
-> Example request:
-
-```bash
-curl -X POST "http://localhost/api/publishings/updateStatus/{id?}" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/publishings/updateStatus/{id?}",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`POST api/publishings/updateStatus/{id?}`
-
-
-<!-- END_4f71d50134a0a4c178582dc2fc2aa3e5 -->
-
-<!-- START_2ebc19a9c467323e08aee4aeb2bceeef -->
-## api/publishings/deletePublishing/{id?}
-
-> Example request:
-
-```bash
-curl -X POST "http://localhost/api/publishings/deletePublishing/{id?}" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/publishings/deletePublishing/{id?}",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-
-### HTTP Request
-`POST api/publishings/deletePublishing/{id?}`
-
-
-<!-- END_2ebc19a9c467323e08aee4aeb2bceeef -->
-
-<!-- START_5d4088a4940540ba2e40f3f61016e478 -->
-## api/publishings/summary
-
-> Example request:
-
-```bash
-curl -X GET -G "http://localhost/api/publishings/summary" \
-    -H "Accept: application/json"
-```
-
-```javascript
-var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/publishings/summary",
-    "method": "GET",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});
-```
-
-> Example response:
-
-```json
-null
-```
-
-### HTTP Request
-`GET api/publishings/summary`
-
-
-<!-- END_5d4088a4940540ba2e40f3f61016e478 -->
 
 <!-- START_d0505dab0b8dac386a10ea0f27445f01 -->
 ## api/rol/getRol

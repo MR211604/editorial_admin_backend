@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Publishing\PublishingIndexRequest;
 use App\Http\Requests\Publishing\PublishingShowRequest;
 use App\Http\Requests\Publishing\PublishingStoreRequest;
+use App\Http\Requests\Publishing\PublishingToggleStatusRequest;
 use App\Http\Requests\Publishing\PublishingUpdateRequest;
 use App\Http\Traits\ApiResponse;
 use App\Http\Traits\SearchFilter;
@@ -616,7 +617,7 @@ class PublishingController extends Controller
      *   "pagination": null
      * }
      */
-    public function toggleStatus(Request $request, $id = null)
+    public function toggleStatus(PublishingToggleStatusRequest $request, $id = null)
     {
         try {
 
@@ -624,16 +625,13 @@ class PublishingController extends Controller
                 throw new BadRequestException('El ID de publicación es requerido');
             }
 
-            $validator = Validator::make($request->all(), [
-                'is_archived' => 'required|boolean'
-            ]);
+            $publishing = Publishing::findOrFail($id);
+            $updatedStatus = filter_var($request->input('is_archived'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
-            if ($validator->fails()) {
-                throw new ValidationException($validator);
+            if ($updatedStatus === null) {
+                throw new BadRequestException('El valor de is_archived no es válido');
             }
 
-            $publishing = Publishing::findOrFail($id);
-            $updatedStatus = $request->input('is_archived');
             $publishing->update(['is_archived' => $updatedStatus]);
 
             $message = $updatedStatus ? 'Publicación archivada exitosamente' : 'Publicación reactivada exitosamente';
