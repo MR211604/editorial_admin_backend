@@ -106,7 +106,8 @@ class PublishingController extends Controller
             $validator = Validator::make($request->all(), [
                 'page' => 'integer|min:1',
                 'limit' => 'integer|min:10',
-                'publishing_type' => 'integer'
+                'publishing_type' => 'integer',
+                'language_id' => 'integer|exists:languages,id',
             ]);
 
             if ($validator->fails()) {
@@ -114,17 +115,31 @@ class PublishingController extends Controller
             }
 
             $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
-            // $page = $request->query('page', 1);
+
             $limit = $request->query('limit', 10);
             $publishingType = $request->query('publishing_type', null);
+            $languageId = $request->query('language_id', 1);
             $search = $request->query('search', null);
             $category = $request->query('category', null);
             $isArchived = $request->has('is_archived') ? (int) $request->query('is_archived') : null;
 
-            $query = Publishing::with(['type', 'authors', 'details']);
+            $query = Publishing::with([
+                'type',
+                'authors',
+                'details',
+                'translation' => function ($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                }
+            ]);
 
+            // if ($search) {
+            //     $query->where('title', 'like', '%' . $search . '%');
+            // }
             if ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
+                $query->whereHas('translations', function ($q) use ($search, $languageId) {
+                    $q->where('language_id', $languageId)
+                        ->where('title', 'like', '%' . $search . '%');
+                });
             }
 
             if ($isArchived !== null) {
@@ -179,7 +194,7 @@ class PublishingController extends Controller
                 throw new NotFoundException('Publicación no encontrada');
             }
 
-            $publishing = Publishing::with(['type', 'authors', 'details'])->findOrFail($id);
+            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])->findOrFail($id);
 
             return $this->successResponse($publishing, 'Publicación obtenida exitosamente');
 
@@ -199,35 +214,70 @@ class PublishingController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'title' => 'required|string|max:255',
-                'URL' => 'nullable|string',
+                // 'title' => 'required|string|max:255',
+                // 'URL' => 'nullable|string',
                 'category_id' => 'nullable|integer|exists:categories,id',
                 'publishing_type' => 'required|integer|exists:publishing_types,id',
+
+                // Traducciones
+                'translations' => 'required|array|min:1',
+                'translations.*.language_id' => 'required|integer|exists:languages,id',
+                'translations.*.title' => 'required|string|max:255',
+                'translations.*.URL' => 'nullable|string',
             ]);
 
             if ($validator->fails()) {
                 throw new ValidationException($validator);
             }
 
-            $publishing = Publishing::create([
-                'title' => $request->input('title'),
-                'URL' => $request->input('URL'),
-                'category_id' => $request->input('category_id'),
-                'cover' => null,
-                'age' => null,
-                'volume' => null,
-                'volume_date' => null,
-                'publish_code' => null,
-                'is_new_arrival' => 0,
-                'publish_date' => null,
-                'publisher' => null,
-                'stock' => null,
-                'author_id' => null,
-                'language_id' => null,
-                'publishing_type' => $request->input('publishing_type'),
-                'age_number' => null,
-                'pages' => null,
-            ]);
+            DB::transaction(function () use ($request, &$publishing) {
+                $publishing = Publishing::create([
+                    // 'title' => $request->input('title'),
+                    // 'URL' => $request->input('URL'),
+                    'category_id' => $request->input('category_id'),
+                    'cover' => null,
+                    'age' => null,
+                    'volume' => null,
+                    'volume_date' => null,
+                    'publish_code' => null,
+                    'is_new_arrival' => 0,
+                    'publish_date' => null,
+                    'publisher' => null,
+                    'stock' => null,
+                    'author_id' => null,
+                    // 'language_id' => null,
+                    'publishing_type' => $request->input('publishing_type'),
+                    'age_number' => null,
+                    'pages' => null,
+                ]);
+                foreach ($request->input('translations') as $translation) {
+                    $publishing->translations()->create([
+                        'language_id' => $translation['language_id'],
+                        'title' => $translation['title'],
+                        'URL' => $translation['URL'] ? $translation['URL'] : null,
+                    ]);
+                }
+            });
+
+            // $publishing = Publishing::create([
+            //     'title' => $request->input('title'),
+            //     'URL' => $request->input('URL'),
+            //     'category_id' => $request->input('category_id'),
+            //     'cover' => null,
+            //     'age' => null,
+            //     'volume' => null,
+            //     'volume_date' => null,
+            //     'publish_code' => null,
+            //     'is_new_arrival' => 0,
+            //     'publish_date' => null,
+            //     'publisher' => null,
+            //     'stock' => null,
+            //     'author_id' => null,
+            //     'language_id' => null,
+            //     'publishing_type' => $request->input('publishing_type'),
+            //     'age_number' => null,
+            //     'pages' => null,
+            // ]);
 
             return $this->successResponse($publishing, 'Publicacion creada exitosamente', null, 200);
 
@@ -237,10 +287,11 @@ class PublishingController extends Controller
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException('Error al crear la publicación', null, $e);
+            throw new ServerErrorException('Error al crear la publicación', $e->getMessage(), $e);
         }
     }
 
+    //! Distinguir entre el idioma de la publicacion
     public function update(Request $request, $id = null)
     {
 

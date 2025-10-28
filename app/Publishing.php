@@ -25,6 +25,19 @@ class Publishing extends Model
 
     public $timestamps = false;
 
+    public function translations()
+    {
+        return $this->hasMany(PublishingTranslations::class);
+    }
+
+    public function translation($languageId = null)
+    {
+        if ($languageId) {
+            $languageId = app()->getLocale() === 'es' ? 1 : 2;
+        }
+        return $this->hasOne(PublishingTranslations::class)->where('language_id', $languageId);
+    }
+
     public function category()
     {
         return $this->belongsTo('App\Category', 'category_id');
