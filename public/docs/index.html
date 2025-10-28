@@ -1235,6 +1235,168 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>GET api/publishings/summary</code></p>
 <!-- END_5d4088a4940540ba2e40f3f61016e478 -->
+<h1>Roles</h1>
+<p>Endpoints para gestionar roles de usuario.</p>
+<!-- START_d0505dab0b8dac386a10ea0f27445f01 -->
+<h2>Listar roles</h2>
+<p>Devuelve un listado paginado de roles.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/rol/getRol" \
+    -H "Accept: application/json" \
+    -d "page"="328319542" \
+        -d "limit"="328319550" </code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/rol/getRol",
+    "method": "GET",
+    "data": {
+        "page": 328319542,
+        "limit": 328319550
+    },
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Roles obtenidos exitosamente",
+    "data": [
+        {
+            "id": 1,
+            "name": "Administrador"
+        }
+    ],
+    "pagination": {
+        "current_page": 1,
+        "last_page": 2,
+        "per_page": 10,
+        "total": 12,
+        "from": 1,
+        "to": 10
+    }
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/rol/getRol</code></p>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>page</td>
+<td>integer</td>
+<td>optional</td>
+<td>Minimum: <code>1</code></td>
+</tr>
+<tr>
+<td>limit</td>
+<td>integer</td>
+<td>optional</td>
+<td>Minimum: <code>10</code></td>
+</tr>
+</tbody>
+</table>
+<!-- END_d0505dab0b8dac386a10ea0f27445f01 -->
+<!-- START_4e3c593528e7edbafc2f458f2cde4089 -->
+<h2>Crear rol</h2>
+<p>Endpoint reservado para la creación de roles.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/rol/createRol" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/rol/createRol",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">null</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/rol/createRol</code></p>
+<!-- END_4e3c593528e7edbafc2f458f2cde4089 -->
+<!-- START_5a74c92ebeef8c365686cb7eadbbd64d -->
+<h2>Actualizar rol</h2>
+<p>Endpoint reservado para actualizar roles existentes.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X PUT "http://localhost/api/rol/updateRol/{id}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/rol/updateRol/{id}",
+    "method": "PUT",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">null</code></pre>
+<h3>HTTP Request</h3>
+<p><code>PUT api/rol/updateRol/{id}</code></p>
+<!-- END_5a74c92ebeef8c365686cb7eadbbd64d -->
+<!-- START_d765e5042c1d26a3a027d6aeda631bbd -->
+<h2>Eliminar rol</h2>
+<p>Endpoint reservado para eliminar roles.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X DELETE "http://localhost/api/rol/deleteRol/{id}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/rol/deleteRol/{id}",
+    "method": "DELETE",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">null</code></pre>
+<h3>HTTP Request</h3>
+<p><code>DELETE api/rol/deleteRol/{id}</code></p>
+<!-- END_d765e5042c1d26a3a027d6aeda631bbd -->
 <h1>general</h1>
 <!-- START_61b568955dfc112d52401a1ac60333a2 -->
 <h2>api/users/getUsers</h2>
@@ -1286,102 +1448,6 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>POST api/users/createUser</code></p>
 <!-- END_bdad24daa8aa8effe5bff98edf583f1f -->
-<!-- START_d0505dab0b8dac386a10ea0f27445f01 -->
-<h2>api/rol/getRol</h2>
-<blockquote>
-<p>Example request:</p>
-</blockquote>
-<pre><code class="language-bash">curl -X GET -G "http://localhost/api/rol/getRol" \
-    -H "Accept: application/json"</code></pre>
-<pre><code class="language-javascript">var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/rol/getRol",
-    "method": "GET",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});</code></pre>
-<blockquote>
-<p>Example response:</p>
-</blockquote>
-<pre><code class="language-json">null</code></pre>
-<h3>HTTP Request</h3>
-<p><code>GET api/rol/getRol</code></p>
-<!-- END_d0505dab0b8dac386a10ea0f27445f01 -->
-<!-- START_4e3c593528e7edbafc2f458f2cde4089 -->
-<h2>api/rol/createRol</h2>
-<blockquote>
-<p>Example request:</p>
-</blockquote>
-<pre><code class="language-bash">curl -X POST "http://localhost/api/rol/createRol" \
-    -H "Accept: application/json"</code></pre>
-<pre><code class="language-javascript">var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/rol/createRol",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});</code></pre>
-<h3>HTTP Request</h3>
-<p><code>POST api/rol/createRol</code></p>
-<!-- END_4e3c593528e7edbafc2f458f2cde4089 -->
-<!-- START_5a74c92ebeef8c365686cb7eadbbd64d -->
-<h2>api/rol/updateRol/{id}</h2>
-<blockquote>
-<p>Example request:</p>
-</blockquote>
-<pre><code class="language-bash">curl -X PUT "http://localhost/api/rol/updateRol/{id}" \
-    -H "Accept: application/json"</code></pre>
-<pre><code class="language-javascript">var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/rol/updateRol/{id}",
-    "method": "PUT",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});</code></pre>
-<h3>HTTP Request</h3>
-<p><code>PUT api/rol/updateRol/{id}</code></p>
-<!-- END_5a74c92ebeef8c365686cb7eadbbd64d -->
-<!-- START_d765e5042c1d26a3a027d6aeda631bbd -->
-<h2>api/rol/deleteRol/{id}</h2>
-<blockquote>
-<p>Example request:</p>
-</blockquote>
-<pre><code class="language-bash">curl -X DELETE "http://localhost/api/rol/deleteRol/{id}" \
-    -H "Accept: application/json"</code></pre>
-<pre><code class="language-javascript">var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/rol/deleteRol/{id}",
-    "method": "DELETE",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});</code></pre>
-<h3>HTTP Request</h3>
-<p><code>DELETE api/rol/deleteRol/{id}</code></p>
-<!-- END_d765e5042c1d26a3a027d6aeda631bbd -->
 <!-- START_dd0177d887ba52822ffb3d90a24e1a69 -->
 <h2>api/privileges/getPrivileges</h2>
 <blockquote>
