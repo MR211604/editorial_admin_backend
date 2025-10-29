@@ -19,10 +19,10 @@ class PublishingController extends Controller
 
     use ApiResponse;
     use SearchFilter;
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api');
+    // }
 
     private function deleteCoverImage($coverPath)
     {
@@ -214,8 +214,8 @@ class PublishingController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                // 'title' => 'required|string|max:255',
-                // 'URL' => 'nullable|string',
+                'title' => 'required|string|max:255',
+                'URL' => 'nullable|string',
                 'category_id' => 'nullable|integer|exists:categories,id',
                 'publishing_type' => 'required|integer|exists:publishing_types,id',
 
@@ -232,8 +232,8 @@ class PublishingController extends Controller
 
             DB::transaction(function () use ($request, &$publishing) {
                 $publishing = Publishing::create([
-                    // 'title' => $request->input('title'),
-                    // 'URL' => $request->input('URL'),
+                    'title' => $request->input('title'),
+                    'URL' => $request->input('URL'),
                     'category_id' => $request->input('category_id'),
                     'cover' => null,
                     'age' => null,
@@ -258,27 +258,6 @@ class PublishingController extends Controller
                     ]);
                 }
             });
-
-            // $publishing = Publishing::create([
-            //     'title' => $request->input('title'),
-            //     'URL' => $request->input('URL'),
-            //     'category_id' => $request->input('category_id'),
-            //     'cover' => null,
-            //     'age' => null,
-            //     'volume' => null,
-            //     'volume_date' => null,
-            //     'publish_code' => null,
-            //     'is_new_arrival' => 0,
-            //     'publish_date' => null,
-            //     'publisher' => null,
-            //     'stock' => null,
-            //     'author_id' => null,
-            //     'language_id' => null,
-            //     'publishing_type' => $request->input('publishing_type'),
-            //     'age_number' => null,
-            //     'pages' => null,
-            // ]);
-
             return $this->successResponse($publishing, 'Publicacion creada exitosamente', null, 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -311,7 +290,7 @@ class PublishingController extends Controller
 
                 $validator = Validator::make($request->all(), [
                     'publishing_type' => 'required|integer|exists:publishing_types,id',
-                    'title' => 'required|string|max:255',
+                    // 'title' => 'required|string|max:255',
                     'pages' => 'required|integer|min:1',
                     'publish_date' => 'required|date',
                     'publish_code' => [
@@ -321,7 +300,10 @@ class PublishingController extends Controller
                     ],
                     'category_id' => 'nullable|exists:categories,id',
                     'is_new_arrival' => 'boolean',
-                    'URL' => 'nullable|string',
+                    // 'URL' => 'nullable|string',
+                    'translations.*.language_id' => 'required|integer|exists:languages,id',
+                    'translations.*.title' => 'required|string|max:255',
+                    'translations.*.URL' => 'nullable|string',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
                     'cover' => 'nullable',
@@ -331,9 +313,9 @@ class PublishingController extends Controller
                     throw new ValidationException($validator);
                 }
 
-                DB::transaction(function () use ($id, $request) {
+                DB::transaction(function () use ($id, $request, &$publishing) {
                     // Buscar la publicación con algunas relaciones
-                    $publishing = Publishing::with(['category', 'type', 'details'])->findOrFail($id);
+                    $publishing = Publishing::with(['category', 'type', 'details', 'translations'])->findOrFail($id);
 
                     if ($request->hasFile('cover')) {
                         // Eliminar imagen anterior si existe
@@ -353,15 +335,26 @@ class PublishingController extends Controller
                     // Actualizar atributos principales
                     $publishing->update($request->only([
                         'publishing_type',
-                        'title',
+                        // 'title',
                         'pages',
                         'publish_date',
                         'publish_code',
                         'category_id',
                         'is_new_arrival',
-                        'URL'
+                        // 'URL'
                     ]));
-
+                    //Actualizar la traduccion asociada 
+                    if ($request->has('translations')) {
+                        foreach ($request->input('translations') as $translationData) {
+                            $publishing->translations()->updateOrCreate(
+                                ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
+                                [
+                                    'title' => $translationData['title'],
+                                    'URL' => $translationData['URL'] ? $translationData['URL'] : null,
+                                ]
+                            );
+                        }
+                    }                    
                     // Sincronizar autores
                     $publishing->authors()->sync($request->input('authors'));
                 });
@@ -377,7 +370,7 @@ class PublishingController extends Controller
                 }
 
                 $validator = Validator::make($request->all(), [
-                    'title' => 'required|string|max:255',
+                    // 'title' => 'required|string|max:255',
                     'pages' => 'required|integer|min:1',
                     'publish_date' => 'required|date',
                     'publish_code' => [
@@ -401,12 +394,10 @@ class PublishingController extends Controller
                 }
 
                 // Usar transacción para asegurar integridad de datos
-                DB::transaction(function () use ($id, $request) {
-                    // Buscar la publicación con algunas relaciones
-                    $publishing = Publishing::with(['category', 'type', 'details'])->findOrFail($id);
+                DB::transaction(function () use ($id, $request, &$publishing) {
+                    $publishing = Publishing::with(['category', 'type', 'details', 'translations'])->findOrFail($id);
 
                     if ($request->hasFile('cover')) {
-                        // Eliminar imagen anterior si existe
                         if ($publishing->cover) {
                             $this->deleteCoverImage($publishing->cover);
                         }
@@ -423,7 +414,7 @@ class PublishingController extends Controller
 
                     // Actualizar atributos principales
                     $publishing->update($request->only([
-                        'title',
+                        // 'title',
                         'publish_date',
                         'publish_code',
                         'age',
@@ -434,6 +425,18 @@ class PublishingController extends Controller
                         'category_id',
                         'publishing_type'
                     ]));
+
+                    if ($request->has('translations')) {
+                        foreach ($request->input('translations') as $translationData) {
+                            $publishing->translations()->updateOrCreate(
+                                ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
+                                [
+                                    'title' => $translationData['title'],
+                                    'URL' => $translationData['URL'] ? $translationData['URL'] : null,
+                                ]
+                            );
+                        }
+                    }          
 
                     // Sincronizar autores
                     $publishing->authors()->sync($request->input('authors'));
@@ -525,6 +528,7 @@ class PublishingController extends Controller
 
                 $publishing->authors()->detach();
                 $publishing->details()->delete();
+                $publishing->translations()->delete(); //Borrar tambien las traducciones asociadas
                 $publishing->delete();
             });
 
