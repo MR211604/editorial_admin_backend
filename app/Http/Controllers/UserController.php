@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Http\Traits\ApiResponse;
 use App\Http\Traits\SearchFilter;
 use Illuminate\Http\Request;
@@ -93,20 +94,43 @@ class UserController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $user = User::create([
-                'name' => $request->input('name'),
-                'password' => bcrypt($request->input('password')),
-                'rol_id' => $request->input('rol_id'),
-                'active' => 1,
-                'join_date' => null,
-                'last_login_date' => null,
-                'token' => $request->input('name')
-            ]);
+            $user = DB::transaction(function () use ($request, &$user) {
+                $user = User::create([
+                    'name' => $request->input('name'),
+                    'password' => bcrypt($request->input('password')),
+                    'rol_id' => $request->input('rol_id'),
+                    'active' => 1,
+                    'join_date' => null,
+                    'last_login_date' => null,
+                    'token' => $request->input('name')
+                ]);
 
-            return response()->json([
-                'ok' => true,
-                'data' => $user
-            ], 201);
+                $user->userRoles()->attach($request->input('rol_id'));
+
+                return $user;
+            });
+
+            return $this->successResponse(
+                $user,
+                'Usuario creado exitosamente',
+                null,
+                201
+            );
+
+            // $user = User::create([
+            //     'name' => $request->input('name'),
+            //     'password' => bcrypt($request->input('password')),
+            //     'rol_id' => $request->input('rol_id'),
+            //     'active' => 1,
+            //     'join_date' => null,
+            //     'last_login_date' => null,
+            //     'token' => $request->input('name')
+            // ]);
+
+            // return response()->json([
+            //     'ok' => true,
+            //     'data' => $user
+            // ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;

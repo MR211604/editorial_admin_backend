@@ -354,7 +354,7 @@ class PublishingController extends Controller
                                 ]
                             );
                         }
-                    }                    
+                    }
                     // Sincronizar autores
                     $publishing->authors()->sync($request->input('authors'));
                 });
@@ -432,11 +432,10 @@ class PublishingController extends Controller
                                 ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
                                 [
                                     'title' => $translationData['title'],
-                                    'URL' => $translationData['URL'] ? $translationData['URL'] : null,
                                 ]
                             );
                         }
-                    }          
+                    }
 
                     // Sincronizar autores
                     $publishing->authors()->sync($request->input('authors'));
@@ -453,7 +452,7 @@ class PublishingController extends Controller
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (\Exception $e) {
-            throw new ServerErrorException('Error al actualizar la publicación', null, $e);
+            throw new ServerErrorException('Error al actualizar la publicación', $e->getMessage(), $e);
         }
     }
 
