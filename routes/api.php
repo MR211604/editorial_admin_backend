@@ -43,8 +43,8 @@ Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
 Route::group(['middleware' => ['api'], 'prefix' => 'rol'], function () {
     Route::get('getRol', 'RolController@index');
     Route::post('createRol', 'RolController@create');
-    Route::put('updateRol/{id}', 'RolController@update');
-    Route::delete('deleteRol/{id}', 'RolController@delete');
+    // Route::put('updateRol/{id}', 'RolController@update');
+    // Route::delete('deleteRol/{id}', 'RolController@delete');
 });
 
 Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
@@ -73,4 +73,5 @@ Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
 Route::group(['middleware' => ['api'], 'prefix' => 'publishingDetails'], function () {
     Route::post('createPublishingDetail', 'PublishingDetailController@create');
     Route::post('updatePublishingDetail/{id?}', 'PublishingDetailController@update');
+    Route::post('deletePublishingDetail/{id?}', 'PublishingDetailController@delete');
 });

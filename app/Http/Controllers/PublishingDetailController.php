@@ -2,6 +2,7 @@
 
 
 namespace App\Http\Controllers;
+use App\Exceptions\BadRequestException;
 use App\Http\Traits\ApiResponse;
 
 use App\PublishingDetail;
@@ -33,9 +34,9 @@ class PublishingDetailController extends Controller
         'publishing_id' => 'required|integer|exists:publishings,id',
       ]);
 
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
+      if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
 
       $data = $request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']);
 
@@ -60,9 +61,9 @@ class PublishingDetailController extends Controller
         'publishing_id' => 'required|integer|exists:publishings,id',
       ]);
 
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
+      if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
 
       $publishingDetail = PublishingDetail::find($id);
 
@@ -76,7 +77,29 @@ class PublishingDetailController extends Controller
     } catch (\Illuminate\Validation\ValidationException $e) {
       throw $e;
     } catch (\Exception $e) {
-      throw new ServerErrorException('Error al actualizar el detalle de la publicación', null, $e);
+      throw new ServerErrorException('Error al actualizar articulo de publicación', null, $e);
+    }
+  }
+
+  public function delete($id = null)
+  {
+    try {
+      if (empty($id) || !is_numeric($id)) {
+        throw new BadRequestException('El ID de publicación es requerido');
+      }
+
+      $publishingDetail = PublishingDetail::find($id);
+
+      if (!$publishingDetail) {
+        throw new NotFoundException('Detalle de publicación no encontrado');
+      }
+
+      $publishingDetail->delete();
+
+      return $this->successResponse(null, 'Detalle de publicación eliminado exitosamente');
+
+    } catch (\Exception $e) {
+      throw new ServerErrorException('Error al eliminar articulo de publicación', null, $e);
     }
   }
 

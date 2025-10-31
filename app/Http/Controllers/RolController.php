@@ -48,13 +48,38 @@ class RolController extends Controller
 
             return $this->successResponse($data['roles'], 'Roles obtenidos exitosamente', $data['pagination']);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             throw $e;
         } catch (\App\Exceptions\ApiException $e) {
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (\Exception $e) {
             throw new ServerErrorException('Error al obtener los roles', null, $e);
+        }
+    }
+
+    public function create(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255|unique:rol,name',
+                'description' => 'nullable|string|max:500',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $rol = Rol::create([
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+            ]);
+
+            return $this->successResponse($rol, 'Rol creado exitosamente', null, 201);
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw new ServerErrorException('Error al crear el rol', null, $e);
         }
     }
 
