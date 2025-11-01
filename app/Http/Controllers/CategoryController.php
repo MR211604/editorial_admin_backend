@@ -15,7 +15,6 @@ use DB;
 class CategoryController extends Controller
 {
 
-
   use ApiResponse;
 
   public function __construct()
@@ -38,7 +37,7 @@ class CategoryController extends Controller
 
       return $this->successResponse($categories, 'Categorías obtenidas correctamente');
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
       throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las excepciones de API lleguen al Handler

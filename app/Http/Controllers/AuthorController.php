@@ -88,7 +88,7 @@ class AuthorController extends Controller
       }
 
       return $this->successResponse($author, 'Autor obtenido exitosamente');
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
       throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler
@@ -119,7 +119,7 @@ class AuthorController extends Controller
 
       return $this->successResponse($author, 'Autor creado exitosamente', null, 201);
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
       throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler
@@ -157,7 +157,7 @@ class AuthorController extends Controller
 
       return $this->successResponse($author, 'Autor actualizado exitosamente');
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
       throw $e;
     } catch (\App\Exceptions\ApiException $e) {
       // Dejar que las ApiException se manejen en el Handler

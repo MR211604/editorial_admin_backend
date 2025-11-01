@@ -117,22 +117,7 @@ class UserController extends Controller
                 201
             );
 
-            // $user = User::create([
-            //     'name' => $request->input('name'),
-            //     'password' => bcrypt($request->input('password')),
-            //     'rol_id' => $request->input('rol_id'),
-            //     'active' => 1,
-            //     'join_date' => null,
-            //     'last_login_date' => null,
-            //     'token' => $request->input('name')
-            // ]);
-
-            // return response()->json([
-            //     'ok' => true,
-            //     'data' => $user
-            // ], 201);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
             throw new ServerErrorException('Error al crear el usuario', null, $e);
