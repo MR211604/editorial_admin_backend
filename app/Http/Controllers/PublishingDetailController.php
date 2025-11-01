@@ -4,7 +4,6 @@
 namespace App\Http\Controllers;
 use App\Exceptions\BadRequestException;
 use App\Http\Traits\ApiResponse;
-
 use App\PublishingDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -23,6 +22,7 @@ class PublishingDetailController extends Controller
     $this->middleware('auth:api');
   }
 
+  // Para crear un articulo de publicación, se necesita el language_shortname para diferenciar el lenguaja. Debido a que la informacion no se comparte, se necesita crear un articulo por cada lenguaje.
   public function create(Request $request)
   {
     try {
@@ -31,6 +31,7 @@ class PublishingDetailController extends Controller
         'summary' => 'required|string',
         'URL' => 'nullable|string',
         'repository_URL' => 'nullable|string',
+        'language_id' => 'required|integer|exists:languages,id',
         'publishing_id' => 'required|integer|exists:publishings,id',
       ]);
 
@@ -38,7 +39,7 @@ class PublishingDetailController extends Controller
         throw new ValidationException($validator);
       }
 
-      $data = $request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']);
+      $data = $request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id', 'language_id']);
 
       $publishingDetail = PublishingDetail::create($data);
 
