@@ -26,6 +26,8 @@ Route::group(['middleware' => ['api'], 'prefix' => 'auth'], function () {
 Route::group(['middleware' => ['api'], 'prefix' => 'users'], function () {
     Route::get('getUsers', 'UserController@index');
     Route::post('createUser', 'UserController@create');
+    Route::post('updateUser/{id?}', 'UserController@update');
+    Route::post('toggleActive/{id?}', 'UserController@toggleActive');
 });
 
 //Creando grupo para las publicaciones

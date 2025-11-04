@@ -123,4 +123,23 @@ class UserController extends Controller
             throw new ServerErrorException('Error al crear el usuario', null, $e);
         }
     }
+
+    public function toggleActive($id = null)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->active = !$user->active;
+            $user->save();
+
+            $message = $user->active ? 'Usuario activado exitosamente' : 'Usuario desactivado exitosamente';
+
+            return $this->successResponse(
+                $user,
+                $message
+            );
+
+        } catch (\Exception $e) {
+            throw new ServerErrorException('Error al cambiar el estado del usuario', null, $e);
+        }
+    }
 }

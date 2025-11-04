@@ -33,6 +33,11 @@ class AuthController extends Controller
 
       $user = Auth::user();
 
+
+      if($user->active === 0) {
+        return response()->json(['error' => 'Usuario desactivado'], 400);
+      }
+
       if (!$user->join_date) {
         $user->join_date = Carbon::now()->toDateTimeString();
       }
