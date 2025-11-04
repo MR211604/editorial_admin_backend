@@ -30,10 +30,10 @@ class CategoryController extends Controller
 
       //Obteniendo las categorías padres con las hijas
       $categories = $request->query('getAll') === '1'
-        ? $query->get(['id', 'title', 'description', 'category_type'])
+        ? $query->get(['id', 'title', 'description', 'category_type', 'state'])
         : $query->with('childrenRecursive')
           ->whereNull('main_category')
-          ->get(['id', 'title', 'description', 'category_type']);
+          ->get(['id', 'title', 'description', 'category_type', 'state']);
 
       return $this->successResponse($categories, 'Categorías obtenidas correctamente');
 
@@ -86,7 +86,7 @@ class CategoryController extends Controller
         'title' => $request->input('title'),
         'description' => $request->input('description'),
         'main_category' => null, // Por defecto, se crea como categoría padre
-        'state' => 0,
+        'state' => 1, //Se crea como categoria activa
         'is_featured' => 0,
         'language_id' => $request->input('language_id', 1), // Por defecto, idioma 1
         'category_type' => $request->input('category_type'),
@@ -118,7 +118,7 @@ class CategoryController extends Controller
       $validator = Validator::make($request->all(), [
         'title' => 'required|string|max:255',
         'description' => 'string',
-        'main_category' => 'nullable|integer',
+        'main_category' => 'integer|nullable',
         'is_featured' => 'boolean',
         'about' => 'string|nullable',
         'editorial_board' => 'string|nullable',
@@ -129,8 +129,17 @@ class CategoryController extends Controller
         'category_id' => 'integer',
       ]);
 
+      //Si el campo main_category viene vacío, se asigna null (asi se mantienen las categorías padre)
+      if($request->main_category === "") {
+        $request->merge(['main_category' => null]);
+      }
+
       if ($validator->fails()) {
         throw new ValidationException($validator);
+      }
+
+      if($request->has('main_category') && $request->input('main_category') == $id) {
+        throw new BadRequestException('Una categoría no puede ser su propia categoría principal');
       }
 
       DB::transaction(function () use ($id, $request) {
@@ -180,6 +189,33 @@ class CategoryController extends Controller
       throw $e;
     } catch (Exception $e) {
       throw new ServerErrorException('Error al actualizar la categoría', null, $e);
+    }
+  }
+
+  public function toggleState(Request $request, $id = null) {
+    try {
+
+      if (empty($id) || !is_numeric($id)) {
+        throw new BadRequestException('El numero de ID es requerido');
+      }
+
+      $category = Category::findOrFail($id);
+
+      // Alternar el estado
+      $category->state = !$category->state;
+      $category->save();
+
+      $message = $category->state ? 'Categoría activada correctamente' : 'Categoría desactivada correctamente';
+
+      return $this->successResponse($category, $message);
+
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      throw new \App\Exceptions\NotFoundException('Categoría no encontrada');
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
+    } catch (Exception $e) {
+      throw new ServerErrorException('Error al cambiar el estado de la categoría', null, $e);
     }
   }
 

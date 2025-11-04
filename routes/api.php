@@ -68,6 +68,7 @@ Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
     Route::get('getCategory/{id?}', 'CategoryController@find');
     Route::post('createCategory', 'CategoryController@create');
     Route::post('updateCategory/{id?}', 'CategoryController@update');
+    Route::post('toggleState/{id?}', 'CategoryController@toggleState');
 });
 
 Route::group(['middleware' => ['api'], 'prefix' => 'publishingDetails'], function () {
