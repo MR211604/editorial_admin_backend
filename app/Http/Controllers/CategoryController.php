@@ -29,7 +29,7 @@ class CategoryController extends Controller
       $query = Category::getModel();
 
       //Obteniendo las categorías padres con las hijas
-      $categories = $request->query('getAll') === '1'
+      $categories = in_array($request->query('getAll'), ['1', 'true', true], true)
         ? $query->get(['id', 'title', 'description', 'category_type', 'state'])
         : $query->with('childrenRecursive')
           ->whereNull('main_category')
@@ -130,7 +130,7 @@ class CategoryController extends Controller
       ]);
 
       //Si el campo main_category viene vacío, se asigna null (asi se mantienen las categorías padre)
-      if($request->main_category === "") {
+      if ($request->main_category === "") {
         $request->merge(['main_category' => null]);
       }
 
@@ -138,7 +138,7 @@ class CategoryController extends Controller
         throw new ValidationException($validator);
       }
 
-      if($request->has('main_category') && $request->input('main_category') == $id) {
+      if ($request->has('main_category') && $request->input('main_category') == $id) {
         throw new BadRequestException('Una categoría no puede ser su propia categoría principal');
       }
 
@@ -192,7 +192,8 @@ class CategoryController extends Controller
     }
   }
 
-  public function toggleState(Request $request, $id = null) {
+  public function toggleState(Request $request, $id = null)
+  {
     try {
 
       if (empty($id) || !is_numeric($id)) {

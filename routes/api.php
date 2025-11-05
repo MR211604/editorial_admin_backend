@@ -51,10 +51,10 @@ Route::group(['middleware' => ['api'], 'prefix' => 'rol'], function () {
 
 Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
     Route::get('getAuthors', 'AuthorController@index');
-    Route::get('getAuthor/{id}', 'AuthorController@find');
+    Route::get('getAuthor/{id?}', 'AuthorController@find');
     Route::post('createAuthor', 'AuthorController@create');
-    Route::post('updateAuthor', 'AuthorController@update');
-    Route::delete('deleteAuthor/{id}', 'AuthorController@delete');
+    Route::post('updateAuthor/{id?}', 'AuthorController@update');
+    Route::post('deleteAuthor/{id?}', 'AuthorController@delete');
 });
 
 // Route::group(['middleware' => ['api'], 'prefix' => 'privileges'], function () {

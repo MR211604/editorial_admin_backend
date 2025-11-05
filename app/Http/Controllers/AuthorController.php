@@ -129,12 +129,15 @@ class AuthorController extends Controller
     }
   }
 
-  public function update(Request $request)
+  public function update(Request $request, $id = null)
   {
     try {
 
+      if (!Author::where('id', $id)->exists()) {
+        throw new NotFoundException('Autor no encontrado');
+      }
+
       $validator = Validator::make($request->all(), [
-        'id' => 'required|integer|exists:authors,id',
         'name' => 'required|string|max:255',
         'lastname' => 'required|string|max:255',
       ]);
@@ -144,10 +147,6 @@ class AuthorController extends Controller
       }
 
       $author = Author::find($request->input('id'));
-
-      if (!$author) {
-        throw new NotFoundException('Autor no encontrado');
-      }
 
       if (Author::alreadyExists($request->input('name'), $request->input('lastname'))) {
         throw new ConflictException('El autor enviado ya existe');
@@ -166,4 +165,38 @@ class AuthorController extends Controller
       throw new ServerErrorException('Error al actualizar el autor', null, $e);
     }
   }
+
+  public function delete($id = null)
+  {
+    try {
+
+      $validator = Validator::make(['id' => $id], [
+        'id' => 'required|integer|exists:authors,id',
+      ]);
+
+      if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
+
+      $author = Author::find($id);
+
+      if (!$author) {
+        throw new NotFoundException('Autor no encontrado');
+      }
+
+      $author->publishings()->detach();
+      $author->delete();
+
+      return $this->successResponse(null, 'Autor eliminado exitosamente');
+
+    } catch (ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      throw $e;
+    } catch (\Exception $e) {
+      throw new ServerErrorException('Error al eliminar el autor', null, $e);
+    }
+  }
 }
+
+

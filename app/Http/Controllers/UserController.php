@@ -85,7 +85,7 @@ class UserController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255|unique:users,name',
+                'name' => 'required|string|min:2|max:255|unique:users,name',
                 'password' => 'required|string|min:8',
                 'rol_id' => 'required|integer|exists:rol,id'
             ]);
@@ -140,6 +140,46 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             throw new ServerErrorException('Error al cambiar el estado del usuario', null, $e);
+        }
+    }
+
+    public function update(Request $request, $id = null)
+    {
+        try {
+
+            if (!$id) {
+                throw new \InvalidArgumentException('El ID del usuario es obligatorio para la actualización');
+            }
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|min:2|max:255|unique:users,name,' . $id,
+                'rol_id' => 'required|integer|exists:rol,id'
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $user = DB::transaction(function () use ($request, $id) {
+                $user = User::findOrFail($id);
+                $user->name = $request->input('name');
+                $user->rol_id = $request->input('rol_id');
+                $user->save();
+                // Actualizar la relación de roles del usuario
+                $user->userRoles()->sync([$request->input('rol_id')]);
+
+                return $user;
+            });
+
+            return $this->successResponse(
+                $user,
+                'Usuario actualizado exitosamente'
+            );
+
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw new ServerErrorException('Error al actualizar el usuario', null, $e);
         }
     }
 }

@@ -33,8 +33,7 @@ class AuthController extends Controller
 
       $user = Auth::user();
 
-
-      if($user->active === 0) {
+      if ($user->active === 0) {
         return response()->json(['error' => 'Usuario desactivado'], 400);
       }
 
@@ -50,6 +49,7 @@ class AuthController extends Controller
         'message' => 'Usuario conectado correctamente',
         'token' => $token,
         'user' => $user,
+        'rol' => $user->rol,
         'first_login' => $user->first_login_at,
         'last_login' => $user->last_login_at
       ]);
@@ -62,7 +62,7 @@ class AuthController extends Controller
   {
     try {
       $token = $request->bearerToken();
-      
+
       if (!$token) {
         return response()->json([
           'ok' => false,
@@ -73,10 +73,10 @@ class AuthController extends Controller
 
       // Establecer el token en JWTAuth
       JWTAuth::setToken($token);
-      
+
       // Verificar que el token es válido antes de renovarlo
       $user = JWTAuth::parseToken()->authenticate();
-      
+
       if (!$user) {
         return response()->json([
           'ok' => false,
@@ -84,9 +84,9 @@ class AuthController extends Controller
           'message' => 'El token no corresponde a un usuario válido'
         ], 401);
       }
-      
+
       $newToken = JWTAuth::refresh();
-      
+
       return response()->json([
         'ok' => true,
         'message' => 'Token renovado correctamente',
@@ -100,21 +100,21 @@ class AuthController extends Controller
         'error' => 'Token expirado',
         'message' => 'El token ha expirado y no puede ser renovado'
       ], 401);
-      
+
     } catch (TokenInvalidException $e) {
       return response()->json([
         'ok' => false,
         'error' => 'Token inválido',
         'message' => 'El token proporcionado no es válido'
       ], 401);
-      
+
     } catch (JWTException $e) {
       return response()->json([
         'ok' => false,
         'error' => 'Error de token',
         'message' => 'Error al procesar el token'
       ], 500);
-      
+
     } catch (\Exception $e) {
       throw new ServerErrorException('No se pudo renovar el token', null, $e);
     }

@@ -298,7 +298,7 @@ class PublishingController extends Controller
                         'string',
                         'regex:/^\d{3}-\d{2}-\d{4}-\d{3}-\d$/'
                     ],
-                    'category_id' => 'nullable|exists:categories,id',
+                    'category_id' => 'integer|nullable',
                     'is_new_arrival' => 'boolean',
                     // 'URL' => 'nullable|string',
                     'translations.*.language_id' => 'required|integer|exists:languages,id',
@@ -382,7 +382,7 @@ class PublishingController extends Controller
                     'age_number' => 'nullable|integer|min:1',
                     'volume' => 'nullable|integer|min:1',
                     'is_new_arrival' => 'boolean',
-                    'category_id' => 'nullable|exists:categories,id',
+                    'category_id' => 'integer|nullable',
                     'publishing_type' => 'required|integer|exists:publishing_types,id',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
