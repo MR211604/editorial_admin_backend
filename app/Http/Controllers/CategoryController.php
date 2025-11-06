@@ -192,6 +192,34 @@ class CategoryController extends Controller
     }
   }
 
+  private function deactivateChildren(Category $category)
+  {
+    foreach ($category->childrenRecursive as $child) {
+      if ($child->state) {
+        $child->state = 0;
+        $child->save();
+
+        if (!$child->childrenRecursive->isEmpty()) {
+          $this->deactivateChildren($child);
+        }
+      }
+    }
+  }
+
+  private function activateChildren(Category $category)
+  {
+    foreach ($category->childrenRecursive as $child) {
+      if (!$child->state) {
+        $child->state = 1;
+        $child->save();
+
+        if (!$child->childrenRecursive->isEmpty()) {
+          $this->activateChildren($child);
+        }
+      }
+    }
+  }
+
   public function toggleState(Request $request, $id = null)
   {
     try {
@@ -200,22 +228,39 @@ class CategoryController extends Controller
         throw new BadRequestException('El numero de ID es requerido');
       }
 
-      $category = Category::findOrFail($id);
+      DB::beginTransaction();
 
-      // Alternar el estado
+      $category = Category::with('childrenRecursive')->findOrFail($id);
+
+      // Si es una categoría padre y se va a desactivar
+      if (!$category->childrenRecursive->isEmpty()) {
+        if ($category->state) {
+          $this->deactivateChildren($category);
+        } else {
+          $this->activateChildren($category);
+        }
+      }
+
+      // Alternar el estado de la categoría principal
       $category->state = !$category->state;
       $category->save();
 
-      $message = $category->state ? 'Categoría activada correctamente' : 'Categoría desactivada correctamente';
+      DB::commit();
+
+      $message = $category->state
+        ? 'Categoría activada correctamente'
+        : 'Categoría y sus subcategorías desactivadas correctamente';
 
       return $this->successResponse($category, $message);
 
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      DB::rollBack();
       throw new \App\Exceptions\NotFoundException('Categoría no encontrada');
     } catch (\App\Exceptions\ApiException $e) {
-      // Dejar que las excepciones de API lleguen al Handler
+      DB::rollBack();
       throw $e;
     } catch (Exception $e) {
+      DB::rollBack();
       throw new ServerErrorException('Error al cambiar el estado de la categoría', null, $e);
     }
   }
