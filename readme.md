@@ -16,15 +16,26 @@ cp .env.example .env
 ```
 Donde configuraremos la conexion a la base de datos MySQL y demas variables de entorno.
 
+Instalaremos las dependencias usando composer
+```
+composer install
+```
+
 Posterior a eso generaremos nuestras key
 ```
 php artisan key:generate
 ```
 
-Y por ultimo instalaremos las dependencias usando composer
+Brindaremos los permisos necesarios a la carpeta raiz, para no tener inconvenientes futuros
 ```
-composer install
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
+
+chown -R www-data:www-data /var/www/html/public
+chmod -R 755 /var/www/html/public
+
 ```
+
 Nuestro servidor estara listo para ser accedido de forma local en el puerto ```http://localhost:8080```.
 
 ## Cómo ejecutar el proyecto mediante Docker

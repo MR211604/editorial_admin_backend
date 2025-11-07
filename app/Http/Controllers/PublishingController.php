@@ -96,7 +96,7 @@ class PublishingController extends Controller
             return "{$relativePath}/{$fileName}";
 
         } catch (Exception $e) {
-            throw new ServerErrorException('Error al almacenar la imagen', null, $e);
+            throw new ServerErrorException('Error al almacenar la imagen', $e->getMessage(), $e);
         }
     }
 
