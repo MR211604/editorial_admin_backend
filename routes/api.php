@@ -57,14 +57,6 @@ Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
     Route::post('deleteAuthor/{id?}', 'AuthorController@delete');
 });
 
-// Route::group(['middleware' => ['api'], 'prefix' => 'privileges'], function () {
-//     Route::get('getPrivileges', 'UserPrivilegeController@index');
-//     Route::get('getPrivilege/{id?}', 'UserPrivilegeController@find');
-//     Route::post('createPrivilege', 'UserPrivilegeController@create');
-//     Route::post('updatePrivilege', 'UserPrivilegeController@update');
-//     Route::delete('deletePrivilege/{id}', 'UserPrivilegeController@delete');
-// });
-
 Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
     Route::get('getCategories', 'CategoryController@index');
     Route::get('getCategory/{id?}', 'CategoryController@find');
@@ -77,4 +69,8 @@ Route::group(['middleware' => ['api'], 'prefix' => 'publishingDetails'], functio
     Route::post('createPublishingDetail', 'PublishingDetailController@create');
     Route::post('updatePublishingDetail/{id?}', 'PublishingDetailController@update');
     Route::post('deletePublishingDetail/{id?}', 'PublishingDetailController@delete');
+});
+
+Route::group(['middleware' => ['api'], 'prefix' => 'categoryTypes'], function () {
+    Route::get('getCategoryTypes', 'CategoryTypeController@index');
 });
