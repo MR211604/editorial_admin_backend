@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use App\Exceptions\BadRequestException;
 use App\Exceptions\ServerErrorException;
 
 class UserController extends Controller
@@ -127,6 +128,11 @@ class UserController extends Controller
     public function toggleActive($id = null)
     {
         try {
+
+            if (empty($id) || !is_numeric($id)) {
+                throw new BadRequestException('El ID del usuario es requerido');
+            }
+
             $user = User::findOrFail($id);
             $user->active = !$user->active;
             $user->save();

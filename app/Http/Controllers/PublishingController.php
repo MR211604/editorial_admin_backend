@@ -446,40 +446,31 @@ class PublishingController extends Controller
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             throw new NotFoundException('Publicación no encontrada');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             throw $e;
         } catch (\App\Exceptions\ApiException $e) {
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException('Error al actualizar la publicación', $e->getMessage(), $e);
         }
     }
 
-    //Actualizando el estado de la publicacion 
+    //Actualizando el estado de la publicacion  (campo is_archived)
     // 1 - Archivado
     // 0 - No archivado
-    public function toggleStatus(Request $request, $id = null)
+    public function toggleStatus($id = null)
     {
         try {
 
             if (empty($id) || !is_numeric($id)) {
                 throw new BadRequestException('El ID de publicación es requerido');
             }
-
-            $validator = Validator::make($request->all(), [
-                'is_archived' => 'required|boolean'
-            ]);
-
-            if ($validator->fails()) {
-                throw new ValidationException($validator);
-            }
-
             $publishing = Publishing::findOrFail($id);
-            $updatedStatus = $request->input('is_archived');
-            $publishing->update(['is_archived' => $updatedStatus]);
+            $publishing->is_archived = !$publishing->is_archived;
+            $publishing->save();
 
-            $message = $updatedStatus ? 'Publicación archivada exitosamente' : 'Publicación reactivada exitosamente';
+            $message = $publishing->is_archived ? 'Publicación reactivada exitosamente' : 'Publicación archivada exitosamente';
 
             return $this->successResponse(null, $message, null, 200);
 
