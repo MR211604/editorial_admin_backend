@@ -37,6 +37,9 @@ EOF
 # 4. Configurar directorio de trabajo y permisos
 WORKDIR /var/www/html
 
+# Limpiar el directorio por defecto de Apache
+RUN rm -rf /var/www/html/* /var/www/html/.*
+
 # Clonar el repositorio (reemplaza con tu URL)
 RUN git clone https://github.com/MR211604/cms-udb-editorial . && \
     composer install --no-dev --optimize-autoloader && \
@@ -46,8 +49,9 @@ RUN git clone https://github.com/MR211604/cms-udb-editorial . && \
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html \
     chown -R www-data:www-data /var/www/html/storage \
-    chmod -R 775 /var/www/html/storage
-
+    chmod -R 775 /var/www/html/storage \
+    chown -R www-data:www-data /var/www/html/public \
+    chmod -R 755 /var/www/html/public
 # 5. Exponer solo puerto 80
 EXPOSE 80
 

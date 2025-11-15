@@ -30,23 +30,27 @@ class CategoryTypeController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $limit = $request->query('limit', 10);
+            $data = CategoryType::get();
 
-            $categoryTypes = CategoryType::paginate($limit);
+            return $this->successResponse($data, 'Tipos de categoría obtenidos exitosamente');
 
-            $data = [
-                'category_types' => $categoryTypes->items(),
-                'pagination' => [
-                    'current_page' => $categoryTypes->currentPage(),
-                    'last_page' => $categoryTypes->lastPage(),
-                    'per_page' => $categoryTypes->perPage(),
-                    'total' => $categoryTypes->total(),
-                    'from' => $categoryTypes->firstItem(),
-                    'to' => $categoryTypes->lastItem(),
-                ]
-            ];
+            //! Si quieren paginarse los datos, descomentar el siguiente bloque:
+            //$limit = $request->query('limit', 10);
+            // $categoryTypes = CategoryType::paginate($limit);
 
-            return $this->successResponse($data['category_types'], 'Tipos de categoría obtenidos exitosamente', $data['pagination']);
+            // $data = [
+            //     'category_types' => $categoryTypes->items(),
+            //     'pagination' => [
+            //         'current_page' => $categoryTypes->currentPage(),
+            //         'last_page' => $categoryTypes->lastPage(),
+            //         'per_page' => $categoryTypes->perPage(),
+            //         'total' => $categoryTypes->total(),
+            //         'from' => $categoryTypes->firstItem(),
+            //         'to' => $categoryTypes->lastItem(),
+            //     ]
+            // ];
+
+            // return $this->successResponse($data['category_types'], 'Tipos de categoría obtenidos exitosamente', $data['pagination']);
 
         } catch (ValidationException $e) {
             throw $e;

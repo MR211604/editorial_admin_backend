@@ -220,7 +220,7 @@ class CategoryController extends Controller
     }
   }
 
-  public function toggleState(Request $request, $id = null)
+  public function toggleState($id = null)
   {
     try {
 

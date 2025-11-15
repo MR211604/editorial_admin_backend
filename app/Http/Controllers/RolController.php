@@ -13,10 +13,10 @@ class RolController extends Controller
 {
     use ApiResponse;
 
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api');
+    // }
     public function index(Request $request)
     {
         try {
@@ -30,23 +30,25 @@ class RolController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $limit = $request->query('limit', 10);
+            $data = Rol::get();
+            return $this->successResponse($data, 'Roles obtenidos exitosamente');
 
-            $roles = Rol::paginate($limit);
+            //! Si quieren paginarse los datos, descomentar el siguiente bloque:
+            // $limit = $request->query('limit', 10);
+            // $roles = Rol::paginate($limit);
+            // $data = [
+            //     'roles' => $roles->items(),
+            //     'pagination' => [
+            //         'current_page' => $roles->currentPage(),
+            //         'last_page' => $roles->lastPage(),
+            //         'per_page' => $roles->perPage(),
+            //         'total' => $roles->total(),
+            //         'from' => $roles->firstItem(),
+            //         'to' => $roles->lastItem(),
+            //     ]
+            // ];
 
-            $data = [
-                'roles' => $roles->items(),
-                'pagination' => [
-                    'current_page' => $roles->currentPage(),
-                    'last_page' => $roles->lastPage(),
-                    'per_page' => $roles->perPage(),
-                    'total' => $roles->total(),
-                    'from' => $roles->firstItem(),
-                    'to' => $roles->lastItem(),
-                ]
-            ];
-
-            return $this->successResponse($data['roles'], 'Roles obtenidos exitosamente', $data['pagination']);
+            // return $this->successResponse($data['roles'], 'Roles obtenidos exitosamente', $data['pagination']);
 
         } catch (ValidationException $e) {
             throw $e;

@@ -19,10 +19,10 @@ class PublishingController extends Controller
 
     use ApiResponse;
     use SearchFilter;
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:api');
-    // }
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
 
     private function deleteCoverImage($coverPath)
     {
