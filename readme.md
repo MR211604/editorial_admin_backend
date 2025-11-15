@@ -5,7 +5,7 @@ Las tecnologías esenciales con las que ha sido construido este sistema han sido
 - PHP 5.6
 - Apache 2.4.25.
 - MySQL 5.7.
-- Composer 1.
+- Composer 2.2
 - [Laravel 5.4](https://laravel.com/docs/eloquent).
 
 ## Cómo ejecutar el proyecto de manera local
