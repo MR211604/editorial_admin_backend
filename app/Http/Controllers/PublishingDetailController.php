@@ -11,12 +11,22 @@ use Illuminate\Validation\ValidationException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ServerErrorException;
 
-
+/**
+ * @resource PublishingDetail
+ *
+ * Endpoints para la gestión de detalles de publicaciones (revistas).
+ * Usa JWT en el header: `Authorization: Bearer {token}`.
+ */
 class PublishingDetailController extends Controller
 {
 
   use ApiResponse;
 
+  /**
+   * Constructor (middleware)
+   *
+   * Aplica el middleware `auth:api` a todas las rutas.
+   */
   public function __construct()
   {
     $this->middleware('auth:api');
@@ -44,7 +54,7 @@ class PublishingDetailController extends Controller
       $publishingDetail = PublishingDetail::create($data);
 
       return $this->successResponse($publishingDetail, 'Detalle de publicación creado', null, 201);
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
       throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al crear el detalle de la publicación', null, $e);
@@ -75,7 +85,7 @@ class PublishingDetailController extends Controller
       $publishingDetail->update($request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']));
 
       return $this->successResponse($publishingDetail);
-    } catch (\Illuminate\Validation\ValidationException $e) {
+    } catch (ValidationException $e) {
       throw $e;
     } catch (\Exception $e) {
       throw new ServerErrorException('Error al actualizar articulo de publicación', null, $e);

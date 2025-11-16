@@ -13,16 +13,94 @@ use App\Exceptions\ConflictException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ServerErrorException;
 
+/**
+ * @resource Authors
+ *
+ * Endpoints para la gestión de autores.
+ * Usa JWT en el header: `Authorization: Bearer {token}`.
+ */
 class AuthorController extends Controller
 {
 
   use ApiResponse;
   use SearchFilter;
+
+  /**
+   * Constructor (middleware)
+   *
+   * Aplica el middleware `auth:api` a todas las rutas.
+   */
   public function __construct()
   {
     $this->middleware('auth:api');
   }
 
+  /**
+   * Listar autores
+   * 
+   * Obtiene una lista paginada de autores con opciones de búsqueda y ordenamiento.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de consulta (Query Parameters):**
+   * - `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
+   * - `limit` (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: `10`
+   * - `search` (string, opcional): Búsqueda por nombre o apellido. Ejemplo: `García`
+   * - `sort` (string, opcional): Campo para ordenar (id, name, lastname). Ejemplo: `name:asc`
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X GET "http://localhost/api/authors/getAuthors?page=1&limit=10&search=García" \
+   *   -H "Accept: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+   * ```
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Autores obtenidos exitosamente",
+   *   "data": [
+   *     {
+   *       "id": 1,
+   *       "name": "Juan",
+   *       "lastname": "García",
+   *       "created_at": "2025-11-15 10:30:00",
+   *       "updated_at": "2025-11-15 10:30:00"
+   *     },
+   *     {
+   *       "id": 2,
+   *       "name": "María",
+   *       "lastname": "López",
+   *       "created_at": "2025-11-15 11:00:00",
+   *       "updated_at": "2025-11-15 11:00:00"
+   *     }
+   *   ],
+   *   "pagination": {
+   *     "total": 50,
+   *     "current_page": 1,
+   *     "last_page": 5,
+   *     "per_page": 10,
+   *     "from": 1,
+   *     "to": 10
+   *   }
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   * 
+   * @response 422 {
+   *   "ok": false,
+   *   "error": "Validation Error",
+   *   "message": "Los datos proporcionados no son válidos",
+   *   "errors": {
+   *     "page": ["The page must be at least 1."],
+   *     "limit": ["The limit must be at least 10."]
+   *   }
+   * }
+   */
   public function index(Request $request)
   {
     try {
@@ -78,6 +156,48 @@ class AuthorController extends Controller
     }
   }
 
+  /**
+   * Obtener un autor
+   * 
+   * Obtiene la información detallada de un autor específico por su ID.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de ruta (URL Parameters):**
+   * - `id` (integer, requerido): ID del autor a consultar. Ejemplo: `1`
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X GET "http://localhost/api/authors/getAuthor/1" \
+   *   -H "Accept: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+   * ```
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Autor obtenido exitosamente",
+   *   "data": {
+   *     "id": 1,
+   *     "name": "Juan",
+   *     "lastname": "García",
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 10:30:00"
+   *   }
+   * }
+   * 
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "Not Found",
+   *   "message": "Autor no encontrado"
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function find($id)
   {
     try {
@@ -98,6 +218,69 @@ class AuthorController extends Controller
     }
   }
 
+  /**
+   * Crear un autor
+   * 
+   * Crea un nuevo autor en el sistema.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros del Body:**
+   * - `name` (string, requerido): Nombre del autor (máximo 255 caracteres). Ejemplo: `Juan`
+   * - `lastname` (string, requerido): Apellido del autor (máximo 255 caracteres). Ejemplo: `García`
+   * 
+   * **Ejemplo de petición (JSON):**
+   * ```json
+   * {
+   *   "name": "Juan",
+   *   "lastname": "García"
+   * }
+   * ```
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X POST "http://localhost/api/authors/createAuthor" \
+   *   -H "Accept: application/json" \
+   *   -H "Content-Type: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+   *   -d '{"name":"Juan","lastname":"García"}'
+   * ```
+   * 
+   * @authenticated
+   * 
+   * @response 201 {
+   *   "ok": true,
+   *   "message": "Autor creado exitosamente",
+   *   "data": {
+   *     "id": 1,
+   *     "name": "Juan",
+   *     "lastname": "García",
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 10:30:00"
+   *   }
+   * }
+   * 
+   * @response 409 {
+   *   "ok": false,
+   *   "error": "Conflict",
+   *   "message": "El autor enviado ya existe"
+   * }
+   * 
+   * @response 422 {
+   *   "ok": false,
+   *   "error": "Validation Error",
+   *   "message": "Los datos proporcionados no son válidos",
+   *   "errors": {
+   *     "name": ["The name field is required."],
+   *     "lastname": ["The lastname field is required."]
+   *   }
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function create(Request $request)
   {
     try {
@@ -129,6 +312,78 @@ class AuthorController extends Controller
     }
   }
 
+  /**
+   * Actualizar un autor
+   * 
+   * Actualiza la información de un autor existente.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de ruta (URL Parameters):**
+   * - `id` (integer, requerido): ID del autor a actualizar. Ejemplo: `1`
+   * 
+   * **Parámetros del Body:**
+   * - `name` (string, requerido): Nuevo nombre del autor (máximo 255 caracteres). Ejemplo: `Juan Carlos`
+   * - `lastname` (string, requerido): Nuevo apellido del autor (máximo 255 caracteres). Ejemplo: `García Pérez`
+   * 
+   * **Ejemplo de petición (JSON):**
+   * ```json
+   * {
+   *   "name": "Juan Carlos",
+   *   "lastname": "García Pérez"
+   * }
+   * ```
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X POST "http://localhost/api/authors/updateAuthor/1" \
+   *   -H "Accept: application/json" \
+   *   -H "Content-Type: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+   *   -d '{"name":"Juan Carlos","lastname":"García Pérez"}'
+   * ```
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Autor actualizado exitosamente",
+   *   "data": {
+   *     "id": 1,
+   *     "name": "Juan Carlos",
+   *     "lastname": "García Pérez",
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 12:00:00"
+   *   }
+   * }
+   * 
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "Not Found",
+   *   "message": "Autor no encontrado"
+   * }
+   * 
+   * @response 409 {
+   *   "ok": false,
+   *   "error": "Conflict",
+   *   "message": "El autor enviado ya existe"
+   * }
+   * 
+   * @response 422 {
+   *   "ok": false,
+   *   "error": "Validation Error",
+   *   "message": "Los datos proporcionados no son válidos",
+   *   "errors": {
+   *     "name": ["The name field is required."],
+   *     "lastname": ["The lastname field is required."]
+   *   }
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function update(Request $request, $id = null)
   {
     try {
@@ -166,6 +421,53 @@ class AuthorController extends Controller
     }
   }
 
+  /**
+   * Eliminar un autor
+   * 
+   * Elimina un autor del sistema. También elimina las relaciones del autor con las publicaciones.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de ruta (URL Parameters):**
+   * - `id` (integer, requerido): ID del autor a eliminar. Ejemplo: `1`
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X POST "http://localhost/api/authors/deleteAuthor/1" \
+   *   -H "Accept: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+   * ```
+   * 
+   * **Nota:** Esta operación eliminará el autor y todas sus relaciones con publicaciones, pero no eliminará las publicaciones mismas.
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Autor eliminado exitosamente",
+   *   "data": null
+   * }
+   * 
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "Not Found",
+   *   "message": "Autor no encontrado"
+   * }
+   * 
+   * @response 422 {
+   *   "ok": false,
+   *   "error": "Validation Error",
+   *   "message": "Los datos proporcionados no son válidos",
+   *   "errors": {
+   *     "id": ["The selected id is invalid."]
+   *   }
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function delete($id = null)
   {
     try {

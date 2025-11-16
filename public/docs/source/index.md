@@ -1,0 +1,2283 @@
+---
+title: API Reference
+
+language_tabs:
+- bash
+- javascript
+
+includes:
+
+search: true
+
+toc_footers:
+- <a href='http://github.com/mpociot/documentarian'>Documentation Powered by Documentarian</a>
+---
+<!-- START_INFO -->
+# Info
+
+Welcome to the generated API reference.
+[Get Postman Collection](http://localhost/docs/collection.json)
+
+<!-- END_INFO -->
+
+#Auth
+
+Endpoints de autenticación (login, renovación de token y logout).
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_a925a8d22b3615f12fca79456d286859 -->
+## Iniciar sesión
+
+Autentica a un usuario con sus credenciales y devuelve un token JWT.
+El token debe ser incluido en el header Authorization como Bearer token para las siguientes peticiones.
+
+**Parámetros del Body:**
+- `token` (string, requerido): El token único del usuario (username). Ejemplo: `admin123`
+- `password` (string, requerido): La contraseña del usuario. Ejemplo: `password123`
+
+```json
+{
+  "token": "admin123",
+  "password": "mySecurePassword123"
+}
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/auth/login" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/auth/login",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Usuario conectado correctamente",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTczMTY5NjAwMCwiZXhwIjoxNzMxNjk5NjAwLCJuYmYiOjE3MzE2OTYwMDAsImp0aSI6ImFiY2RlZjEyMzQ1IiwidXNlcl9pZCI6MX0",
+    "user": {
+        "id": 1,
+        "name": "Juan Pérez",
+        "email": "juan@example.com",
+        "token": "admin123",
+        "active": 1,
+        "join_date": "2025-11-15 10:30:00",
+        "last_login_date": "2025-11-15 10:30:00"
+    },
+    "rol": {
+        "id": 1,
+        "name": "Administrador"
+    },
+    "first_login": "2025-01-10 08:00:00",
+    "last_login": "2025-11-14 15:45:00"
+}
+```
+
+### HTTP Request
+`POST api/auth/login`
+
+
+<!-- END_a925a8d22b3615f12fca79456d286859 -->
+
+<!-- START_a72455bc9968f52ac7e1d8518d843eb6 -->
+## Renovar token
+
+Renueva un token JWT existente antes de que expire completamente.
+El usuario debe estar autenticado con un token válido para poder renovarlo.
+
+**Autenticación requerida:**
+Este endpoint requiere que incluyas tu token JWT actual en el header de autorización.
+
+**Header requerido:**
+- `Authorization`: Bearer {tu_token_actual}
+
+```bash
+curl -X GET "http://localhost/api/auth/renew" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/auth/renew" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/auth/renew",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Token renovado correctamente",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MFwvYXBpXC9hdXRoXC9yZW5ldyIsImlhdCI6MTczMTY5NjAwMCwiZXhwIjoxNzMxNjk5NjAwLCJuYmYiOjE3MzE2OTYwMDAsImp0aSI6ImFiY2RlZjEyMzQ1IiwidXNlcl9pZCI6MX0",
+    "user": {
+        "id": 1,
+        "name": "Juan Pérez",
+        "email": "juan@example.com",
+        "token": "admin123",
+        "active": 1
+    }
+}
+```
+
+### HTTP Request
+`GET api/auth/renew`
+
+
+<!-- END_a72455bc9968f52ac7e1d8518d843eb6 -->
+
+<!-- START_19ff1b6f8ce19d3c444e9b518e8f7160 -->
+## Cerrar sesión
+
+Invalida el token JWT actual del usuario, cerrando su sesión.
+Después de cerrar sesión, el token ya no será válido para futuras peticiones.
+
+**Autenticación requerida:**
+Este endpoint requiere que incluyas tu token JWT actual en el header de autorización.
+
+**Header requerido:**
+- `Authorization`: Bearer {tu_token_actual}
+
+```bash
+curl -X POST "http://localhost/api/auth/logout" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**Nota:** Una vez que cierres sesión, deberás volver a iniciar sesión para obtener un nuevo token.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/auth/logout" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/auth/logout",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "message": "Usuario desconectado correctamente"
+}
+```
+
+### HTTP Request
+`POST api/auth/logout`
+
+
+<!-- END_19ff1b6f8ce19d3c444e9b518e8f7160 -->
+
+#Authors
+
+Endpoints para la gestión de autores.
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_b9db63505163eb92403717250ed1745e -->
+## Listar autores
+
+Obtiene una lista paginada de autores con opciones de búsqueda y ordenamiento.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de consulta (Query Parameters):**
+- `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: `10`
+- `search` (string, opcional): Búsqueda por nombre o apellido. Ejemplo: `García`
+- `sort` (string, opcional): Campo para ordenar (id, name, lastname). Ejemplo: `name:asc`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X GET "http://localhost/api/authors/getAuthors?page=1&limit=10&search=García" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/authors/getAuthors" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/getAuthors",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autores obtenidos exitosamente",
+    "data": [
+        {
+            "id": 1,
+            "name": "Juan",
+            "lastname": "García",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        },
+        {
+            "id": 2,
+            "name": "María",
+            "lastname": "López",
+            "created_at": "2025-11-15 11:00:00",
+            "updated_at": "2025-11-15 11:00:00"
+        }
+    ],
+    "pagination": {
+        "total": 50,
+        "current_page": 1,
+        "last_page": 5,
+        "per_page": 10,
+        "from": 1,
+        "to": 10
+    }
+}
+```
+
+### HTTP Request
+`GET api/authors/getAuthors`
+
+
+<!-- END_b9db63505163eb92403717250ed1745e -->
+
+<!-- START_61f6ceba7c1c20445e8c048a58341d74 -->
+## Obtener un autor
+
+Obtiene la información detallada de un autor específico por su ID.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del autor a consultar. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X GET "http://localhost/api/authors/getAuthor/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/authors/getAuthor/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/getAuthor/{id?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autor obtenido exitosamente",
+    "data": {
+        "id": 1,
+        "name": "Juan",
+        "lastname": "García",
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}
+```
+
+### HTTP Request
+`GET api/authors/getAuthor/{id?}`
+
+
+<!-- END_61f6ceba7c1c20445e8c048a58341d74 -->
+
+<!-- START_4b1b0caf286ea71c299b0389a6525a2c -->
+## Crear un autor
+
+Crea un nuevo autor en el sistema.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros del Body:**
+- `name` (string, requerido): Nombre del autor (máximo 255 caracteres). Ejemplo: `Juan`
+- `lastname` (string, requerido): Apellido del autor (máximo 255 caracteres). Ejemplo: `García`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "name": "Juan",
+  "lastname": "García"
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/authors/createAuthor" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"name":"Juan","lastname":"García"}'
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/authors/createAuthor" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/createAuthor",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+null
+```
+
+### HTTP Request
+`POST api/authors/createAuthor`
+
+
+<!-- END_4b1b0caf286ea71c299b0389a6525a2c -->
+
+<!-- START_5b035c2aca4a9dc77187e2e7f08080f8 -->
+## Actualizar un autor
+
+Actualiza la información de un autor existente.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del autor a actualizar. Ejemplo: `1`
+
+**Parámetros del Body:**
+- `name` (string, requerido): Nuevo nombre del autor (máximo 255 caracteres). Ejemplo: `Juan Carlos`
+- `lastname` (string, requerido): Nuevo apellido del autor (máximo 255 caracteres). Ejemplo: `García Pérez`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "name": "Juan Carlos",
+  "lastname": "García Pérez"
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/authors/updateAuthor/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"name":"Juan Carlos","lastname":"García Pérez"}'
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/authors/updateAuthor/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/updateAuthor/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autor actualizado exitosamente",
+    "data": {
+        "id": 1,
+        "name": "Juan Carlos",
+        "lastname": "García Pérez",
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 12:00:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/authors/updateAuthor/{id?}`
+
+
+<!-- END_5b035c2aca4a9dc77187e2e7f08080f8 -->
+
+<!-- START_e1321a8b15fdbe094d92f98e3e9e5c4d -->
+## Eliminar un autor
+
+Elimina un autor del sistema. También elimina las relaciones del autor con las publicaciones.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del autor a eliminar. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/authors/deleteAuthor/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**Nota:** Esta operación eliminará el autor y todas sus relaciones con publicaciones, pero no eliminará las publicaciones mismas.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/authors/deleteAuthor/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/authors/deleteAuthor/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Autor eliminado exitosamente",
+    "data": null
+}
+```
+
+### HTTP Request
+`POST api/authors/deleteAuthor/{id?}`
+
+
+<!-- END_e1321a8b15fdbe094d92f98e3e9e5c4d -->
+
+#Categories
+
+Endpoints para la gestión de categorías y subcategorías del sistema editorial.
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_e025a908a743d8d7e8b0c3c27ddc9046 -->
+## Listar categorías
+
+Obtiene una lista de categorías. Por defecto obtiene solo las categorías padre con sus hijas recursivamente.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de consulta (Query Parameters):**
+- `getAll` (boolean, opcional): Si es `true`, obtiene todas las categorías sin estructura jerárquica.
+  Si es `false` u omitido, obtiene solo categorías padre con sus subcategorías anidadas.
+  Ejemplo: `1`, `true`, `false`
+
+**Ejemplo de petición (curl):**
+```bash
+# Obtener solo categorías padre con hijas
+curl -X GET "http://localhost/api/categories/getCategories" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+
+# Obtener todas las categorías planas
+curl -X GET "http://localhost/api/categories/getCategories?getAll=true" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/categories/getCategories" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/getCategories",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Categorías obtenidas correctamente",
+    "data": [
+        {
+            "id": 1,
+            "title": "Ciencias",
+            "description": "Categoría de ciencias",
+            "category_type": 1,
+            "state": 1,
+            "children_recursive": [
+                {
+                    "id": 2,
+                    "title": "Física",
+                    "description": "Subcategoría de física",
+                    "category_type": 1,
+                    "state": 1,
+                    "main_category": 1,
+                    "children_recursive": []
+                },
+                {
+                    "id": 3,
+                    "title": "Química",
+                    "description": "Subcategoría de química",
+                    "category_type": 1,
+                    "state": 1,
+                    "main_category": 1,
+                    "children_recursive": []
+                }
+            ]
+        }
+    ]
+}
+```
+
+### HTTP Request
+`GET api/categories/getCategories`
+
+
+<!-- END_e025a908a743d8d7e8b0c3c27ddc9046 -->
+
+<!-- START_b69b9dfb42050f0036c4a5ec9f9d6a6b -->
+## Obtener una categoría
+
+Obtiene la información detallada de una categoría específica por su ID, incluyendo sus detalles adicionales.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID de la categoría a consultar. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X GET "http://localhost/api/categories/getCategory/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/categories/getCategory/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/getCategory/{id?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Categoría obtenida correctamente",
+    "data": {
+        "id": 1,
+        "title": "Ciencias",
+        "description": "Categoría de ciencias",
+        "main_category": null,
+        "state": 1,
+        "is_featured": 0,
+        "language_id": 1,
+        "category_type": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00",
+        "detail": {
+            "id": 1,
+            "category_id": 1,
+            "language_id": 1,
+            "about": "Información sobre la categoría",
+            "editorial_board": "Consejo editorial",
+            "policy": "Políticas de publicación",
+            "norms": "Normas de la categoría",
+            "process": "Proceso de publicación",
+            "contact": "info@example.com"
+        }
+    }
+}
+```
+
+### HTTP Request
+`GET api/categories/getCategory/{id?}`
+
+
+<!-- END_b69b9dfb42050f0036c4a5ec9f9d6a6b -->
+
+<!-- START_73cd004146fd92a9601b7943fa74d33c -->
+## Crear una categoría
+
+Crea una nueva categoría en el sistema. Por defecto se crea como categoría padre (sin categoría principal).
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros del Body:**
+- `title` (string, requerido): Título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias`
+- `description` (string, opcional): Descripción de la categoría. Ejemplo: `Categoría de ciencias`
+- `category_type` (integer, opcional): Tipo de categoría. Ejemplo: `1`
+- `language_id` (integer, opcional): ID del idioma. Por defecto: `1`. Ejemplo: `1`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "title": "Ciencias",
+  "description": "Categoría de ciencias exactas",
+  "category_type": 1,
+  "language_id": 1
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/categories/createCategory" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"title":"Ciencias","description":"Categoría de ciencias exactas","category_type":1}'
+```
+
+**Nota:** La categoría se crea activa (`state=1`) y como categoría padre (`main_category=null`) por defecto.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/categories/createCategory" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/createCategory",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Categoría creada correctamente",
+    "data": {
+        "id": 1,
+        "title": "Ciencias",
+        "description": "Categoría de ciencias exactas",
+        "main_category": null,
+        "state": 1,
+        "is_featured": 0,
+        "language_id": 1,
+        "category_type": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/categories/createCategory`
+
+
+<!-- END_73cd004146fd92a9601b7943fa74d33c -->
+
+<!-- START_1263912fd1b0f393408f41322fb6c8fe -->
+## Actualizar una categoría
+
+Actualiza la información de una categoría existente, incluyendo sus detalles adicionales.
+Permite convertir una categoría padre en subcategoría o viceversa.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID de la categoría a actualizar. Ejemplo: `1`
+
+**Parámetros del Body:**
+- `title` (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias Exactas`
+- `description` (string, opcional): Nueva descripción. Ejemplo: `Categoría actualizada`
+- `main_category` (integer, nullable): ID de la categoría padre. Si es `null` o vacío, se mantiene como categoría padre. Ejemplo: `2`
+- `is_featured` (boolean, opcional): Si la categoría es destacada. Ejemplo: `true`
+- `about` (string, opcional): Información sobre la categoría. Ejemplo: `Sobre esta categoría`
+- `editorial_board` (string, opcional): Consejo editorial. Ejemplo: `Lista de editores`
+- `policy` (string, opcional): Políticas de publicación. Ejemplo: `Políticas editoriales`
+- `norms` (string, opcional): Normas de la categoría. Ejemplo: `Normas de publicación`
+- `process` (string, opcional): Proceso de publicación. Ejemplo: `Proceso editorial`
+- `contact` (string, opcional): Información de contacto. Ejemplo: `editorial@example.com`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "title": "Ciencias Exactas",
+  "description": "Categoría actualizada de ciencias",
+  "main_category": null,
+  "is_featured": true,
+  "about": "Información sobre la categoría",
+  "editorial_board": "Dr. Juan Pérez, Dra. María López",
+  "policy": "Políticas de revisión por pares",
+  "norms": "Normas APA 7",
+  "process": "Proceso de revisión en 30 días",
+  "contact": "ciencias@example.com"
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/categories/updateCategory/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"title":"Ciencias Exactas","description":"Categoría actualizada","is_featured":true}'
+```
+
+**Nota:** Si se envían campos de detalle (about, editorial_board, etc.), se creará o actualizará el registro en `categories_details`.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/categories/updateCategory/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/updateCategory/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Categoría actualizada correctamente",
+    "data": {
+        "id": 1,
+        "title": "Ciencias Exactas",
+        "description": "Categoría actualizada de ciencias",
+        "main_category": null,
+        "state": 1,
+        "is_featured": 1,
+        "language_id": 1,
+        "category_type": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 12:00:00",
+        "detail": {
+            "id": 1,
+            "category_id": 1,
+            "language_id": 1,
+            "about": "Información sobre la categoría",
+            "editorial_board": "Dr. Juan Pérez, Dra. María López",
+            "policy": "Políticas de revisión por pares",
+            "norms": "Normas APA 7",
+            "process": "Proceso de revisión en 30 días",
+            "contact": "ciencias@example.com"
+        }
+    }
+}
+```
+
+### HTTP Request
+`POST api/categories/updateCategory/{id?}`
+
+
+<!-- END_1263912fd1b0f393408f41322fb6c8fe -->
+
+<!-- START_4feae160b9ae5351c9386deab52228dc -->
+## Activar/Desactivar categoría
+
+Alterna el estado de una categoría (activa/inactiva).
+Si es una categoría padre, también afecta recursivamente a todas sus subcategorías.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/categories/toggleState/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**Comportamiento:**
+- Si la categoría está **activa** y tiene subcategorías: se desactiva junto con todas sus subcategorías recursivamente
+- Si la categoría está **inactiva** y tiene subcategorías: se activa junto con todas sus subcategorías recursivamente
+- Si es una categoría sin hijas: solo cambia su propio estado
+
+**Nota importante:** Esta operación usa transacciones de base de datos para garantizar la consistencia.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/categories/toggleState/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/toggleState/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Categoría activada correctamente",
+    "data": {
+        "id": 1,
+        "title": "Ciencias",
+        "description": "Categoría de ciencias",
+        "main_category": null,
+        "state": 1,
+        "is_featured": 0,
+        "language_id": 1,
+        "category_type": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 12:30:00",
+        "children_recursive": [
+            {
+                "id": 2,
+                "title": "Física",
+                "state": 1,
+                "main_category": 1
+            }
+        ]
+    }
+}
+```
+
+### HTTP Request
+`POST api/categories/toggleState/{id?}`
+
+
+<!-- END_4feae160b9ae5351c9386deab52228dc -->
+
+#Category Types
+
+Endpoints para la gestión de tipos de categorías.
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_658bb2bbcd93a39102798b891f308fdc -->
+## Listar tipos de categoría
+
+Obtiene todos los tipos de categoría disponibles en el sistema.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de consulta (Query Parameters):**
+- `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X GET "http://localhost/api/categoryTypes/getCategoryTypes" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**Nota:** Actualmente devuelve todos los tipos sin paginación.
+Si se requiere paginación en el futuro, revisar el código comentado en el controlador.
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/categoryTypes/getCategoryTypes" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categoryTypes/getCategoryTypes",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Tipos de categoría obtenidos exitosamente",
+    "data": [
+        {
+            "id": 1,
+            "name": "Revista",
+            "description": "Publicaciones periódicas",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        },
+        {
+            "id": 2,
+            "name": "Libro",
+            "description": "Publicaciones en formato libro",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        }
+    ]
+}
+```
+
+### HTTP Request
+`GET api/categoryTypes/getCategoryTypes`
+
+
+<!-- END_658bb2bbcd93a39102798b891f308fdc -->
+
+#PublishingDetail
+
+Endpoints para la gestión de detalles de publicaciones (revistas).
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_3baa66247916c6f29706b1dba1d0f3b6 -->
+## api/publishingDetails/createPublishingDetail
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishingDetails/createPublishingDetail" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishingDetails/createPublishingDetail",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/publishingDetails/createPublishingDetail`
+
+
+<!-- END_3baa66247916c6f29706b1dba1d0f3b6 -->
+
+<!-- START_a802abe40b0b7535aa3b715bd30146f7 -->
+## api/publishingDetails/updatePublishingDetail/{id?}
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishingDetails/updatePublishingDetail/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishingDetails/updatePublishingDetail/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/publishingDetails/updatePublishingDetail/{id?}`
+
+
+<!-- END_a802abe40b0b7535aa3b715bd30146f7 -->
+
+<!-- START_a9da9d3b2714b3d6a886603796446c9c -->
+## api/publishingDetails/deletePublishingDetail/{id?}
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishingDetails/deletePublishingDetail/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishingDetails/deletePublishingDetail/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/publishingDetails/deletePublishingDetail/{id?}`
+
+
+<!-- END_a9da9d3b2714b3d6a886603796446c9c -->
+
+#Publishings
+
+Endpoints para la gestión de publicaciones (libros y revistas).
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_f32197e71cb96cfd48b93667b5eedf8c -->
+## Listar publicaciones
+
+Obtiene una lista paginada de publicaciones (libros y revistas) con opciones de filtrado, búsqueda y ordenamiento.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de consulta (Query Parameters):**
+- `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: `10`
+- `publishing_type` (integer, opcional): Tipo de publicación (1=Libro, 2=Revista). Ejemplo: `1`
+- `language_id` (integer, opcional): ID del idioma para las traducciones. Por defecto: 1. Ejemplo: `1`
+- `search` (string, opcional): Búsqueda por título. Ejemplo: `Laravel`
+- `category` (integer, opcional): Filtrar por ID de categoría. Ejemplo: `3`
+- `is_archived` (integer, opcional): Filtrar por estado (0=Activo, 1=Archivado). Ejemplo: `0`
+- `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at, publishing_type). Ejemplo: `title:asc`
+
+
+```bash
+curl -X GET "http://localhost/api/publishings/getPublishings?page=1&limit=10&publishing_type=1&search=Laravel" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/getPublishings" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/getPublishings",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicaciones obtenidas correctamente",
+    "data": [
+        {
+            "id": 1,
+            "title": "Laravel para Principiantes",
+            "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
+            "pages": 320,
+            "publish_date": "2025-01-15",
+            "publish_code": "978-84-9876-123-4",
+            "category_id": 3,
+            "publishing_type": 1,
+            "is_new_arrival": true,
+            "is_archived": false,
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00",
+            "type": {
+                "id": 1,
+                "name": "Libro"
+            },
+            "authors": [
+                {
+                    "id": 1,
+                    "name": "Juan",
+                    "lastname": "García"
+                }
+            ],
+            "translation": {
+                "id": 1,
+                "title": "Laravel para Principiantes",
+                "URL": "laravel-para-principiantes",
+                "language_id": 1
+            }
+        }
+    ],
+    "pagination": {
+        "total": 50,
+        "current_page": 1,
+        "last_page": 5,
+        "per_page": 10,
+        "from": 1,
+        "to": 10
+    }
+}
+```
+
+### HTTP Request
+`GET api/publishings/getPublishings`
+
+
+<!-- END_f32197e71cb96cfd48b93667b5eedf8c -->
+
+<!-- START_ad89b3f28c1bdbc089c08760b57e4f29 -->
+## Obtener una publicación
+
+Obtiene la información detallada de una publicación específica con todas sus relaciones (tipo, autores, detalles, traducciones).
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID de la publicación a consultar. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X GET "http://localhost/api/publishings/getPublishing/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/getPublishing/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/getPublishing/{id?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación obtenida exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Laravel para Principiantes",
+        "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
+        "pages": 320,
+        "publish_date": "2025-01-15",
+        "publish_code": "978-84-9876-123-4",
+        "category_id": 3,
+        "publishing_type": 1,
+        "is_new_arrival": true,
+        "is_archived": false,
+        "type": {
+            "id": 1,
+            "name": "Libro"
+        },
+        "authors": [
+            {
+                "id": 1,
+                "name": "Juan",
+                "lastname": "García"
+            }
+        ],
+        "translations": [
+            {
+                "id": 1,
+                "title": "Laravel para Principiantes",
+                "URL": "laravel-para-principiantes",
+                "language": {
+                    "id": 1,
+                    "name": "Español"
+                }
+            }
+        ]
+    }
+}
+```
+
+### HTTP Request
+`GET api/publishings/getPublishing/{id?}`
+
+
+<!-- END_ad89b3f28c1bdbc089c08760b57e4f29 -->
+
+<!-- START_bd07c46bcd1ea465d2b325edab2a8edf -->
+## Crear una publicación
+
+Crea una nueva publicación (libro o revista) con sus traducciones en múltiples idiomas.
+Esta es una operación inicial que crea la publicación base, luego debe actualizarse con más detalles.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros del Body:**
+- `title` (string, requerido): Título principal de la publicación (máximo 255 caracteres). Ejemplo: `Laravel para Principiantes`
+- `URL` (string, opcional): URL slug de la publicación. Ejemplo: `laravel-para-principiantes`
+- `category_id` (integer, opcional): ID de la categoría. Ejemplo: `3`
+- `publishing_type` (integer, requerido): Tipo de publicación (1=Libro, 2=Revista). Ejemplo: `1`
+- `translations` (array, requerido): Array de traducciones (mínimo 1)
+- `translations[].language_id` (integer, requerido): ID del idioma. Ejemplo: `1`
+- `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres). Ejemplo: `Laravel for Beginners`
+- `translations[].URL` (string, opcional): URL slug traducida. Ejemplo: `laravel-for-beginners`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "title": "Laravel para Principiantes",
+  "URL": "laravel-para-principiantes",
+  "category_id": 3,
+  "publishing_type": 1,
+  "translations": [
+    {
+      "language_id": 1,
+      "title": "Laravel para Principiantes",
+      "URL": "laravel-para-principiantes"
+    },
+    {
+      "language_id": 2,
+      "title": "Laravel for Beginners",
+      "URL": "laravel-for-beginners"
+    }
+  ]
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/publishings/createPublishing" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"title":"Laravel para Principiantes","publishing_type":1,"translations":[{"language_id":1,"title":"Laravel para Principiantes"}]}'
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/createPublishing" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/createPublishing",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicacion creada exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Laravel para Principiantes",
+        "URL": "laravel-para-principiantes",
+        "category_id": 3,
+        "publishing_type": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/publishings/createPublishing`
+
+
+<!-- END_bd07c46bcd1ea465d2b325edab2a8edf -->
+
+<!-- START_ef93a34472cbbf4adc14b6f2833ce65d -->
+## Actualizar una publicación
+
+Actualiza una publicación existente. Los campos requeridos varían según el tipo de publicación:
+- **Libros (publishing_type=1)**: Requiere páginas, fecha de publicación, código ISBN, y puede incluir portada
+- **Revistas (publishing_type=2)**: Además de lo anterior, puede incluir año, número, volumen
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID de la publicación a actualizar. Ejemplo: `1`
+
+**Parámetros del Body (para Libros - publishing_type=1):**
+- `publishing_type` (integer, requerido): Debe ser 1 para libros
+- `pages` (integer, requerido): Número de páginas. Ejemplo: `320`
+- `publish_date` (date, requerido): Fecha de publicación. Ejemplo: `2025-01-15`
+- `publish_code` (string, requerido): Código ISBN (formato: XXX-XX-XXXX-XXX-X). Ejemplo: `978-84-9876-123-4`
+- `category_id` (integer, opcional): ID de categoría. Ejemplo: `3`
+- `is_new_arrival` (boolean, opcional): ¿Es novedad? Ejemplo: `true`
+- `translations` (array, requerido): Array de traducciones
+- `translations[].language_id` (integer, requerido): ID del idioma
+- `translations[].title` (string, requerido): Título traducido
+- `translations[].URL` (string, opcional): URL slug
+- `authors` (array, opcional): Array de IDs de autores. Ejemplo: `[1, 2]`
+- `cover` (file, opcional): Imagen de portada (JPEG, PNG)
+
+**Parámetros del Body (para Revistas - publishing_type=2):**
+- `publishing_type` (integer, requerido): Debe ser 2 para revistas
+- `pages` (integer, requerido): Número de páginas
+- `publish_date` (date, requerido): Fecha de publicación
+- `publish_code` (string, requerido): Código ISSN
+- `age` (integer, opcional): Año de la revista. Ejemplo: `2025`
+- `age_number` (integer, opcional): Número dentro del año. Ejemplo: `3`
+- `volume` (integer, opcional): Volumen. Ejemplo: `12`
+- `is_new_arrival` (boolean, opcional): ¿Es novedad?
+- `category_id` (integer, opcional): ID de categoría
+- `translations` (array, requerido): Array de traducciones
+- `authors` (array, opcional): Array de IDs de autores
+- `cover` (file, opcional): Imagen de portada
+
+**Ejemplo de petición para Libro (multipart/form-data):**
+```bash
+curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -F "publishing_type=1" \
+  -F "pages=320" \
+  -F "publish_date=2025-01-15" \
+  -F "publish_code=978-84-9876-123-4" \
+  -F "category_id=3" \
+  -F "is_new_arrival=1" \
+  -F "translations[0][language_id]=1" \
+  -F "translations[0][title]=Laravel para Principiantes" \
+  -F "translations[0][URL]=laravel-para-principiantes" \
+  -F "authors[]=1" \
+  -F "authors[]=2" \
+  -F "cover=@/path/to/cover.jpg"
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/updatePublishing/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/updatePublishing/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación actualizada exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Laravel para Principiantes",
+        "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
+        "pages": 320,
+        "publish_date": "2025-01-15",
+        "publish_code": "978-84-9876-123-4",
+        "category_id": 3,
+        "publishing_type": 1,
+        "is_new_arrival": true
+    }
+}
+```
+
+### HTTP Request
+`POST api/publishings/updatePublishing/{id?}`
+
+
+<!-- END_ef93a34472cbbf4adc14b6f2833ce65d -->
+
+<!-- START_4f71d50134a0a4c178582dc2fc2aa3e5 -->
+## Cambiar estado de archivo de una publicación
+
+Alterna el estado de archivo de una publicación entre activo (0) y archivado (1).
+Las publicaciones archivadas no aparecen en las búsquedas normales pero pueden ser recuperadas.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID de la publicación. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/publishings/updateStatus/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**Nota:** Este endpoint alterna el estado automáticamente. Si está activo (0) lo archiva (1) y viceversa.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/updateStatus/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/updateStatus/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación archivada exitosamente",
+    "data": null
+}
+```
+
+### HTTP Request
+`POST api/publishings/updateStatus/{id?}`
+
+
+<!-- END_4f71d50134a0a4c178582dc2fc2aa3e5 -->
+
+<!-- START_2ebc19a9c467323e08aee4aeb2bceeef -->
+## Eliminar una publicación
+
+Elimina permanentemente una publicación del sistema junto con todas sus relaciones (autores, detalles, traducciones).
+También elimina la imagen de portada del servidor si existe.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID de la publicación a eliminar. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/publishings/deletePublishing/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**IMPORTANTE:**
+- La publicación DEBE estar archivada (is_archived=1) antes de poder eliminarla.
+- Esta operación es IRREVERSIBLE y eliminará toda la información relacionada.
+- Se eliminarán: autores asociados, detalles, traducciones y archivo de portada.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/publishings/deletePublishing/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/deletePublishing/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación eliminada exitosamente",
+    "data": null
+}
+```
+
+### HTTP Request
+`POST api/publishings/deletePublishing/{id?}`
+
+
+<!-- END_2ebc19a9c467323e08aee4aeb2bceeef -->
+
+<!-- START_5d4088a4940540ba2e40f3f61016e478 -->
+## Resumen del dashboard
+
+Obtiene un resumen estadístico con el conteo total de libros y revistas en el sistema.
+Útil para mostrar en el dashboard o página principal.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X GET "http://localhost/api/publishings/summary" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/summary" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/summary",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Resumen del dashboard obtenido correctamente",
+    "data": {
+        "books": 125,
+        "magazines": 87
+    }
+}
+```
+
+### HTTP Request
+`GET api/publishings/summary`
+
+
+<!-- END_5d4088a4940540ba2e40f3f61016e478 -->
+
+#Roles
+
+Endpoints para la gestión de roles de usuarios.
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_d0505dab0b8dac386a10ea0f27445f01 -->
+## Listar roles
+
+Obtiene todos los roles disponibles en el sistema.
+
+**Parámetros de consulta (Query Parameters):**
+- `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X GET "http://localhost/api/rol/getRol" \
+  -H "Accept: application/json"
+```
+
+**Nota:** Actualmente devuelve todos los roles sin paginación.
+Si se requiere paginación en el futuro, revisar el código comentado en el controlador.
+Este endpoint NO requiere autenticación actualmente.
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/rol/getRol" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/rol/getRol",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Roles obtenidos exitosamente",
+    "data": [
+        {
+            "id": 1,
+            "name": "Administrador",
+            "description": "Control total del sistema",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        },
+        {
+            "id": 2,
+            "name": "Editor",
+            "description": "Puede editar publicaciones",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        },
+        {
+            "id": 3,
+            "name": "Revisor",
+            "description": "Puede revisar contenido",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        }
+    ]
+}
+```
+
+### HTTP Request
+`GET api/rol/getRol`
+
+
+<!-- END_d0505dab0b8dac386a10ea0f27445f01 -->
+
+<!-- START_4e3c593528e7edbafc2f458f2cde4089 -->
+## Crear un rol
+
+Crea un nuevo rol en el sistema.
+
+**Parámetros del Body:**
+- `name` (string, requerido): Nombre del rol (máximo 255 caracteres, debe ser único). Ejemplo: `Moderador`
+- `description` (string, opcional): Descripción del rol (máximo 500 caracteres). Ejemplo: `Puede moderar contenido`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "name": "Moderador",
+  "description": "Puede moderar contenido y aprobar publicaciones"
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/rol/createRol" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Moderador","description":"Puede moderar contenido"}'
+```
+
+**Nota:** Este endpoint NO requiere autenticación actualmente.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/rol/createRol" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/rol/createRol",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+null
+```
+
+### HTTP Request
+`POST api/rol/createRol`
+
+
+<!-- END_4e3c593528e7edbafc2f458f2cde4089 -->
+
+#Users
+
+Endpoints para la gestión de usuarios del sistema.
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_61b568955dfc112d52401a1ac60333a2 -->
+## Listar usuarios
+
+Obtiene una lista paginada de usuarios con sus roles asociados.
+Permite filtrar por rol y buscar por nombre.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de consulta (Query Parameters):**
+- `page` (integer, opcional): Número de página (mínimo 1). Por defecto: 1. Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: `10`
+- `rol_id` (integer, opcional): Filtrar usuarios por rol. Ejemplo: `1`
+- `search` (string, opcional): Buscar usuarios por nombre. Ejemplo: `Juan`
+- `sort` (string, opcional): Ordenar por campo (id, name, token). Ejemplo: `name:asc`
+
+**Ejemplo de petición (curl):**
+```bash
+# Listar todos los usuarios
+curl -X GET "http://localhost/api/users/getUsers?page=1&limit=10" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+
+# Filtrar por rol y buscar por nombre
+curl -X GET "http://localhost/api/users/getUsers?rol_id=1&search=Juan" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/users/getUsers" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/users/getUsers",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Usuarios obtenidos exitosamente",
+    "data": [
+        {
+            "id": 1,
+            "name": "Juan Pérez",
+            "token": "juanperez",
+            "rol_id": 1,
+            "active": 1,
+            "join_date": "2025-01-15 10:00:00",
+            "last_login_date": "2025-11-15 09:30:00",
+            "created_at": "2025-01-15 10:00:00",
+            "updated_at": "2025-11-15 09:30:00",
+            "rol": {
+                "id": 1,
+                "name": "Administrador",
+                "description": "Control total del sistema"
+            }
+        },
+        {
+            "id": 2,
+            "name": "María López",
+            "token": "marialopez",
+            "rol_id": 2,
+            "active": 1,
+            "join_date": "2025-02-20 11:00:00",
+            "last_login_date": "2025-11-14 16:45:00",
+            "created_at": "2025-02-20 11:00:00",
+            "updated_at": "2025-11-14 16:45:00",
+            "rol": {
+                "id": 2,
+                "name": "Editor",
+                "description": "Puede editar publicaciones"
+            }
+        }
+    ],
+    "pagination": {
+        "total": 50,
+        "current_page": 1,
+        "last_page": 5,
+        "per_page": 10,
+        "from": 1,
+        "to": 10
+    }
+}
+```
+
+### HTTP Request
+`GET api/users/getUsers`
+
+
+<!-- END_61b568955dfc112d52401a1ac60333a2 -->
+
+<!-- START_bdad24daa8aa8effe5bff98edf583f1f -->
+## Crear un usuario
+
+Crea un nuevo usuario en el sistema con su rol asignado.
+El usuario se crea activo por defecto y se establece una relación con el rol.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros del Body:**
+- `name` (string, requerido): Nombre del usuario (mínimo 2, máximo 255 caracteres, debe ser único). Ejemplo: `Carlos Ramírez`
+- `password` (string, requerido): Contraseña del usuario (mínimo 8 caracteres). Ejemplo: `SecurePass123`
+- `rol_id` (integer, requerido): ID del rol a asignar (debe existir en la tabla roles). Ejemplo: `2`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "name": "Carlos Ramírez",
+  "password": "SecurePass123",
+  "rol_id": 2
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/users/createUser" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"name":"Carlos Ramírez","password":"SecurePass123","rol_id":2}'
+```
+
+**Nota:**
+- La contraseña se encripta automáticamente con bcrypt
+- El campo `token` se genera automáticamente igual al `name`
+- El usuario se crea activo (`active=1`) por defecto
+- Se crea una relación en la tabla pivot `user_rol`
+- La operación usa transacción de base de datos
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/users/createUser" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/users/createUser",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+null
+```
+
+### HTTP Request
+`POST api/users/createUser`
+
+
+<!-- END_bdad24daa8aa8effe5bff98edf583f1f -->
+
+<!-- START_4b6533a6af57c56260dfd1718d7d15a6 -->
+## Actualizar un usuario
+
+Actualiza la información de un usuario existente, incluyendo su nombre y rol asignado.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del usuario a actualizar. Ejemplo: `1`
+
+**Parámetros del Body:**
+- `name` (string, requerido): Nuevo nombre del usuario (mínimo 2, máximo 255 caracteres, debe ser único excepto para el mismo usuario). Ejemplo: `Juan Carlos Pérez`
+- `rol_id` (integer, requerido): Nuevo ID del rol a asignar (debe existir en la tabla roles). Ejemplo: `1`
+
+**Ejemplo de petición (JSON):**
+```json
+{
+  "name": "Juan Carlos Pérez",
+  "rol_id": 1
+}
+```
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/users/updateUser/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"name":"Juan Carlos Pérez","rol_id":1}'
+```
+
+**Nota:**
+- La relación de roles se sincroniza automáticamente en la tabla pivot `user_rol`
+- La operación usa transacción de base de datos para garantizar consistencia
+- No se puede actualizar la contraseña a través de este endpoint
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/users/updateUser/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/users/updateUser/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Usuario actualizado exitosamente",
+    "data": {
+        "id": 1,
+        "name": "Juan Carlos Pérez",
+        "token": "juanperez",
+        "rol_id": 1,
+        "active": 1,
+        "join_date": "2025-01-15 10:00:00",
+        "last_login_date": "2025-11-15 09:30:00",
+        "created_at": "2025-01-15 10:00:00",
+        "updated_at": "2025-11-15 13:00:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/users/updateUser/{id?}`
+
+
+<!-- END_4b6533a6af57c56260dfd1718d7d15a6 -->
+
+<!-- START_887a98664fab32daa6f1f4e4045eadcb -->
+## Activar/Desactivar usuario
+
+Alterna el estado de un usuario entre activo e inactivo.
+Los usuarios inactivos no podrán iniciar sesión en el sistema.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del usuario cuyo estado se alternará. Ejemplo: `1`
+
+**Ejemplo de petición (curl):**
+```bash
+curl -X POST "http://localhost/api/users/toggleActive/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**Nota:** Esta operación es reversible. Puede activar o desactivar usuarios según sea necesario.
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/users/toggleActive/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/users/toggleActive/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Usuario activado exitosamente",
+    "data": {
+        "id": 1,
+        "name": "Juan Pérez",
+        "token": "juanperez",
+        "rol_id": 1,
+        "active": 1,
+        "join_date": "2025-01-15 10:00:00",
+        "last_login_date": "2025-11-15 09:30:00",
+        "created_at": "2025-01-15 10:00:00",
+        "updated_at": "2025-11-15 12:30:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/users/toggleActive/{id?}`
+
+
+<!-- END_887a98664fab32daa6f1f4e4045eadcb -->
+
+

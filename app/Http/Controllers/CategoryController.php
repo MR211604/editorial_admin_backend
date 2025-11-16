@@ -12,16 +12,93 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
 
+/**
+ * @resource Categories
+ *
+ * Endpoints para la gestión de categorías y subcategorías del sistema editorial.
+ * Usa JWT en el header: `Authorization: Bearer {token}`.
+ */
 class CategoryController extends Controller
 {
 
   use ApiResponse;
 
+  /**
+   * Constructor (middleware)
+   *
+   * Aplica el middleware `auth:api` a todas las rutas.
+   */
   public function __construct()
   {
     $this->middleware('auth:api');
   }
 
+  /**
+   * Listar categorías
+   * 
+   * Obtiene una lista de categorías. Por defecto obtiene solo las categorías padre con sus hijas recursivamente.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de consulta (Query Parameters):**
+   * - `getAll` (boolean, opcional): Si es `true`, obtiene todas las categorías sin estructura jerárquica. 
+   *   Si es `false` u omitido, obtiene solo categorías padre con sus subcategorías anidadas. 
+   *   Ejemplo: `1`, `true`, `false`
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * # Obtener solo categorías padre con hijas
+   * curl -X GET "http://localhost/api/categories/getCategories" \
+   *   -H "Accept: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+   * 
+   * # Obtener todas las categorías planas
+   * curl -X GET "http://localhost/api/categories/getCategories?getAll=true" \
+   *   -H "Accept: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+   * ```
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Categorías obtenidas correctamente",
+   *   "data": [
+   *     {
+   *       "id": 1,
+   *       "title": "Ciencias",
+   *       "description": "Categoría de ciencias",
+   *       "category_type": 1,
+   *       "state": 1,
+   *       "children_recursive": [
+   *         {
+   *           "id": 2,
+   *           "title": "Física",
+   *           "description": "Subcategoría de física",
+   *           "category_type": 1,
+   *           "state": 1,
+   *           "main_category": 1,
+   *           "children_recursive": []
+   *         },
+   *         {
+   *           "id": 3,
+   *           "title": "Química",
+   *           "description": "Subcategoría de química",
+   *           "category_type": 1,
+   *           "state": 1,
+   *           "main_category": 1,
+   *           "children_recursive": []
+   *         }
+   *       ]
+   *     }
+   *   ]
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function index(Request $request)
   {
     try {
@@ -47,6 +124,64 @@ class CategoryController extends Controller
     }
   }
 
+  /**
+   * Obtener una categoría
+   * 
+   * Obtiene la información detallada de una categoría específica por su ID, incluyendo sus detalles adicionales.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de ruta (URL Parameters):**
+   * - `id` (integer, requerido): ID de la categoría a consultar. Ejemplo: `1`
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X GET "http://localhost/api/categories/getCategory/1" \
+   *   -H "Accept: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+   * ```
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Categoría obtenida correctamente",
+   *   "data": {
+   *     "id": 1,
+   *     "title": "Ciencias",
+   *     "description": "Categoría de ciencias",
+   *     "main_category": null,
+   *     "state": 1,
+   *     "is_featured": 0,
+   *     "language_id": 1,
+   *     "category_type": 1,
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 10:30:00",
+   *     "detail": {
+   *       "id": 1,
+   *       "category_id": 1,
+   *       "language_id": 1,
+   *       "about": "Información sobre la categoría",
+   *       "editorial_board": "Consejo editorial",
+   *       "policy": "Políticas de publicación",
+   *       "norms": "Normas de la categoría",
+   *       "process": "Proceso de publicación",
+   *       "contact": "info@example.com"
+   *     }
+   *   }
+   * }
+   * 
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "Not Found",
+   *   "message": "Categoría no encontrada"
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function find($id = null)
   {
     try {
@@ -62,6 +197,79 @@ class CategoryController extends Controller
     }
   }
 
+  /**
+   * Crear una categoría
+   * 
+   * Crea una nueva categoría en el sistema. Por defecto se crea como categoría padre (sin categoría principal).
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros del Body:**
+   * - `title` (string, requerido): Título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias`
+   * - `description` (string, opcional): Descripción de la categoría. Ejemplo: `Categoría de ciencias`
+   * - `category_type` (integer, opcional): Tipo de categoría. Ejemplo: `1`
+   * - `language_id` (integer, opcional): ID del idioma. Por defecto: `1`. Ejemplo: `1`
+   * 
+   * **Ejemplo de petición (JSON):**
+   * ```json
+   * {
+   *   "title": "Ciencias",
+   *   "description": "Categoría de ciencias exactas",
+   *   "category_type": 1,
+   *   "language_id": 1
+   * }
+   * ```
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X POST "http://localhost/api/categories/createCategory" \
+   *   -H "Accept: application/json" \
+   *   -H "Content-Type: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+   *   -d '{"title":"Ciencias","description":"Categoría de ciencias exactas","category_type":1}'
+   * ```
+   * 
+   * **Nota:** La categoría se crea activa (`state=1`) y como categoría padre (`main_category=null`) por defecto.
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Categoría creada correctamente",
+   *   "data": {
+   *     "id": 1,
+   *     "title": "Ciencias",
+   *     "description": "Categoría de ciencias exactas",
+   *     "main_category": null,
+   *     "state": 1,
+   *     "is_featured": 0,
+   *     "language_id": 1,
+   *     "category_type": 1,
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 10:30:00"
+   *   }
+   * }
+   * 
+   * @response 409 {
+   *   "ok": false,
+   *   "error": "Conflict",
+   *   "message": "La categoría ya existe"
+   * }
+   * 
+   * @response 422 {
+   *   "ok": false,
+   *   "error": "Validation Error",
+   *   "message": "Los datos proporcionados no son válidos",
+   *   "errors": {
+   *     "title": ["The title field is required."]
+   *   }
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function create(Request $request)
   {
 
@@ -105,6 +313,112 @@ class CategoryController extends Controller
 
   }
 
+  /**
+   * Actualizar una categoría
+   * 
+   * Actualiza la información de una categoría existente, incluyendo sus detalles adicionales.
+   * Permite convertir una categoría padre en subcategoría o viceversa.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de ruta (URL Parameters):**
+   * - `id` (integer, requerido): ID de la categoría a actualizar. Ejemplo: `1`
+   * 
+   * **Parámetros del Body:**
+   * - `title` (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias Exactas`
+   * - `description` (string, opcional): Nueva descripción. Ejemplo: `Categoría actualizada`
+   * - `main_category` (integer, nullable): ID de la categoría padre. Si es `null` o vacío, se mantiene como categoría padre. Ejemplo: `2`
+   * - `is_featured` (boolean, opcional): Si la categoría es destacada. Ejemplo: `true`
+   * - `about` (string, opcional): Información sobre la categoría. Ejemplo: `Sobre esta categoría`
+   * - `editorial_board` (string, opcional): Consejo editorial. Ejemplo: `Lista de editores`
+   * - `policy` (string, opcional): Políticas de publicación. Ejemplo: `Políticas editoriales`
+   * - `norms` (string, opcional): Normas de la categoría. Ejemplo: `Normas de publicación`
+   * - `process` (string, opcional): Proceso de publicación. Ejemplo: `Proceso editorial`
+   * - `contact` (string, opcional): Información de contacto. Ejemplo: `editorial@example.com`
+   * 
+   * **Ejemplo de petición (JSON):**
+   * ```json
+   * {
+   *   "title": "Ciencias Exactas",
+   *   "description": "Categoría actualizada de ciencias",
+   *   "main_category": null,
+   *   "is_featured": true,
+   *   "about": "Información sobre la categoría",
+   *   "editorial_board": "Dr. Juan Pérez, Dra. María López",
+   *   "policy": "Políticas de revisión por pares",
+   *   "norms": "Normas APA 7",
+   *   "process": "Proceso de revisión en 30 días",
+   *   "contact": "ciencias@example.com"
+   * }
+   * ```
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X POST "http://localhost/api/categories/updateCategory/1" \
+   *   -H "Accept: application/json" \
+   *   -H "Content-Type: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+   *   -d '{"title":"Ciencias Exactas","description":"Categoría actualizada","is_featured":true}'
+   * ```
+   * 
+   * **Nota:** Si se envían campos de detalle (about, editorial_board, etc.), se creará o actualizará el registro en `categories_details`.
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Categoría actualizada correctamente",
+   *   "data": {
+   *     "id": 1,
+   *     "title": "Ciencias Exactas",
+   *     "description": "Categoría actualizada de ciencias",
+   *     "main_category": null,
+   *     "state": 1,
+   *     "is_featured": 1,
+   *     "language_id": 1,
+   *     "category_type": 1,
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 12:00:00",
+   *     "detail": {
+   *       "id": 1,
+   *       "category_id": 1,
+   *       "language_id": 1,
+   *       "about": "Información sobre la categoría",
+   *       "editorial_board": "Dr. Juan Pérez, Dra. María López",
+   *       "policy": "Políticas de revisión por pares",
+   *       "norms": "Normas APA 7",
+   *       "process": "Proceso de revisión en 30 días",
+   *       "contact": "ciencias@example.com"
+   *     }
+   *   }
+   * }
+   * 
+   * @response 400 {
+   *   "ok": false,
+   *   "error": "Bad Request",
+   *   "message": "Una categoría no puede ser su propia categoría principal"
+   * }
+   * 
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "Not Found",
+   *   "message": "Categoría no encontrada"
+   * }
+   * 
+   * @response 422 {
+   *   "ok": false,
+   *   "error": "Validation Error",
+   *   "message": "Los datos proporcionados no son válidos",
+   *   "errors": {
+   *     "title": ["The title field is required."]
+   *   }
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function update(Request $request, $id = null)
   {
     try {
@@ -192,6 +506,11 @@ class CategoryController extends Controller
     }
   }
 
+  /**
+   * Método privado para desactivar subcategorías recursivamente
+   * 
+   * @param Category $category Categoría cuyas hijas se desactivarán
+   */
   private function deactivateChildren(Category $category)
   {
     foreach ($category->childrenRecursive as $child) {
@@ -206,6 +525,11 @@ class CategoryController extends Controller
     }
   }
 
+  /**
+   * Método privado para activar subcategorías recursivamente
+   * 
+   * @param Category $category Categoría cuyas hijas se activarán
+   */
   private function activateChildren(Category $category)
   {
     foreach ($category->childrenRecursive as $child) {
@@ -220,6 +544,100 @@ class CategoryController extends Controller
     }
   }
 
+  /**
+   * Activar/Desactivar categoría
+   * 
+   * Alterna el estado de una categoría (activa/inactiva). 
+   * Si es una categoría padre, también afecta recursivamente a todas sus subcategorías.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint requiere un token JWT válido en el header de autorización.
+   * 
+   * **Parámetros de ruta (URL Parameters):**
+   * - `id` (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: `1`
+   * 
+   * **Ejemplo de petición (curl):**
+   * ```bash
+   * curl -X POST "http://localhost/api/categories/toggleState/1" \
+   *   -H "Accept: application/json" \
+   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+   * ```
+   * 
+   * **Comportamiento:**
+   * - Si la categoría está **activa** y tiene subcategorías: se desactiva junto con todas sus subcategorías recursivamente
+   * - Si la categoría está **inactiva** y tiene subcategorías: se activa junto con todas sus subcategorías recursivamente
+   * - Si es una categoría sin hijas: solo cambia su propio estado
+   * 
+   * **Nota importante:** Esta operación usa transacciones de base de datos para garantizar la consistencia.
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Categoría activada correctamente",
+   *   "data": {
+   *     "id": 1,
+   *     "title": "Ciencias",
+   *     "description": "Categoría de ciencias",
+   *     "main_category": null,
+   *     "state": 1,
+   *     "is_featured": 0,
+   *     "language_id": 1,
+   *     "category_type": 1,
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 12:30:00",
+   *     "children_recursive": [
+   *       {
+   *         "id": 2,
+   *         "title": "Física",
+   *         "state": 1,
+   *         "main_category": 1
+   *       }
+   *     ]
+   *   }
+   * }
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Categoría y sus subcategorías desactivadas correctamente",
+   *   "data": {
+   *     "id": 1,
+   *     "title": "Ciencias",
+   *     "description": "Categoría de ciencias",
+   *     "main_category": null,
+   *     "state": 0,
+   *     "is_featured": 0,
+   *     "language_id": 1,
+   *     "category_type": 1,
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 12:30:00",
+   *     "children_recursive": [
+   *       {
+   *         "id": 2,
+   *         "title": "Física",
+   *         "state": 0,
+   *         "main_category": 1
+   *       }
+   *     ]
+   *   }
+   * }
+   * 
+   * @response 400 {
+   *   "ok": false,
+   *   "error": "Bad Request",
+   *   "message": "El numero de ID es requerido"
+   * }
+   * 
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "Not Found",
+   *   "message": "Categoría no encontrada"
+   * }
+   * 
+   * @response 401 {
+   *   "message": "Unauthenticated"
+   * }
+   */
   public function toggleState($id = null)
   {
     try {
