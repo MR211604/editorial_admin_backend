@@ -29,3 +29,8 @@ values ('Teoría y Praxis', 'Revista de teoria y praxis', null, 0, 0, 1);
 # INSERTANDO DETALLES DE TEORIA Y PRAXIS (a partir del menu de la pagina web)
 insert into categories_details(about, editorial_board, policy, norms, process, contact, category_id, language_id)
 values ('Estos son los detalles principales para la revista de teoria y praxis','','','','','', 1,1);
+
+#Insertando los tipos de categorias
+INSERT INTO categories_types (id, name) VALUES (1, 'Sin Categoria');
+INSERT INTO categories_types (id, name) VALUES (2, 'Libro');
+INSERT INTO categories_types (id, name) VALUES (3, 'Revista');

@@ -47,10 +47,10 @@ RUN git clone https://github.com/MR211604/cms-udb-editorial . && \
     php artisan key:generate
 
 RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html \
-    chown -R www-data:www-data /var/www/html/storage \
-    chmod -R 775 /var/www/html/storage \
-    chown -R www-data:www-data /var/www/html/public \
+    chmod -R 755 /var/www/html && \
+    chown -R www-data:www-data /var/www/html/storage && \
+    chmod -R 775 /var/www/html/storage && \
+    chown -R www-data:www-data /var/www/html/public && \
     chmod -R 755 /var/www/html/public
 # 5. Exponer solo puerto 80
 EXPOSE 80

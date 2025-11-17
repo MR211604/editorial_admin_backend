@@ -6,6 +6,13 @@ create table authors
     lastname varchar(150) null
 );
 
+create table categories_types
+(
+    id   int auto_increment
+        primary key,
+    name varchar(255) null
+);
+
 create table languages
 (
     id        int auto_increment
@@ -24,7 +31,9 @@ create table categories
     state         tinyint     null,
     is_featured   tinyint(1)  null,
     language_id   int         null,
-    category_type tinyint(1)  null comment 'tipo de categoria (0: revista / 1: libro)',
+    category_type int         null comment 'tipo de categoria',
+    constraint categories_categories_types_id_fk
+        foreign key (category_type) references categories_types (id),
     constraint categories_ibfk_1
         foreign key (language_id) references languages (id)
 );
@@ -134,6 +143,27 @@ create index language_id
 
 create index publishing_id
     on publishing_details (publishing_id);
+
+create table publishing_translations
+(
+    id            int auto_increment
+        primary key,
+    publishing_id int          not null,
+    language_id   int          not null,
+    title         varchar(300) null,
+    URL           text         null,
+    summary       text         null comment 'Resumen de los detalles de un articulo de una revista',
+    constraint publishing_translations_ibfk_1
+        foreign key (publishing_id) references publishings (id),
+    constraint publishing_translations_ibfk_2
+        foreign key (language_id) references languages (id)
+);
+
+create index language_id
+    on publishing_translations (language_id);
+
+create index publishing_id
+    on publishing_translations (publishing_id);
 
 create index category_id
     on publishings (category_id);
