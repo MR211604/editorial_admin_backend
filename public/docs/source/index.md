@@ -234,7 +234,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `search` (string, opcional): Búsqueda por nombre o apellido. Ejemplo: `García`
 - `sort` (string, opcional): Campo para ordenar (id, name, lastname). Ejemplo: `name:asc`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X GET "http://localhost/api/authors/getAuthors?page=1&limit=10&search=García" \
   -H "Accept: application/json" \
@@ -314,7 +313,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID del autor a consultar. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X GET "http://localhost/api/authors/getAuthor/1" \
   -H "Accept: application/json" \
@@ -378,7 +376,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `name` (string, requerido): Nombre del autor (máximo 255 caracteres). Ejemplo: `Juan`
 - `lastname` (string, requerido): Apellido del autor (máximo 255 caracteres). Ejemplo: `García`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "name": "Juan",
@@ -386,7 +383,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/authors/createAuthor" \
   -H "Accept: application/json" \
@@ -445,7 +441,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `name` (string, requerido): Nuevo nombre del autor (máximo 255 caracteres). Ejemplo: `Juan Carlos`
 - `lastname` (string, requerido): Nuevo apellido del autor (máximo 255 caracteres). Ejemplo: `García Pérez`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "name": "Juan Carlos",
@@ -453,7 +448,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/authors/updateAuthor/1" \
   -H "Accept: application/json" \
@@ -518,7 +512,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID del autor a eliminar. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/authors/deleteAuthor/1" \
   -H "Accept: application/json" \
@@ -583,7 +576,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
   Si es `false` u omitido, obtiene solo categorías padre con sus subcategorías anidadas.
   Ejemplo: `1`, `true`, `false`
 
-**Ejemplo de petición (curl):**
 ```bash
 # Obtener solo categorías padre con hijas
 curl -X GET "http://localhost/api/categories/getCategories" \
@@ -674,7 +666,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID de la categoría a consultar. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X GET "http://localhost/api/categories/getCategory/1" \
   -H "Accept: application/json" \
@@ -756,7 +747,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `category_type` (integer, opcional): Tipo de categoría. Ejemplo: `1`
 - `language_id` (integer, opcional): ID del idioma. Por defecto: `1`. Ejemplo: `1`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "title": "Ciencias",
@@ -766,7 +756,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/categories/createCategory" \
   -H "Accept: application/json" \
@@ -851,7 +840,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `process` (string, opcional): Proceso de publicación. Ejemplo: `Proceso editorial`
 - `contact` (string, opcional): Información de contacto. Ejemplo: `editorial@example.com`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "title": "Ciencias Exactas",
@@ -867,7 +855,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/categories/updateCategory/1" \
   -H "Accept: application/json" \
@@ -951,7 +938,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/categories/toggleState/1" \
   -H "Accept: application/json" \
@@ -1039,7 +1025,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
 - `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X GET "http://localhost/api/categoryTypes/getCategoryTypes" \
   -H "Accept: application/json" \
@@ -1108,7 +1093,51 @@ $.ajax(settings).done(function (response) {
 Endpoints para la gestión de detalles de publicaciones (revistas).
 Usa JWT en el header: `Authorization: Bearer {token}`.
 <!-- START_3baa66247916c6f29706b1dba1d0f3b6 -->
-## api/publishingDetails/createPublishingDetail
+## Crear detalle de publicación
+
+Crea un artículo o detalle de una publicación (revista) en un idioma específico.
+Cada publicación puede tener múltiples detalles, uno por cada idioma disponible.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros del Body:**
+- `title` (string, requerido): Título del artículo/detalle. Ejemplo: `Avances en Inteligencia Artificial`
+- `summary` (string, requerido): Resumen del artículo. Ejemplo: `Este artículo explora los últimos avances...`
+- `URL` (string, opcional): URL del artículo completo. Ejemplo: `https://revista.udb.edu.sv/articulo/123`
+- `repository_URL` (string, opcional): URL del repositorio académico. Ejemplo: `https://repositorio.udb.edu.sv/123`
+- `language_id` (integer, requerido): ID del idioma (debe existir en tabla languages). Ejemplo: `1`
+- `publishing_id` (integer, requerido): ID de la publicación padre (debe existir en tabla publishings). Ejemplo: `5`
+
+```json
+{
+  "title": "Avances en Inteligencia Artificial",
+  "summary": "Este artículo explora los últimos avances en IA aplicados a la educación superior",
+  "URL": "https://revista.udb.edu.sv/articulo/123",
+  "repository_URL": "https://repositorio.udb.edu.sv/123",
+  "language_id": 1,
+  "publishing_id": 5
+}
+```
+
+```bash
+curl -X POST "http://localhost/api/publishingDetails/createPublishingDetail" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{
+    "title":"Avances en IA",
+    "summary":"Resumen del artículo",
+    "URL":"https://revista.udb.edu.sv/articulo/123",
+    "language_id":1,
+    "publishing_id":5
+  }'
+```
+
+**Nota importante:**
+- La información NO se comparte entre idiomas, se debe crear un detalle por cada idioma
+- Los campos `URL` y `repository_URL` son opcionales
+- El `publishing_id` debe corresponder a una publicación de tipo revista existente
 
 > Example request:
 
@@ -1133,6 +1162,11 @@ $.ajax(settings).done(function (response) {
 });
 ```
 
+> Example response:
+
+```json
+null
+```
 
 ### HTTP Request
 `POST api/publishingDetails/createPublishingDetail`
@@ -1141,7 +1175,47 @@ $.ajax(settings).done(function (response) {
 <!-- END_3baa66247916c6f29706b1dba1d0f3b6 -->
 
 <!-- START_a802abe40b0b7535aa3b715bd30146f7 -->
-## api/publishingDetails/updatePublishingDetail/{id?}
+## Actualizar detalle de publicación
+
+Actualiza la información de un artículo o detalle de publicación existente.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del detalle de publicación a actualizar. Ejemplo: `1`
+
+**Parámetros del Body:**
+- `title` (string, requerido): Nuevo título del artículo. Ejemplo: `Inteligencia Artificial en la Educación`
+- `summary` (string, requerido): Nuevo resumen del artículo. Ejemplo: `Resumen actualizado del contenido...`
+- `URL` (string, opcional): Nueva URL del artículo completo. Ejemplo: `https://revista.udb.edu.sv/articulo/123-v2`
+- `repository_URL` (string, opcional): Nueva URL del repositorio. Ejemplo: `https://repositorio.udb.edu.sv/123-v2`
+- `publishing_id` (integer, requerido): ID de la publicación padre (debe existir en tabla publishings). Ejemplo: `5`
+
+```json
+{
+  "title": "Inteligencia Artificial en la Educación Superior",
+  "summary": "Resumen actualizado con información adicional sobre IA en educación",
+  "URL": "https://revista.udb.edu.sv/articulo/123-v2",
+  "repository_URL": "https://repositorio.udb.edu.sv/123-v2",
+  "publishing_id": 5
+}
+```
+
+```bash
+curl -X POST "http://localhost/api/publishingDetails/updatePublishingDetail/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{
+    "title":"IA en Educación Superior",
+    "summary":"Resumen actualizado",
+    "URL":"https://revista.udb.edu.sv/articulo/123-v2",
+    "publishing_id":5
+  }'
+```
+
+**Nota:** El idioma (`language_id`) no se puede cambiar. Para cambiar el idioma, crea un nuevo detalle.
 
 > Example request:
 
@@ -1166,6 +1240,25 @@ $.ajax(settings).done(function (response) {
 });
 ```
 
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Success",
+    "data": {
+        "id": 1,
+        "title": "Inteligencia Artificial en la Educación Superior",
+        "summary": "Resumen actualizado con información adicional sobre IA en educación",
+        "URL": "https:\/\/revista.udb.edu.sv\/articulo\/123-v2",
+        "repository_URL": "https:\/\/repositorio.udb.edu.sv\/123-v2",
+        "language_id": 1,
+        "publishing_id": 5,
+        "created_at": "2025-11-17 10:00:00",
+        "updated_at": "2025-11-17 12:30:00"
+    }
+}
+```
 
 ### HTTP Request
 `POST api/publishingDetails/updatePublishingDetail/{id?}`
@@ -1174,7 +1267,27 @@ $.ajax(settings).done(function (response) {
 <!-- END_a802abe40b0b7535aa3b715bd30146f7 -->
 
 <!-- START_a9da9d3b2714b3d6a886603796446c9c -->
-## api/publishingDetails/deletePublishingDetail/{id?}
+## Eliminar detalle de publicación
+
+Elimina un artículo o detalle de publicación del sistema.
+Esta acción es permanente y no se puede deshacer.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del detalle de publicación a eliminar. Ejemplo: `1`
+
+```bash
+curl -X POST "http://localhost/api/publishingDetails/deletePublishingDetail/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+**Nota importante:**
+- Esta operación es irreversible
+- Solo elimina el detalle en un idioma específico, no la publicación completa
+- Para eliminar todos los detalles de una publicación, debe eliminar cada uno individualmente
 
 > Example request:
 
@@ -1199,6 +1312,15 @@ $.ajax(settings).done(function (response) {
 });
 ```
 
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Detalle de publicación eliminado exitosamente",
+    "data": null
+}
+```
 
 ### HTTP Request
 `POST api/publishingDetails/deletePublishingDetail/{id?}`
@@ -1325,7 +1447,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID de la publicación a consultar. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X GET "http://localhost/api/publishings/getPublishing/1" \
   -H "Accept: application/json" \
@@ -1423,7 +1544,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres). Ejemplo: `Laravel for Beginners`
 - `translations[].URL` (string, opcional): URL slug traducida. Ejemplo: `laravel-for-beginners`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "title": "Laravel para Principiantes",
@@ -1445,7 +1565,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/publishings/createPublishing" \
   -H "Accept: application/json" \
@@ -1542,7 +1661,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `authors` (array, opcional): Array de IDs de autores
 - `cover` (file, opcional): Imagen de portada
 
-**Ejemplo de petición para Libro (multipart/form-data):**
 ```bash
 curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
   -H "Accept: application/json" \
@@ -1622,7 +1740,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID de la publicación. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/publishings/updateStatus/1" \
   -H "Accept: application/json" \
@@ -1682,7 +1799,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID de la publicación a eliminar. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/publishings/deletePublishing/1" \
   -H "Accept: application/json" \
@@ -1742,7 +1858,6 @@ Obtiene un resumen estadístico con el conteo total de libros y revistas en el s
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X GET "http://localhost/api/publishings/summary" \
   -H "Accept: application/json" \
@@ -1804,13 +1919,11 @@ Obtiene todos los roles disponibles en el sistema.
 - `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
 - `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X GET "http://localhost/api/rol/getRol" \
   -H "Accept: application/json"
 ```
 
-**Nota:** Actualmente devuelve todos los roles sin paginación.
 Si se requiere paginación en el futuro, revisar el código comentado en el controlador.
 Este endpoint NO requiere autenticación actualmente.
 
@@ -1884,7 +1997,6 @@ Crea un nuevo rol en el sistema.
 - `name` (string, requerido): Nombre del rol (máximo 255 caracteres, debe ser único). Ejemplo: `Moderador`
 - `description` (string, opcional): Descripción del rol (máximo 500 caracteres). Ejemplo: `Puede moderar contenido`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "name": "Moderador",
@@ -1892,15 +2004,12 @@ Crea un nuevo rol en el sistema.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/rol/createRol" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{"name":"Moderador","description":"Puede moderar contenido"}'
 ```
-
-**Nota:** Este endpoint NO requiere autenticación actualmente.
 
 > Example request:
 
@@ -1957,7 +2066,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `search` (string, opcional): Buscar usuarios por nombre. Ejemplo: `Juan`
 - `sort` (string, opcional): Ordenar por campo (id, name, token). Ejemplo: `name:asc`
 
-**Ejemplo de petición (curl):**
 ```bash
 # Listar todos los usuarios
 curl -X GET "http://localhost/api/users/getUsers?page=1&limit=10" \
@@ -2064,7 +2172,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `password` (string, requerido): Contraseña del usuario (mínimo 8 caracteres). Ejemplo: `SecurePass123`
 - `rol_id` (integer, requerido): ID del rol a asignar (debe existir en la tabla roles). Ejemplo: `2`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "name": "Carlos Ramírez",
@@ -2073,7 +2180,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/users/createUser" \
   -H "Accept: application/json" \
@@ -2139,7 +2245,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `name` (string, requerido): Nuevo nombre del usuario (mínimo 2, máximo 255 caracteres, debe ser único excepto para el mismo usuario). Ejemplo: `Juan Carlos Pérez`
 - `rol_id` (integer, requerido): Nuevo ID del rol a asignar (debe existir en la tabla roles). Ejemplo: `1`
 
-**Ejemplo de petición (JSON):**
 ```json
 {
   "name": "Juan Carlos Pérez",
@@ -2147,7 +2252,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 }
 ```
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/users/updateUser/1" \
   -H "Accept: application/json" \
@@ -2222,7 +2326,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros de ruta (URL Parameters):**
 - `id` (integer, requerido): ID del usuario cuyo estado se alternará. Ejemplo: `1`
 
-**Ejemplo de petición (curl):**
 ```bash
 curl -X POST "http://localhost/api/users/toggleActive/1" \
   -H "Accept: application/json" \

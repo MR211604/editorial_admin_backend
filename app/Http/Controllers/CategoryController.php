@@ -46,7 +46,6 @@ class CategoryController extends Controller
    *   Si es `false` u omitido, obtiene solo categorías padre con sus subcategorías anidadas. 
    *   Ejemplo: `1`, `true`, `false`
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * # Obtener solo categorías padre con hijas
    * curl -X GET "http://localhost/api/categories/getCategories" \
@@ -135,7 +134,6 @@ class CategoryController extends Controller
    * **Parámetros de ruta (URL Parameters):**
    * - `id` (integer, requerido): ID de la categoría a consultar. Ejemplo: `1`
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X GET "http://localhost/api/categories/getCategory/1" \
    *   -H "Accept: application/json" \
@@ -211,7 +209,6 @@ class CategoryController extends Controller
    * - `category_type` (integer, opcional): Tipo de categoría. Ejemplo: `1`
    * - `language_id` (integer, opcional): ID del idioma. Por defecto: `1`. Ejemplo: `1`
    * 
-   * **Ejemplo de petición (JSON):**
    * ```json
    * {
    *   "title": "Ciencias",
@@ -221,7 +218,6 @@ class CategoryController extends Controller
    * }
    * ```
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X POST "http://localhost/api/categories/createCategory" \
    *   -H "Accept: application/json" \
@@ -337,7 +333,6 @@ class CategoryController extends Controller
    * - `process` (string, opcional): Proceso de publicación. Ejemplo: `Proceso editorial`
    * - `contact` (string, opcional): Información de contacto. Ejemplo: `editorial@example.com`
    * 
-   * **Ejemplo de petición (JSON):**
    * ```json
    * {
    *   "title": "Ciencias Exactas",
@@ -353,7 +348,6 @@ class CategoryController extends Controller
    * }
    * ```
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X POST "http://localhost/api/categories/updateCategory/1" \
    *   -H "Accept: application/json" \
@@ -556,7 +550,6 @@ class CategoryController extends Controller
    * **Parámetros de ruta (URL Parameters):**
    * - `id` (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: `1`
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X POST "http://localhost/api/categories/toggleState/1" \
    *   -H "Accept: application/json" \

@@ -19,10 +19,16 @@ class RolController extends Controller
 {
     use ApiResponse;
 
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:api');
-    // }
+
+    /**
+     * Constructor (middleware)
+     *
+     * Aplica el middleware `auth:api` a todas las rutas.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
 
     /**
      * Listar roles
@@ -33,13 +39,11 @@ class RolController extends Controller
      * - `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
      * - `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X GET "http://localhost/api/rol/getRol" \
      *   -H "Accept: application/json"
      * ```
      * 
-     * **Nota:** Actualmente devuelve todos los roles sin paginación. 
      * Si se requiere paginación en el futuro, revisar el código comentado en el controlador.
      * Este endpoint NO requiere autenticación actualmente.
      * 
@@ -133,7 +137,6 @@ class RolController extends Controller
      * - `name` (string, requerido): Nombre del rol (máximo 255 caracteres, debe ser único). Ejemplo: `Moderador`
      * - `description` (string, opcional): Descripción del rol (máximo 500 caracteres). Ejemplo: `Puede moderar contenido`
      * 
-     * **Ejemplo de petición (JSON):**
      * ```json
      * {
      *   "name": "Moderador",
@@ -141,15 +144,12 @@ class RolController extends Controller
      * }
      * ```
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X POST "http://localhost/api/rol/createRol" \
      *   -H "Accept: application/json" \
      *   -H "Content-Type: application/json" \
      *   -d '{"name":"Moderador","description":"Puede moderar contenido"}'
      * ```
-     * 
-     * **Nota:** Este endpoint NO requiere autenticación actualmente.
      * 
      * @response 201 {
      *   "ok": true,

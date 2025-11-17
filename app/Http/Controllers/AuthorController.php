@@ -49,7 +49,6 @@ class AuthorController extends Controller
    * - `search` (string, opcional): Búsqueda por nombre o apellido. Ejemplo: `García`
    * - `sort` (string, opcional): Campo para ordenar (id, name, lastname). Ejemplo: `name:asc`
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X GET "http://localhost/api/authors/getAuthors?page=1&limit=10&search=García" \
    *   -H "Accept: application/json" \
@@ -167,7 +166,6 @@ class AuthorController extends Controller
    * **Parámetros de ruta (URL Parameters):**
    * - `id` (integer, requerido): ID del autor a consultar. Ejemplo: `1`
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X GET "http://localhost/api/authors/getAuthor/1" \
    *   -H "Accept: application/json" \
@@ -230,7 +228,6 @@ class AuthorController extends Controller
    * - `name` (string, requerido): Nombre del autor (máximo 255 caracteres). Ejemplo: `Juan`
    * - `lastname` (string, requerido): Apellido del autor (máximo 255 caracteres). Ejemplo: `García`
    * 
-   * **Ejemplo de petición (JSON):**
    * ```json
    * {
    *   "name": "Juan",
@@ -238,7 +235,6 @@ class AuthorController extends Controller
    * }
    * ```
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X POST "http://localhost/api/authors/createAuthor" \
    *   -H "Accept: application/json" \
@@ -327,7 +323,6 @@ class AuthorController extends Controller
    * - `name` (string, requerido): Nuevo nombre del autor (máximo 255 caracteres). Ejemplo: `Juan Carlos`
    * - `lastname` (string, requerido): Nuevo apellido del autor (máximo 255 caracteres). Ejemplo: `García Pérez`
    * 
-   * **Ejemplo de petición (JSON):**
    * ```json
    * {
    *   "name": "Juan Carlos",
@@ -335,7 +330,6 @@ class AuthorController extends Controller
    * }
    * ```
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X POST "http://localhost/api/authors/updateAuthor/1" \
    *   -H "Accept: application/json" \
@@ -432,7 +426,6 @@ class AuthorController extends Controller
    * **Parámetros de ruta (URL Parameters):**
    * - `id` (integer, requerido): ID del autor a eliminar. Ejemplo: `1`
    * 
-   * **Ejemplo de petición (curl):**
    * ```bash
    * curl -X POST "http://localhost/api/authors/deleteAuthor/1" \
    *   -H "Accept: application/json" \

@@ -41,7 +41,6 @@ class CategoryTypeController extends Controller
      * - `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
      * - `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X GET "http://localhost/api/categoryTypes/getCategoryTypes" \
      *   -H "Accept: application/json" \

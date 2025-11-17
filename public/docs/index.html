@@ -218,7 +218,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>search</code> (string, opcional): Búsqueda por nombre o apellido. Ejemplo: <code>García</code></li>
 <li><code>sort</code> (string, opcional): Campo para ordenar (id, name, lastname). Ejemplo: <code>name:asc</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/authors/getAuthors?page=1&amp;limit=10&amp;search=García" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -283,7 +282,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID del autor a consultar. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/authors/getAuthor/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -332,12 +330,10 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>name</code> (string, requerido): Nombre del autor (máximo 255 caracteres). Ejemplo: <code>Juan</code></li>
 <li><code>lastname</code> (string, requerido): Apellido del autor (máximo 255 caracteres). Ejemplo: <code>García</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "name": "Juan",
   "lastname": "García"
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/authors/createAuthor" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -382,12 +378,10 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>name</code> (string, requerido): Nuevo nombre del autor (máximo 255 caracteres). Ejemplo: <code>Juan Carlos</code></li>
 <li><code>lastname</code> (string, requerido): Nuevo apellido del autor (máximo 255 caracteres). Ejemplo: <code>García Pérez</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "name": "Juan Carlos",
   "lastname": "García Pérez"
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/authors/updateAuthor/1" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -437,7 +431,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID del autor a eliminar. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/authors/deleteAuthor/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -485,7 +478,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 Si es <code>false</code> u omitido, obtiene solo categorías padre con sus subcategorías anidadas.
 Ejemplo: <code>1</code>, <code>true</code>, <code>false</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash"># Obtener solo categorías padre con hijas
 curl -X GET "http://localhost/api/categories/getCategories" \
   -H "Accept: application/json" \
@@ -561,7 +553,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID de la categoría a consultar. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/categories/getCategory/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -628,14 +619,12 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>category_type</code> (integer, opcional): Tipo de categoría. Ejemplo: <code>1</code></li>
 <li><code>language_id</code> (integer, opcional): ID del idioma. Por defecto: <code>1</code>. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "title": "Ciencias",
   "description": "Categoría de ciencias exactas",
   "category_type": 1,
   "language_id": 1
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/categories/createCategory" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -705,7 +694,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>process</code> (string, opcional): Proceso de publicación. Ejemplo: <code>Proceso editorial</code></li>
 <li><code>contact</code> (string, opcional): Información de contacto. Ejemplo: <code>editorial@example.com</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "title": "Ciencias Exactas",
   "description": "Categoría actualizada de ciencias",
@@ -718,7 +706,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
   "process": "Proceso de revisión en 30 días",
   "contact": "ciencias@example.com"
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/categories/updateCategory/1" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -786,7 +773,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/categories/toggleState/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -858,7 +844,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>page</code> (integer, opcional): Número de página (mínimo 1). Ejemplo: <code>1</code></li>
 <li><code>limit</code> (integer, opcional): Resultados por página (mínimo 10). Ejemplo: <code>10</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/categoryTypes/getCategoryTypes" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -912,7 +897,45 @@ $.ajax(settings).done(function (response) {
 <p>Endpoints para la gestión de detalles de publicaciones (revistas).
 Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
 <!-- START_3baa66247916c6f29706b1dba1d0f3b6 -->
-<h2>api/publishingDetails/createPublishingDetail</h2>
+<h2>Crear detalle de publicación</h2>
+<p>Crea un artículo o detalle de una publicación (revista) en un idioma específico.
+Cada publicación puede tener múltiples detalles, uno por cada idioma disponible.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros del Body:</strong></p>
+<ul>
+<li><code>title</code> (string, requerido): Título del artículo/detalle. Ejemplo: <code>Avances en Inteligencia Artificial</code></li>
+<li><code>summary</code> (string, requerido): Resumen del artículo. Ejemplo: <code>Este artículo explora los últimos avances...</code></li>
+<li><code>URL</code> (string, opcional): URL del artículo completo. Ejemplo: <code>https://revista.udb.edu.sv/articulo/123</code></li>
+<li><code>repository_URL</code> (string, opcional): URL del repositorio académico. Ejemplo: <code>https://repositorio.udb.edu.sv/123</code></li>
+<li><code>language_id</code> (integer, requerido): ID del idioma (debe existir en tabla languages). Ejemplo: <code>1</code></li>
+<li><code>publishing_id</code> (integer, requerido): ID de la publicación padre (debe existir en tabla publishings). Ejemplo: <code>5</code></li>
+</ul>
+<pre><code class="language-json">{
+  "title": "Avances en Inteligencia Artificial",
+  "summary": "Este artículo explora los últimos avances en IA aplicados a la educación superior",
+  "URL": "https://revista.udb.edu.sv/articulo/123",
+  "repository_URL": "https://repositorio.udb.edu.sv/123",
+  "language_id": 1,
+  "publishing_id": 5
+}</code></pre>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/publishingDetails/createPublishingDetail" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{
+    "title":"Avances en IA",
+    "summary":"Resumen del artículo",
+    "URL":"https://revista.udb.edu.sv/articulo/123",
+    "language_id":1,
+    "publishing_id":5
+  }'</code></pre>
+<p><strong>Nota importante:</strong></p>
+<ul>
+<li>La información NO se comparte entre idiomas, se debe crear un detalle por cada idioma</li>
+<li>Los campos <code>URL</code> y <code>repository_URL</code> son opcionales</li>
+<li>El <code>publishing_id</code> debe corresponder a una publicación de tipo revista existente</li>
+</ul>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -931,11 +954,48 @@ Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
 $.ajax(settings).done(function (response) {
     console.log(response);
 });</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">null</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/publishingDetails/createPublishingDetail</code></p>
 <!-- END_3baa66247916c6f29706b1dba1d0f3b6 -->
 <!-- START_a802abe40b0b7535aa3b715bd30146f7 -->
-<h2>api/publishingDetails/updatePublishingDetail/{id?}</h2>
+<h2>Actualizar detalle de publicación</h2>
+<p>Actualiza la información de un artículo o detalle de publicación existente.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros de ruta (URL Parameters):</strong></p>
+<ul>
+<li><code>id</code> (integer, requerido): ID del detalle de publicación a actualizar. Ejemplo: <code>1</code></li>
+</ul>
+<p><strong>Parámetros del Body:</strong></p>
+<ul>
+<li><code>title</code> (string, requerido): Nuevo título del artículo. Ejemplo: <code>Inteligencia Artificial en la Educación</code></li>
+<li><code>summary</code> (string, requerido): Nuevo resumen del artículo. Ejemplo: <code>Resumen actualizado del contenido...</code></li>
+<li><code>URL</code> (string, opcional): Nueva URL del artículo completo. Ejemplo: <code>https://revista.udb.edu.sv/articulo/123-v2</code></li>
+<li><code>repository_URL</code> (string, opcional): Nueva URL del repositorio. Ejemplo: <code>https://repositorio.udb.edu.sv/123-v2</code></li>
+<li><code>publishing_id</code> (integer, requerido): ID de la publicación padre (debe existir en tabla publishings). Ejemplo: <code>5</code></li>
+</ul>
+<pre><code class="language-json">{
+  "title": "Inteligencia Artificial en la Educación Superior",
+  "summary": "Resumen actualizado con información adicional sobre IA en educación",
+  "URL": "https://revista.udb.edu.sv/articulo/123-v2",
+  "repository_URL": "https://repositorio.udb.edu.sv/123-v2",
+  "publishing_id": 5
+}</code></pre>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/publishingDetails/updatePublishingDetail/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{
+    "title":"IA en Educación Superior",
+    "summary":"Resumen actualizado",
+    "URL":"https://revista.udb.edu.sv/articulo/123-v2",
+    "publishing_id":5
+  }'</code></pre>
+<p><strong>Nota:</strong> El idioma (<code>language_id</code>) no se puede cambiar. Para cambiar el idioma, crea un nuevo detalle.</p>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -954,11 +1014,46 @@ $.ajax(settings).done(function (response) {
 $.ajax(settings).done(function (response) {
     console.log(response);
 });</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Success",
+    "data": {
+        "id": 1,
+        "title": "Inteligencia Artificial en la Educación Superior",
+        "summary": "Resumen actualizado con información adicional sobre IA en educación",
+        "URL": "https:\/\/revista.udb.edu.sv\/articulo\/123-v2",
+        "repository_URL": "https:\/\/repositorio.udb.edu.sv\/123-v2",
+        "language_id": 1,
+        "publishing_id": 5,
+        "created_at": "2025-11-17 10:00:00",
+        "updated_at": "2025-11-17 12:30:00"
+    }
+}</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/publishingDetails/updatePublishingDetail/{id?}</code></p>
 <!-- END_a802abe40b0b7535aa3b715bd30146f7 -->
 <!-- START_a9da9d3b2714b3d6a886603796446c9c -->
-<h2>api/publishingDetails/deletePublishingDetail/{id?}</h2>
+<h2>Eliminar detalle de publicación</h2>
+<p>Elimina un artículo o detalle de publicación del sistema.
+Esta acción es permanente y no se puede deshacer.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros de ruta (URL Parameters):</strong></p>
+<ul>
+<li><code>id</code> (integer, requerido): ID del detalle de publicación a eliminar. Ejemplo: <code>1</code></li>
+</ul>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/publishingDetails/deletePublishingDetail/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
+<p><strong>Nota importante:</strong></p>
+<ul>
+<li>Esta operación es irreversible</li>
+<li>Solo elimina el detalle en un idioma específico, no la publicación completa</li>
+<li>Para eliminar todos los detalles de una publicación, debe eliminar cada uno individualmente</li>
+</ul>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -977,6 +1072,14 @@ $.ajax(settings).done(function (response) {
 $.ajax(settings).done(function (response) {
     console.log(response);
 });</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Detalle de publicación eliminado exitosamente",
+    "data": null
+}</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/publishingDetails/deletePublishingDetail/{id?}</code></p>
 <!-- END_a9da9d3b2714b3d6a886603796446c9c -->
@@ -1080,7 +1183,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID de la publicación a consultar. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/publishings/getPublishing/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -1163,7 +1265,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>translations[].title</code> (string, requerido): Título traducido (máximo 255 caracteres). Ejemplo: <code>Laravel for Beginners</code></li>
 <li><code>translations[].URL</code> (string, opcional): URL slug traducida. Ejemplo: <code>laravel-for-beginners</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "title": "Laravel para Principiantes",
   "URL": "laravel-para-principiantes",
@@ -1182,7 +1283,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
     }
   ]
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/publishings/createPublishing" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -1268,7 +1368,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>authors</code> (array, opcional): Array de IDs de autores</li>
 <li><code>cover</code> (file, opcional): Imagen de portada</li>
 </ul>
-<p><strong>Ejemplo de petición para Libro (multipart/form-data):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
@@ -1333,7 +1432,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID de la publicación. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/publishings/updateStatus/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -1377,7 +1475,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID de la publicación a eliminar. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/publishings/deletePublishing/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -1422,7 +1519,6 @@ $.ajax(settings).done(function (response) {
 Útil para mostrar en el dashboard o página principal.</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint requiere un token JWT válido en el header de autorización.</p>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/publishings/summary" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
@@ -1469,11 +1565,9 @@ Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
 <li><code>page</code> (integer, opcional): Número de página (mínimo 1). Ejemplo: <code>1</code></li>
 <li><code>limit</code> (integer, opcional): Resultados por página (mínimo 10). Ejemplo: <code>10</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/rol/getRol" \
   -H "Accept: application/json"</code></pre>
-<p><strong>Nota:</strong> Actualmente devuelve todos los roles sin paginación.
-Si se requiere paginación en el futuro, revisar el código comentado en el controlador.
+<p>Si se requiere paginación en el futuro, revisar el código comentado en el controlador.
 Este endpoint NO requiere autenticación actualmente.</p>
 <blockquote>
 <p>Example request:</p>
@@ -1534,17 +1628,14 @@ $.ajax(settings).done(function (response) {
 <li><code>name</code> (string, requerido): Nombre del rol (máximo 255 caracteres, debe ser único). Ejemplo: <code>Moderador</code></li>
 <li><code>description</code> (string, opcional): Descripción del rol (máximo 500 caracteres). Ejemplo: <code>Puede moderar contenido</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "name": "Moderador",
   "description": "Puede moderar contenido y aprobar publicaciones"
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/rol/createRol" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{"name":"Moderador","description":"Puede moderar contenido"}'</code></pre>
-<p><strong>Nota:</strong> Este endpoint NO requiere autenticación actualmente.</p>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -1587,7 +1678,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>search</code> (string, opcional): Buscar usuarios por nombre. Ejemplo: <code>Juan</code></li>
 <li><code>sort</code> (string, opcional): Ordenar por campo (id, name, token). Ejemplo: <code>name:asc</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash"># Listar todos los usuarios
 curl -X GET "http://localhost/api/users/getUsers?page=1&amp;limit=10" \
   -H "Accept: application/json" \
@@ -1679,13 +1769,11 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>password</code> (string, requerido): Contraseña del usuario (mínimo 8 caracteres). Ejemplo: <code>SecurePass123</code></li>
 <li><code>rol_id</code> (integer, requerido): ID del rol a asignar (debe existir en la tabla roles). Ejemplo: <code>2</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "name": "Carlos Ramírez",
   "password": "SecurePass123",
   "rol_id": 2
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/users/createUser" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -1738,12 +1826,10 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <li><code>name</code> (string, requerido): Nuevo nombre del usuario (mínimo 2, máximo 255 caracteres, debe ser único excepto para el mismo usuario). Ejemplo: <code>Juan Carlos Pérez</code></li>
 <li><code>rol_id</code> (integer, requerido): Nuevo ID del rol a asignar (debe existir en la tabla roles). Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (JSON):</strong></p>
 <pre><code class="language-json">{
   "name": "Juan Carlos Pérez",
   "rol_id": 1
 }</code></pre>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/users/updateUser/1" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
@@ -1804,7 +1890,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>id</code> (integer, requerido): ID del usuario cuyo estado se alternará. Ejemplo: <code>1</code></li>
 </ul>
-<p><strong>Ejemplo de petición (curl):</strong></p>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/users/toggleActive/1" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>

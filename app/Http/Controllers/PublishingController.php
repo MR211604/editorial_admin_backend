@@ -293,7 +293,6 @@ class PublishingController extends Controller
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID de la publicación a consultar. Ejemplo: `1`
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X GET "http://localhost/api/publishings/getPublishing/1" \
      *   -H "Accept: application/json" \
@@ -403,7 +402,6 @@ class PublishingController extends Controller
      * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres). Ejemplo: `Laravel for Beginners`
      * - `translations[].URL` (string, opcional): URL slug traducida. Ejemplo: `laravel-for-beginners`
      * 
-     * **Ejemplo de petición (JSON):**
      * ```json
      * {
      *   "title": "Laravel para Principiantes",
@@ -425,7 +423,6 @@ class PublishingController extends Controller
      * }
      * ```
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X POST "http://localhost/api/publishings/createPublishing" \
      *   -H "Accept: application/json" \
@@ -566,7 +563,6 @@ class PublishingController extends Controller
      * - `authors` (array, opcional): Array de IDs de autores
      * - `cover` (file, opcional): Imagen de portada
      * 
-     * **Ejemplo de petición para Libro (multipart/form-data):**
      * ```bash
      * curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
      *   -H "Accept: application/json" \
@@ -827,7 +823,6 @@ class PublishingController extends Controller
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID de la publicación. Ejemplo: `1`
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X POST "http://localhost/api/publishings/updateStatus/1" \
      *   -H "Accept: application/json" \
@@ -892,7 +887,6 @@ class PublishingController extends Controller
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X GET "http://localhost/api/publishings/summary" \
      *   -H "Accept: application/json" \
@@ -943,7 +937,6 @@ class PublishingController extends Controller
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID de la publicación a eliminar. Ejemplo: `1`
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X POST "http://localhost/api/publishings/deletePublishing/1" \
      *   -H "Accept: application/json" \

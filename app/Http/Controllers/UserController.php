@@ -50,7 +50,6 @@ class UserController extends Controller
      * - `search` (string, opcional): Buscar usuarios por nombre. Ejemplo: `Juan`
      * - `sort` (string, opcional): Ordenar por campo (id, name, token). Ejemplo: `name:asc`
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * # Listar todos los usuarios
      * curl -X GET "http://localhost/api/users/getUsers?page=1&limit=10" \
@@ -200,7 +199,6 @@ class UserController extends Controller
      * - `password` (string, requerido): Contraseña del usuario (mínimo 8 caracteres). Ejemplo: `SecurePass123`
      * - `rol_id` (integer, requerido): ID del rol a asignar (debe existir en la tabla roles). Ejemplo: `2`
      * 
-     * **Ejemplo de petición (JSON):**
      * ```json
      * {
      *   "name": "Carlos Ramírez",
@@ -209,7 +207,6 @@ class UserController extends Controller
      * }
      * ```
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X POST "http://localhost/api/users/createUser" \
      *   -H "Accept: application/json" \
@@ -313,7 +310,6 @@ class UserController extends Controller
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID del usuario cuyo estado se alternará. Ejemplo: `1`
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X POST "http://localhost/api/users/toggleActive/1" \
      *   -H "Accept: application/json" \
@@ -411,7 +407,6 @@ class UserController extends Controller
      * - `name` (string, requerido): Nuevo nombre del usuario (mínimo 2, máximo 255 caracteres, debe ser único excepto para el mismo usuario). Ejemplo: `Juan Carlos Pérez`
      * - `rol_id` (integer, requerido): Nuevo ID del rol a asignar (debe existir en la tabla roles). Ejemplo: `1`
      * 
-     * **Ejemplo de petición (JSON):**
      * ```json
      * {
      *   "name": "Juan Carlos Pérez",
@@ -419,7 +414,6 @@ class UserController extends Controller
      * }
      * ```
      * 
-     * **Ejemplo de petición (curl):**
      * ```bash
      * curl -X POST "http://localhost/api/users/updateUser/1" \
      *   -H "Accept: application/json" \
