@@ -38,6 +38,7 @@ class RolController extends Controller
      * **Parámetros de consulta (Query Parameters):**
      * - `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
      * - `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
+     * - `search` (string, opcional): Buscar rol por nombre. Ejemplo: `Administrador`
      * 
      * ```bash
      * curl -X GET "http://localhost/api/rol/getRol" \
@@ -98,7 +99,17 @@ class RolController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $data = Rol::get();
+            $query = Rol::query();
+
+            $search = $request->query('search', null);
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
+            }
+
+            $data = $query->get();
             return $this->successResponse($data, 'Roles obtenidos exitosamente');
 
             //! Si quieren paginarse los datos, descomentar el siguiente bloque:
@@ -194,7 +205,7 @@ class RolController extends Controller
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new ServerErrorException('Error al crear el rol', null, $e);
+            throw new ServerErrorException('Error al crear el rol', $e->getMessage(), $e);
         }
     }
 
