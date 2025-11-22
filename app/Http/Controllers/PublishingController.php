@@ -33,7 +33,7 @@ class PublishingController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except(['index', 'find']);
     }
 
     private function deleteCoverImage($coverPath)
@@ -231,15 +231,15 @@ class PublishingController extends Controller
                 }
             ]);
 
-            // if ($search) {
-            //     $query->where('title', 'like', '%' . $search . '%');
-            // }
             if ($search) {
-                $query->whereHas('translations', function ($q) use ($search, $languageId) {
-                    $q->where('language_id', $languageId)
-                        ->where('title', 'like', '%' . $search . '%');
-                });
+                $query->where('title', 'like', '%' . $search . '%');
             }
+            // if ($search) {
+            //     $query->whereHas('translations', function ($q) use ($search, $languageId) {
+            //         $q->where('language_id', $languageId)
+            //             ->where('title', 'like', '%' . $search . '%');
+            //     });
+            // }
 
             if ($isArchived !== null) {
                 $query->where('is_archived', $isArchived);
@@ -356,24 +356,23 @@ class PublishingController extends Controller
      *   "message": "Unauthenticated"
      * }
      */
-    public function find($id = null)
+    public function find($publishing_URL = null)
     {
         try {
-            if (empty($id) || !is_numeric($id)) {
-                throw new BadRequestException('El numero de ID es requerido');
+            if (empty($publishing_URL) || !is_string($publishing_URL)) {
+                throw new BadRequestException('La URL del libro es requerida y debe ser una cadena de texto');
             }
 
-            if (!Publishing::where('id', $id)->exists()) {
+            if (!Publishing::where('URL', $publishing_URL)->exists()) {
                 throw new NotFoundException('Publicación no encontrada');
             }
 
-            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])->findOrFail($id);
-
+            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])->where('URL', $publishing_URL)->firstOrFail();
             return $this->successResponse($publishing, 'Publicación obtenida exitosamente');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             throw new NotFoundException('Publicación no encontrada');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             throw $e;
         } catch (\App\Exceptions\ApiException $e) {
             // Dejar que las excepciones de API lleguen al Handler
@@ -466,7 +465,7 @@ class PublishingController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'title' => 'required|string|max:255',
+                'title' => 'required|string|max:255|unique:publishings,title',
                 'URL' => 'nullable|string',
                 'category_id' => 'nullable|integer|exists:categories,id',
                 'publishing_type' => 'required|integer|exists:publishing_types,id',
@@ -575,7 +574,6 @@ class PublishingController extends Controller
      *   -F "is_new_arrival=1" \
      *   -F "translations[0][language_id]=1" \
      *   -F "translations[0][title]=Laravel para Principiantes" \
-     *   -F "translations[0][URL]=laravel-para-principiantes" \
      *   -F "authors[]=1" \
      *   -F "authors[]=2" \
      *   -F "cover=@/path/to/cover.jpg"
@@ -645,7 +643,7 @@ class PublishingController extends Controller
 
                 $validator = Validator::make($request->all(), [
                     'publishing_type' => 'required|integer|exists:publishing_types,id',
-                    // 'title' => 'required|string|max:255',
+                    'title' => 'string|unique:publishings,title,' . $id,
                     'pages' => 'required|integer|min:1',
                     'publish_date' => 'required|date',
                     'publish_code' => [
@@ -655,10 +653,10 @@ class PublishingController extends Controller
                     ],
                     'category_id' => 'integer|nullable',
                     'is_new_arrival' => 'boolean',
-                    // 'URL' => 'nullable|string',
+                    'URL' => 'nullable|string',
+                    'resource_URL' => 'nullable|string',
                     'translations.*.language_id' => 'required|integer|exists:languages,id',
                     'translations.*.title' => 'required|string|max:255',
-                    'translations.*.URL' => 'nullable|string',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
                     'cover' => 'nullable',
@@ -688,16 +686,30 @@ class PublishingController extends Controller
                     }
 
                     // Actualizar atributos principales
-                    $publishing->update($request->only([
+                    $updateData = $request->only([
                         'publishing_type',
-                        // 'title',
+                        'URL',
+                        'resource_URL',
                         'pages',
                         'publish_date',
                         'publish_code',
                         'category_id',
                         'is_new_arrival',
-                        // 'URL'
-                    ]));
+                    ]);
+
+                    //Actualizar el titulo principal si la traduccion en español cambia
+                    if ($request->has('translations')) {
+                        foreach ($request->input('translations') as $translationData) {
+                            // Si la traducción es en español (id: 1), actualizar el título principal
+                            if ($translationData['language_id'] == 1) {
+                                $updateData['title'] = $translationData['title'];
+                                break;
+                            }
+                        }
+                    }
+
+                    $publishing->update($updateData);
+
                     //Actualizar la traduccion asociada 
                     if ($request->has('translations')) {
                         foreach ($request->input('translations') as $translationData) {
@@ -705,7 +717,7 @@ class PublishingController extends Controller
                                 ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
                                 [
                                     'title' => $translationData['title'],
-                                    'URL' => $translationData['URL'] ? $translationData['URL'] : null,
+                                    'URL' => isset($translationData['URL']) ? $translationData['URL'] : null,
                                 ]
                             );
                         }
@@ -725,7 +737,7 @@ class PublishingController extends Controller
                 }
 
                 $validator = Validator::make($request->all(), [
-                    // 'title' => 'required|string|max:255',
+                    'title' => 'string|unique:publishings,title,' . $id,
                     'pages' => 'required|integer|min:1',
                     'publish_date' => 'required|date',
                     'publish_code' => [
@@ -734,10 +746,13 @@ class PublishingController extends Controller
                         'regex:/^\d{3}-\d{2}-\d{4}-\d{3}-\d$/'
                     ],
                     'age' => 'nullable|integer|min:1',
+                    'URL' => 'nullable|string',
                     'age_number' => 'nullable|integer|min:1',
                     'volume' => 'nullable|integer|min:1',
                     'is_new_arrival' => 'boolean',
                     'category_id' => 'integer|nullable',
+                    'translations.*.language_id' => 'required|integer|exists:languages,id',
+                    'translations.*.title' => 'required|string|max:255',
                     'publishing_type' => 'required|integer|exists:publishing_types,id',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
@@ -768,10 +783,10 @@ class PublishingController extends Controller
                     }
 
                     // Actualizar atributos principales
-                    $publishing->update($request->only([
-                        // 'title',
+                    $updateData = $request->only([
                         'publish_date',
                         'publish_code',
+                        'URL',
                         'age',
                         'age_number',
                         'pages',
@@ -779,7 +794,19 @@ class PublishingController extends Controller
                         'is_new_arrival',
                         'category_id',
                         'publishing_type'
-                    ]));
+                    ]);
+
+                    // Actualizar título principal solo si hay traducción en español
+                    if ($request->has('translations')) {
+                        foreach ($request->input('translations') as $translationData) {
+                            if ($translationData['language_id'] == 1) {
+                                $updateData['title'] = $translationData['title'];
+                                break;
+                            }
+                        }
+                    }
+
+                    $publishing->update($updateData);
 
                     if ($request->has('translations')) {
                         foreach ($request->input('translations') as $translationData) {

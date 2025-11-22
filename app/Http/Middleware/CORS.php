@@ -18,7 +18,16 @@ class CORS
     {
         //        return $next($request);
 
-        header("Access-Control-Allow-Origin: http://localhost:5173");
+        $allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:4321',
+        ];
+
+        $origin = $request->header('Origin');
+
+        if (in_array($origin, $allowedOrigins)) {
+            header("Access-Control-Allow-Origin: " . $origin);
+        }
         header("Access-Control-Allow-Credentials: true");
 
         // ALLOW OPTIONS METHOD

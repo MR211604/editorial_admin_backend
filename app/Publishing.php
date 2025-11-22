@@ -18,6 +18,7 @@ class Publishing extends Model
         'is_new_arrival',
         'category_id',
         'publishing_type',
+        'resource_URL',
         'is_archived',
         'URL',
         'cover'
