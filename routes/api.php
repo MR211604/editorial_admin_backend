@@ -34,6 +34,7 @@ Route::group(['middleware' => ['api'], 'prefix' => 'users'], function () {
 Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
     Route::get('getPublishings', 'PublishingController@index');
     Route::get('getPublishing/{id?}', 'PublishingController@find');
+    Route::get('searchPublishing/{publishingURL?}', 'PublishingController@searchByURL');
     Route::post('createPublishing', 'PublishingController@create');
     Route::post('updatePublishing/{id?}', 'PublishingController@update');
     Route::post('updateStatus/{id?}', 'PublishingController@toggleStatus');
@@ -60,6 +61,7 @@ Route::group(['middleware' => ['api'], 'prefix' => 'authors'], function () {
 Route::group(['middleware' => ['api'], 'prefix' => 'categories'], function () {
     Route::get('getCategories', 'CategoryController@index');
     Route::get('getCategory/{id?}', 'CategoryController@find');
+    Route::get('searchCategory/{categoryURL?}', 'CategoryController@searchByURL');
     Route::post('createCategory', 'CategoryController@create');
     Route::post('updateCategory/{id?}', 'CategoryController@update');
     Route::post('toggleState/{id?}', 'CategoryController@toggleState');

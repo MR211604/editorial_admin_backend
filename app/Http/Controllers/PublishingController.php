@@ -33,7 +33,7 @@ class PublishingController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api')->except(['index', 'find']);
+        $this->middleware('auth:api')->except(['index', 'searchByURL']);
     }
 
     private function deleteCoverImage($coverPath)
@@ -283,9 +283,10 @@ class PublishingController extends Controller
     }
 
     /**
-     * Obtener una publicación
+     * Obtener una publicación por ID
      * 
      * Obtiene la información detallada de una publicación específica con todas sus relaciones (tipo, autores, detalles, traducciones).
+     * Esta función es para uso interno del CMS usando ID numérico.
      * 
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
@@ -356,18 +357,18 @@ class PublishingController extends Controller
      *   "message": "Unauthenticated"
      * }
      */
-    public function find($publishing_URL = null)
+    public function find($id = null)
     {
         try {
-            if (empty($publishing_URL) || !is_string($publishing_URL)) {
-                throw new BadRequestException('La URL del libro es requerida y debe ser una cadena de texto');
+            if (empty($id)) {
+                throw new BadRequestException('El ID de la publicación es requerido y debe ser un número entero');
             }
 
-            if (!Publishing::where('URL', $publishing_URL)->exists()) {
+            if (!Publishing::where('id', $id)->exists()) {
                 throw new NotFoundException('Publicación no encontrada');
             }
 
-            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])->where('URL', $publishing_URL)->firstOrFail();
+            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])->where('id', $id)->firstOrFail();
             return $this->successResponse($publishing, 'Publicación obtenida exitosamente');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -379,6 +380,104 @@ class PublishingController extends Controller
             throw $e;
         } catch (Exception $e) {
             throw new ServerErrorException('Error al obtener la publicación', null, $e);
+        }
+    }
+
+    /**
+     * Buscar una publicación por URL/slug
+     * 
+     * Obtiene la información detallada de una publicación específica usando su URL/slug con todas sus relaciones.
+     * Esta función es para uso público del frontend usando URLs amigables.
+     * 
+     * **Autenticación requerida:**
+     * Este endpoint NO requiere autenticación (público).
+     * 
+     * **Parámetros de consulta (Query Parameters):**
+     * - `publishing_URL` (string, requerido): URL/slug de la publicación a consultar. Ejemplo: `laravel-para-principiantes`
+     * 
+     * ```bash
+     * curl -X GET "http://localhost/api/publishings/searchByURL?publishing_URL=laravel-para-principiantes" \
+     *   -H "Accept: application/json"
+     * ```
+     * 
+     * @response {
+     *   "ok": true,
+     *   "message": "Publicación encontrada exitosamente",
+     *   "data": {
+     *     "id": 1,
+     *     "title": "Laravel para Principiantes",
+     *     "URL": "laravel-para-principiantes",
+     *     "cover": "editorial_files/libros/programacion/laravel_principiantes/1234567890.jpg",
+     *     "pages": 320,
+     *     "publish_date": "2025-01-15",
+     *     "publish_code": "978-84-9876-123-4",
+     *     "category_id": 3,
+     *     "publishing_type": 1,
+     *     "is_new_arrival": true,
+     *     "is_archived": false,
+     *     "type": {
+     *       "id": 1,
+     *       "name": "Libro"
+     *     },
+     *     "authors": [
+     *       {
+     *         "id": 1,
+     *         "name": "Juan",
+     *         "lastname": "García"
+     *       }
+     *     ],
+     *     "translations": [
+     *       {
+     *         "id": 1,
+     *         "title": "Laravel para Principiantes",
+     *         "URL": "laravel-para-principiantes",
+     *         "language": {
+     *           "id": 1,
+     *           "name": "Español"
+     *         }
+     *       }
+     *     ]
+     *   }
+     * }
+     * 
+     * @response 400 {
+     *   "ok": false,
+     *   "error": "Bad Request",
+     *   "message": "La URL de la publicación es requerida"
+     * }
+     * 
+     * @response 404 {
+     *   "ok": false,
+     *   "error": "Not Found",
+     *   "message": "Publicación no encontrada"
+     * }
+     */
+    public function searchByURL($publishingURL = null)
+    {
+        try {
+            if (empty($publishingURL)) {
+                throw new BadRequestException('La URL de la publicación es requerida');
+            }
+
+            // Buscar por URL principal de la publicación
+            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])
+                ->where('URL', $publishingURL)
+                ->where('is_archived', 0) // Solo publicaciones activas para frontend
+                ->first();
+
+            if (!$publishing) {
+                throw new NotFoundException('Publicación no encontrada');
+            }
+
+            return $this->successResponse($publishing, 'Publicación encontrada exitosamente');
+
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            // Dejar que las excepciones de API lleguen al Handler
+            throw $e;
+        } catch (Exception $e) {
+            throw new ServerErrorException('Error al buscar la publicación', null, $e);
         }
     }
 
@@ -474,7 +573,6 @@ class PublishingController extends Controller
                 'translations' => 'required|array|min:1',
                 'translations.*.language_id' => 'required|integer|exists:languages,id',
                 'translations.*.title' => 'required|string|max:255',
-                'translations.*.URL' => 'nullable|string',
             ]);
 
             if ($validator->fails()) {
@@ -496,7 +594,6 @@ class PublishingController extends Controller
                     'publisher' => null,
                     'stock' => null,
                     'author_id' => null,
-                    // 'language_id' => null,
                     'publishing_type' => $request->input('publishing_type'),
                     'age_number' => null,
                     'pages' => null,

@@ -30,7 +30,7 @@ class CategoryController extends Controller
    */
   public function __construct()
   {
-    $this->middleware('auth:api')->except(['find']);
+    $this->middleware('auth:api')->except(['searchByURL']);
   }
 
   /**
@@ -69,6 +69,7 @@ class CategoryController extends Controller
    *       "title": "Ciencias",
    *       "description": "Categoría de ciencias",
    *       "category_type": 1,
+   *       "URL": "ciencias",
    *       "state": 1,
    *       "children_recursive": [
    *         {
@@ -151,6 +152,7 @@ class CategoryController extends Controller
    *     "description": "Categoría de ciencias",
    *     "main_category": null,
    *     "state": 1,
+   *     "URL": "ciencias",
    *     "is_featured": 0,
    *     "language_id": 1,
    *     "category_type": 1,
@@ -183,7 +185,13 @@ class CategoryController extends Controller
   public function find($id = null)
   {
     try {
+
+      if (empty($id) || !is_numeric($id)) {
+        throw new BadRequestException('El numero de ID es requerido');
+      }
+
       $category = Category::with(['detail'])->findOrFail($id);
+
       return $this->successResponse($category, 'Categoría obtenida correctamente');
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
       throw new \App\Exceptions\NotFoundException('Categoría no encontrada');
@@ -192,6 +200,92 @@ class CategoryController extends Controller
       throw $e;
     } catch (Exception $e) {
       throw new ServerErrorException('Error al obtener la categoría', null, $e);
+    }
+  }
+
+  /**
+   * Buscar una categoria por URL/slug
+   * 
+   * Obtiene la información detallada de una categoria específica usando su URL/slug con todas sus relaciones.
+   * Esta función es para uso público del frontend usando URLs amigables.
+   * 
+   * **Autenticación requerida:**
+   * Este endpoint NO requiere autenticación (público).
+   * 
+   * **Parámetros de consulta (Query Parameters):**
+   * - `categoryURL` (string, requerido): URL/slug de la categoria a consultar. Ejemplo: `ciencias`
+   * 
+   * ```bash
+   * curl -X GET "http://localhost/api/categories/searchByURL/ciencias" \
+   *   -H "Accept: application/json"
+   * ```
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Categoría encontrada exitosamente",
+   *   "data": {
+   *     "id": 1,
+   *     "title": "Ciencias",
+   *     "description": "Categoría de ciencias",
+   *     "main_category": null,
+   *     "state": 1,
+   *     "URL": "ciencias",
+   *     "is_featured": 0,
+   *     "language_id": 1,
+   *     "category_type": 1,
+   *     "created_at": "2025-11-15 10:30:00",
+   *     "updated_at": "2025-11-15 10:30:00",
+   *     "detail": {
+   *       "id": 1,
+   *       "category_id": 1,
+   *       "language_id": 1,
+   *       "about": "Información sobre la categoría",
+   *       "editorial_board": "Consejo editorial",
+   *       "policy": "Políticas de publicación",
+   *       "norms": "Normas de la categoría",
+   *       "process": "Proceso de publicación",
+   *       "contact": "info@example.com"
+   *     }
+   *   }
+   * }
+   * 
+   * @response 400 {
+   *   "ok": false,
+   *   "error": "Bad Request",
+   *   "message": "La URL de la categoría es requerida"
+   * }
+   * 
+   * @response 404 {
+   *   "ok": false,
+   *   "error": "Not Found",
+   *   "message": "Categoría no encontrada"
+   * }
+   */
+  public function searchByURL($categoryURL = null)
+  {
+    try {
+      if (empty($categoryURL)) {
+        throw new BadRequestException('La URL de la categoría es requerida');
+      }
+
+      // Buscar por URL principal de la publicación
+      $category = Category::with(['detail'])
+        ->where('URL', $categoryURL)
+        ->where('state', 1) // Solo publicaciones activas para frontend
+        ->first();
+
+      if (!$category) {
+        throw new \App\Exceptions\NotFoundException('Categoría no encontrada');
+      }
+
+      return $this->successResponse($category, 'Categoría encontrada exitosamente');
+    } catch (ValidationException $e) {
+      throw $e;
+    } catch (\App\Exceptions\ApiException $e) {
+      // Dejar que las excepciones de API lleguen al Handler
+      throw $e;
+    } catch (Exception $e) {
+      throw new ServerErrorException('Error al buscar la publicación', null, $e);
     }
   }
 
@@ -214,7 +308,8 @@ class CategoryController extends Controller
    *   "title": "Ciencias",
    *   "description": "Categoría de ciencias exactas",
    *   "category_type": 1,
-   *   "language_id": 1
+   *   "language_id": 1,
+   *   "URL": "ciencias"
    * }
    * ```
    * 
@@ -238,6 +333,7 @@ class CategoryController extends Controller
    *     "title": "Ciencias",
    *     "description": "Categoría de ciencias exactas",
    *     "main_category": null,
+   *     "URL": "ciencias",
    *     "state": 1,
    *     "is_featured": 0,
    *     "language_id": 1,
@@ -273,17 +369,14 @@ class CategoryController extends Controller
 
       //!TODO: AGREGAR LANGUAGE ID DESPUES
       $validator = Validator::make($request->all(), [
-        'title' => 'required|string|max:255',
+        'title' => 'required|string|max:255|unique:categories,title',
         'description' => 'string',
-        'category_type' => 'integer' // Se crea como padre por defecto        
+        'category_type' => 'integer',
+        'URL' => 'string|unique:categories,URL'
       ]);
 
       if ($validator->fails()) {
         throw new ValidationException($validator);
-      }
-
-      if (Category::alreadyExists($request->input('title'))) {
-        throw new ConflictException('La categoría ya existe');
       }
 
       $category = Category::create([
@@ -294,6 +387,7 @@ class CategoryController extends Controller
         'is_featured' => 0,
         'language_id' => $request->input('language_id', 1), // Por defecto, idioma 1
         'category_type' => $request->input('category_type'),
+        'URL' => $request->input('URL')
       ]);
 
       return $this->successResponse($category, 'Categoría creada correctamente');
@@ -324,6 +418,7 @@ class CategoryController extends Controller
    * **Parámetros del Body:**
    * - `title` (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias Exactas`
    * - `description` (string, opcional): Nueva descripción. Ejemplo: `Categoría actualizada`
+   * - `URL` (string, opcional): Nueva URL/slug de la categoría. Ejemplo: `ciencias_exactas`
    * - `main_category` (integer, nullable): ID de la categoría padre. Si es `null` o vacío, se mantiene como categoría padre. Ejemplo: `2`
    * - `is_featured` (boolean, opcional): Si la categoría es destacada. Ejemplo: `true`
    * - `about` (string, opcional): Información sobre la categoría. Ejemplo: `Sobre esta categoría`
@@ -366,6 +461,7 @@ class CategoryController extends Controller
    *   "data": {
    *     "id": 1,
    *     "title": "Ciencias Exactas",
+   *     "URL": "ciencias_exactas",
    *     "description": "Categoría actualizada de ciencias",
    *     "main_category": null,
    *     "state": 1,
@@ -424,7 +520,8 @@ class CategoryController extends Controller
       $updatedCategory = Category::with(['detail'])->findOrFail($id);
 
       $validator = Validator::make($request->all(), [
-        'title' => 'required|string|max:255',
+        'title' => 'required|string|max:255|unique:categories,title,' . $id,
+        'URL' => 'string|unique:categories,URL,' . $id,
         'description' => 'string',
         'main_category' => 'integer|nullable',
         'is_featured' => 'boolean',
@@ -458,7 +555,8 @@ class CategoryController extends Controller
           'title',
           'description',
           'main_category',
-          'is_featured'
+          'is_featured',
+          'URL'
         ]));
 
         // Campos que van a la tabla categories_details
@@ -575,6 +673,7 @@ class CategoryController extends Controller
    *     "main_category": null,
    *     "state": 1,
    *     "is_featured": 0,
+   *     "URL": "ciencias",
    *     "language_id": 1,
    *     "category_type": 1,
    *     "created_at": "2025-11-15 10:30:00",
@@ -600,6 +699,7 @@ class CategoryController extends Controller
    *     "main_category": null,
    *     "state": 0,
    *     "is_featured": 0,
+   *     "URL": "ciencias",
    *     "language_id": 1,
    *     "category_type": 1,
    *     "created_at": "2025-11-15 10:30:00",

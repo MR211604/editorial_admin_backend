@@ -10,7 +10,7 @@ class Category extends Model
     protected $table = "categories";
     public $timestamps = false;
 
-    protected $fillable = ['id', 'title', 'description', 'main_category', 'state', 'is_featured', 'language_id', 'category_type'];
+    protected $fillable = ['id', 'title', 'description', 'main_category', 'state', 'is_featured', 'language_id', 'category_type', 'URL'];
 
     public function detail()
     {
@@ -35,11 +35,6 @@ class Category extends Model
     public function childrenRecursive()
     {
         return $this->children()->with('childrenRecursive');
-    }
-
-    public static function alreadyExists($title)
-    {
-        return self::where('title', $title)->exists();
     }
 
 }
