@@ -33,7 +33,7 @@ class PublishingController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api')->except(['index', 'searchByURL']);
+        $this->middleware('auth:api')->except(['index', 'searchByURL', 'globalSearch']);
     }
 
     private function deleteCoverImage($coverPath)
@@ -1136,6 +1136,54 @@ class PublishingController extends Controller
             throw $e;
         } catch (Exception $e) {
             throw new ServerErrorException('Error al eliminar la publicación', null, $e);
+        }
+    }
+
+    public function globalSearch(Request $request)
+    {
+        try {
+            $query = $request->query('search', '');
+
+            if (empty($query)) {
+                throw new BadRequestException('El parámetro de búsqueda es requerido');
+            }
+
+            // Buscar libros (publishing_type = 1)
+            $libros = Publishing::where('publishing_type', 1)
+                ->where('title', 'like', '%' . $query . '%')
+                ->where('is_archived', 0)
+                ->select('id', 'title', 'resource_URL')
+                ->get();
+
+            // Buscar revistas (publishing_type = 2)
+            $revistas = Publishing::where('publishing_type', 2)
+                ->where('title', 'like', '%' . $query . '%')
+                ->where('is_archived', 0)
+                ->select('id', 'title', 'resource_URL')
+                ->get();
+
+            // Buscar artículos en PublishingDetail
+            $articulos = \App\PublishingDetail::whereHas('publishing', function ($q) {
+                $q->where('is_archived', 0); // Solo artículos de publicaciones activas
+            })
+                ->where('title', 'like', '%' . $query . '%')
+                ->select('id', 'title', 'URL')
+                ->get();
+
+            $data = [
+                'libros' => $libros,
+                'revistas' => $revistas,
+                'articulos' => $articulos
+            ];
+
+            return $this->successResponse($data, 'Búsqueda global realizada exitosamente');
+
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\App\Exceptions\ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new ServerErrorException('Error al realizar la búsqueda global', null, $e);
         }
     }
 

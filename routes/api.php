@@ -40,6 +40,7 @@ Route::group(['middleware' => ['api'], 'prefix' => 'publishings'], function () {
     Route::post('updateStatus/{id?}', 'PublishingController@toggleStatus');
     Route::post('deletePublishing/{id?}', 'PublishingController@delete');
     Route::get('summary', 'PublishingController@summary');
+    Route::get('globalSearch', 'PublishingController@globalSearch');
 });
 
 //Creando un grupo para los roles

@@ -43,7 +43,7 @@ class PublishingDetailController extends Controller
    * 
    * **Parámetros del Body:**
    * - `title` (string, requerido): Título del artículo/detalle. Ejemplo: `Avances en Inteligencia Artificial`
-   * - `summary` (string, requerido): Resumen del artículo. Ejemplo: `Este artículo explora los últimos avances...`
+   * - `summary` (string, opcional): Resumen del artículo. Ejemplo: `Este artículo explora los últimos avances...`
    * - `URL` (string, opcional): URL del artículo completo. Ejemplo: `https://revista.udb.edu.sv/articulo/123`
    * - `repository_URL` (string, opcional): URL del repositorio académico. Ejemplo: `https://repositorio.udb.edu.sv/123`
    * - `language_id` (integer, requerido): ID del idioma (debe existir en tabla languages). Ejemplo: `1`
@@ -103,7 +103,6 @@ class PublishingDetailController extends Controller
    *   "message": "Los datos proporcionados no son válidos",
    *   "errors": {
    *     "title": ["The title field is required."],
-   *     "summary": ["The summary field is required."],
    *     "language_id": ["The language id field is required.", "The selected language id is invalid."],
    *     "publishing_id": ["The publishing id field is required.", "The selected publishing id is invalid."]
    *   }
@@ -118,7 +117,7 @@ class PublishingDetailController extends Controller
     try {
       $validator = Validator::make($request->all(), [
         'title' => 'required|string',
-        'summary' => 'required|string',
+        'summary' => 'nullable|string',
         'URL' => 'nullable|string',
         'repository_URL' => 'nullable|string',
         'language_id' => 'required|integer|exists:languages,id',
@@ -154,7 +153,7 @@ class PublishingDetailController extends Controller
    * 
    * **Parámetros del Body:**
    * - `title` (string, requerido): Nuevo título del artículo. Ejemplo: `Inteligencia Artificial en la Educación`
-   * - `summary` (string, requerido): Nuevo resumen del artículo. Ejemplo: `Resumen actualizado del contenido...`
+   * - `summary` (string, opcional): Nuevo resumen del artículo. Ejemplo: `Resumen actualizado del contenido...`
    * - `URL` (string, opcional): Nueva URL del artículo completo. Ejemplo: `https://revista.udb.edu.sv/articulo/123-v2`
    * - `repository_URL` (string, opcional): Nueva URL del repositorio. Ejemplo: `https://repositorio.udb.edu.sv/123-v2`
    * - `publishing_id` (integer, requerido): ID de la publicación padre (debe existir en tabla publishings). Ejemplo: `5`
@@ -214,7 +213,6 @@ class PublishingDetailController extends Controller
    *   "message": "Los datos proporcionados no son válidos",
    *   "errors": {
    *     "title": ["The title field is required."],
-   *     "summary": ["The summary field is required."],
    *     "publishing_id": ["The publishing id field is required.", "The selected publishing id is invalid."]
    *   }
    * }
@@ -228,7 +226,7 @@ class PublishingDetailController extends Controller
     try {
       $validator = Validator::make($request->all(), [
         'title' => 'required|string',
-        'summary' => 'required|string',
+        'summary' => 'nullable|string',
         'URL' => 'nullable|string',
         'repository_URL' => 'nullable|string',
         'publishing_id' => 'required|integer|exists:publishings,id',
