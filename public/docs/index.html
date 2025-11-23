@@ -517,6 +517,7 @@ $.ajax(settings).done(function (response) {
             "title": "Ciencias",
             "description": "Categoría de ciencias",
             "category_type": 1,
+            "URL": "ciencias",
             "state": 1,
             "children_recursive": [
                 {
@@ -586,6 +587,7 @@ $.ajax(settings).done(function (response) {
         "description": "Categoría de ciencias",
         "main_category": null,
         "state": 1,
+        "URL": "ciencias",
         "is_featured": 0,
         "language_id": 1,
         "category_type": 1,
@@ -607,6 +609,70 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>GET api/categories/getCategory/{id?}</code></p>
 <!-- END_b69b9dfb42050f0036c4a5ec9f9d6a6b -->
+<!-- START_fe098ef3e869114d1d2d1cee9e13cbf2 -->
+<h2>Buscar una categoria por URL/slug</h2>
+<p>Obtiene la información detallada de una categoria específica usando su URL/slug con todas sus relaciones.
+Esta función es para uso público del frontend usando URLs amigables.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint NO requiere autenticación (público).</p>
+<p><strong>Parámetros de consulta (Query Parameters):</strong></p>
+<ul>
+<li><code>categoryURL</code> (string, requerido): URL/slug de la categoria a consultar. Ejemplo: <code>ciencias</code></li>
+</ul>
+<pre><code class="language-bash">curl -X GET "http://localhost/api/categories/searchByURL/ciencias" \
+  -H "Accept: application/json"</code></pre>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/categories/searchCategory/{categoryURL?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/searchCategory/{categoryURL?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Categoría encontrada exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Ciencias",
+        "description": "Categoría de ciencias",
+        "main_category": null,
+        "state": 1,
+        "URL": "ciencias",
+        "is_featured": 0,
+        "language_id": 1,
+        "category_type": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00",
+        "detail": {
+            "id": 1,
+            "category_id": 1,
+            "language_id": 1,
+            "about": "Información sobre la categoría",
+            "editorial_board": "Consejo editorial",
+            "policy": "Políticas de publicación",
+            "norms": "Normas de la categoría",
+            "process": "Proceso de publicación",
+            "contact": "info@example.com"
+        }
+    }
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/categories/searchCategory/{categoryURL?}</code></p>
+<!-- END_fe098ef3e869114d1d2d1cee9e13cbf2 -->
 <!-- START_73cd004146fd92a9601b7943fa74d33c -->
 <h2>Crear una categoría</h2>
 <p>Crea una nueva categoría en el sistema. Por defecto se crea como categoría padre (sin categoría principal).</p>
@@ -623,7 +689,8 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
   "title": "Ciencias",
   "description": "Categoría de ciencias exactas",
   "category_type": 1,
-  "language_id": 1
+  "language_id": 1,
+  "URL": "ciencias"
 }</code></pre>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/categories/createCategory" \
   -H "Accept: application/json" \
@@ -660,6 +727,7 @@ $.ajax(settings).done(function (response) {
         "title": "Ciencias",
         "description": "Categoría de ciencias exactas",
         "main_category": null,
+        "URL": "ciencias",
         "state": 1,
         "is_featured": 0,
         "language_id": 1,
@@ -685,6 +753,7 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <ul>
 <li><code>title</code> (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: <code>Ciencias Exactas</code></li>
 <li><code>description</code> (string, opcional): Nueva descripción. Ejemplo: <code>Categoría actualizada</code></li>
+<li><code>URL</code> (string, opcional): Nueva URL/slug de la categoría. Ejemplo: <code>ciencias_exactas</code></li>
 <li><code>main_category</code> (integer, nullable): ID de la categoría padre. Si es <code>null</code> o vacío, se mantiene como categoría padre. Ejemplo: <code>2</code></li>
 <li><code>is_featured</code> (boolean, opcional): Si la categoría es destacada. Ejemplo: <code>true</code></li>
 <li><code>about</code> (string, opcional): Información sobre la categoría. Ejemplo: <code>Sobre esta categoría</code></li>
@@ -739,6 +808,7 @@ $.ajax(settings).done(function (response) {
     "data": {
         "id": 1,
         "title": "Ciencias Exactas",
+        "URL": "ciencias_exactas",
         "description": "Categoría actualizada de ciencias",
         "main_category": null,
         "state": 1,
@@ -814,6 +884,7 @@ $.ajax(settings).done(function (response) {
         "main_category": null,
         "state": 1,
         "is_featured": 0,
+        "URL": "ciencias",
         "language_id": 1,
         "category_type": 1,
         "created_at": "2025-11-15 10:30:00",
@@ -1175,8 +1246,9 @@ $.ajax(settings).done(function (response) {
 <p><code>GET api/publishings/getPublishings</code></p>
 <!-- END_f32197e71cb96cfd48b93667b5eedf8c -->
 <!-- START_ad89b3f28c1bdbc089c08760b57e4f29 -->
-<h2>Obtener una publicación</h2>
-<p>Obtiene la información detallada de una publicación específica con todas sus relaciones (tipo, autores, detalles, traducciones).</p>
+<h2>Obtener una publicación por ID</h2>
+<p>Obtiene la información detallada de una publicación específica con todas sus relaciones (tipo, autores, detalles, traducciones).
+Esta función es para uso interno del CMS usando ID numérico.</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <p><strong>Parámetros de ruta (URL Parameters):</strong></p>
@@ -1248,6 +1320,81 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>GET api/publishings/getPublishing/{id?}</code></p>
 <!-- END_ad89b3f28c1bdbc089c08760b57e4f29 -->
+<!-- START_d9b6a14dbcebbf5115083f6c8fd40b69 -->
+<h2>Buscar una publicación por URL/slug</h2>
+<p>Obtiene la información detallada de una publicación específica usando su URL/slug con todas sus relaciones.
+Esta función es para uso público del frontend usando URLs amigables.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint NO requiere autenticación (público).</p>
+<p><strong>Parámetros de consulta (Query Parameters):</strong></p>
+<ul>
+<li><code>publishing_URL</code> (string, requerido): URL/slug de la publicación a consultar. Ejemplo: <code>laravel-para-principiantes</code></li>
+</ul>
+<pre><code class="language-bash">curl -X GET "http://localhost/api/publishings/searchByURL?publishing_URL=laravel-para-principiantes" \
+  -H "Accept: application/json"</code></pre>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/publishings/searchPublishing/{publishingURL?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/searchPublishing/{publishingURL?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Publicación encontrada exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Laravel para Principiantes",
+        "URL": "laravel-para-principiantes",
+        "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
+        "pages": 320,
+        "publish_date": "2025-01-15",
+        "publish_code": "978-84-9876-123-4",
+        "category_id": 3,
+        "publishing_type": 1,
+        "is_new_arrival": true,
+        "is_archived": false,
+        "type": {
+            "id": 1,
+            "name": "Libro"
+        },
+        "authors": [
+            {
+                "id": 1,
+                "name": "Juan",
+                "lastname": "García"
+            }
+        ],
+        "translations": [
+            {
+                "id": 1,
+                "title": "Laravel para Principiantes",
+                "URL": "laravel-para-principiantes",
+                "language": {
+                    "id": 1,
+                    "name": "Español"
+                }
+            }
+        ]
+    }
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/publishings/searchPublishing/{publishingURL?}</code></p>
+<!-- END_d9b6a14dbcebbf5115083f6c8fd40b69 -->
 <!-- START_bd07c46bcd1ea465d2b325edab2a8edf -->
 <h2>Crear una publicación</h2>
 <p>Crea una nueva publicación (libro o revista) con sus traducciones en múltiples idiomas.
@@ -1379,7 +1526,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
   -F "is_new_arrival=1" \
   -F "translations[0][language_id]=1" \
   -F "translations[0][title]=Laravel para Principiantes" \
-  -F "translations[0][URL]=laravel-para-principiantes" \
   -F "authors[]=1" \
   -F "authors[]=2" \
   -F "cover=@/path/to/cover.jpg"</code></pre>
@@ -1564,6 +1710,7 @@ Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
 <ul>
 <li><code>page</code> (integer, opcional): Número de página (mínimo 1). Ejemplo: <code>1</code></li>
 <li><code>limit</code> (integer, opcional): Resultados por página (mínimo 10). Ejemplo: <code>10</code></li>
+<li><code>search</code> (string, opcional): Buscar rol por nombre. Ejemplo: <code>Administrador</code></li>
 </ul>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/rol/getRol" \
   -H "Accept: application/json"</code></pre>

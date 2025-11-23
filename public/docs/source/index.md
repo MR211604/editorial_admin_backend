@@ -623,6 +623,7 @@ $.ajax(settings).done(function (response) {
             "title": "Ciencias",
             "description": "Categoría de ciencias",
             "category_type": 1,
+            "URL": "ciencias",
             "state": 1,
             "children_recursive": [
                 {
@@ -707,6 +708,7 @@ $.ajax(settings).done(function (response) {
         "description": "Categoría de ciencias",
         "main_category": null,
         "state": 1,
+        "URL": "ciencias",
         "is_featured": 0,
         "language_id": 1,
         "category_type": 1,
@@ -733,6 +735,85 @@ $.ajax(settings).done(function (response) {
 
 <!-- END_b69b9dfb42050f0036c4a5ec9f9d6a6b -->
 
+<!-- START_fe098ef3e869114d1d2d1cee9e13cbf2 -->
+## Buscar una categoria por URL/slug
+
+Obtiene la información detallada de una categoria específica usando su URL/slug con todas sus relaciones.
+Esta función es para uso público del frontend usando URLs amigables.
+
+**Autenticación requerida:**
+Este endpoint NO requiere autenticación (público).
+
+**Parámetros de consulta (Query Parameters):**
+- `categoryURL` (string, requerido): URL/slug de la categoria a consultar. Ejemplo: `ciencias`
+
+```bash
+curl -X GET "http://localhost/api/categories/searchByURL/ciencias" \
+  -H "Accept: application/json"
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/categories/searchCategory/{categoryURL?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/searchCategory/{categoryURL?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Categoría encontrada exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Ciencias",
+        "description": "Categoría de ciencias",
+        "main_category": null,
+        "state": 1,
+        "URL": "ciencias",
+        "is_featured": 0,
+        "language_id": 1,
+        "category_type": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00",
+        "detail": {
+            "id": 1,
+            "category_id": 1,
+            "language_id": 1,
+            "about": "Información sobre la categoría",
+            "editorial_board": "Consejo editorial",
+            "policy": "Políticas de publicación",
+            "norms": "Normas de la categoría",
+            "process": "Proceso de publicación",
+            "contact": "info@example.com"
+        }
+    }
+}
+```
+
+### HTTP Request
+`GET api/categories/searchCategory/{categoryURL?}`
+
+
+<!-- END_fe098ef3e869114d1d2d1cee9e13cbf2 -->
+
 <!-- START_73cd004146fd92a9601b7943fa74d33c -->
 ## Crear una categoría
 
@@ -752,7 +833,8 @@ Este endpoint requiere un token JWT válido en el header de autorización.
   "title": "Ciencias",
   "description": "Categoría de ciencias exactas",
   "category_type": 1,
-  "language_id": 1
+  "language_id": 1,
+  "URL": "ciencias"
 }
 ```
 
@@ -800,6 +882,7 @@ $.ajax(settings).done(function (response) {
         "title": "Ciencias",
         "description": "Categoría de ciencias exactas",
         "main_category": null,
+        "URL": "ciencias",
         "state": 1,
         "is_featured": 0,
         "language_id": 1,
@@ -831,6 +914,7 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 **Parámetros del Body:**
 - `title` (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias Exactas`
 - `description` (string, opcional): Nueva descripción. Ejemplo: `Categoría actualizada`
+- `URL` (string, opcional): Nueva URL/slug de la categoría. Ejemplo: `ciencias_exactas`
 - `main_category` (integer, nullable): ID de la categoría padre. Si es `null` o vacío, se mantiene como categoría padre. Ejemplo: `2`
 - `is_featured` (boolean, opcional): Si la categoría es destacada. Ejemplo: `true`
 - `about` (string, opcional): Información sobre la categoría. Ejemplo: `Sobre esta categoría`
@@ -897,6 +981,7 @@ $.ajax(settings).done(function (response) {
     "data": {
         "id": 1,
         "title": "Ciencias Exactas",
+        "URL": "ciencias_exactas",
         "description": "Categoría actualizada de ciencias",
         "main_category": null,
         "state": 1,
@@ -987,6 +1072,7 @@ $.ajax(settings).done(function (response) {
         "main_category": null,
         "state": 1,
         "is_featured": 0,
+        "URL": "ciencias",
         "language_id": 1,
         "category_type": 1,
         "created_at": "2025-11-15 10:30:00",
@@ -1437,9 +1523,10 @@ $.ajax(settings).done(function (response) {
 <!-- END_f32197e71cb96cfd48b93667b5eedf8c -->
 
 <!-- START_ad89b3f28c1bdbc089c08760b57e4f29 -->
-## Obtener una publicación
+## Obtener una publicación por ID
 
 Obtiene la información detallada de una publicación específica con todas sus relaciones (tipo, autores, detalles, traducciones).
+Esta función es para uso interno del CMS usando ID numérico.
 
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
@@ -1524,6 +1611,96 @@ $.ajax(settings).done(function (response) {
 
 
 <!-- END_ad89b3f28c1bdbc089c08760b57e4f29 -->
+
+<!-- START_d9b6a14dbcebbf5115083f6c8fd40b69 -->
+## Buscar una publicación por URL/slug
+
+Obtiene la información detallada de una publicación específica usando su URL/slug con todas sus relaciones.
+Esta función es para uso público del frontend usando URLs amigables.
+
+**Autenticación requerida:**
+Este endpoint NO requiere autenticación (público).
+
+**Parámetros de consulta (Query Parameters):**
+- `publishing_URL` (string, requerido): URL/slug de la publicación a consultar. Ejemplo: `laravel-para-principiantes`
+
+```bash
+curl -X GET "http://localhost/api/publishings/searchByURL?publishing_URL=laravel-para-principiantes" \
+  -H "Accept: application/json"
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/searchPublishing/{publishingURL?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/searchPublishing/{publishingURL?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicación encontrada exitosamente",
+    "data": {
+        "id": 1,
+        "title": "Laravel para Principiantes",
+        "URL": "laravel-para-principiantes",
+        "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
+        "pages": 320,
+        "publish_date": "2025-01-15",
+        "publish_code": "978-84-9876-123-4",
+        "category_id": 3,
+        "publishing_type": 1,
+        "is_new_arrival": true,
+        "is_archived": false,
+        "type": {
+            "id": 1,
+            "name": "Libro"
+        },
+        "authors": [
+            {
+                "id": 1,
+                "name": "Juan",
+                "lastname": "García"
+            }
+        ],
+        "translations": [
+            {
+                "id": 1,
+                "title": "Laravel para Principiantes",
+                "URL": "laravel-para-principiantes",
+                "language": {
+                    "id": 1,
+                    "name": "Español"
+                }
+            }
+        ]
+    }
+}
+```
+
+### HTTP Request
+`GET api/publishings/searchPublishing/{publishingURL?}`
+
+
+<!-- END_d9b6a14dbcebbf5115083f6c8fd40b69 -->
 
 <!-- START_bd07c46bcd1ea465d2b325edab2a8edf -->
 ## Crear una publicación
@@ -1673,7 +1850,6 @@ curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
   -F "is_new_arrival=1" \
   -F "translations[0][language_id]=1" \
   -F "translations[0][title]=Laravel para Principiantes" \
-  -F "translations[0][URL]=laravel-para-principiantes" \
   -F "authors[]=1" \
   -F "authors[]=2" \
   -F "cover=@/path/to/cover.jpg"
@@ -1918,6 +2094,7 @@ Obtiene todos los roles disponibles en el sistema.
 **Parámetros de consulta (Query Parameters):**
 - `page` (integer, opcional): Número de página (mínimo 1). Ejemplo: `1`
 - `limit` (integer, opcional): Resultados por página (mínimo 10). Ejemplo: `10`
+- `search` (string, opcional): Buscar rol por nombre. Ejemplo: `Administrador`
 
 ```bash
 curl -X GET "http://localhost/api/rol/getRol" \
