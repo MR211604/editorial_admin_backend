@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Traits\ApiResponse;
 use App\Http\Traits\SearchFilter;
+use App\PublishingType;
 use DB;
 use Exception;
 use Illuminate\Validation\ValidationException;
@@ -204,8 +205,8 @@ class PublishingController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'page' => 'integer|min:1',
-                'limit' => 'integer|min:10',
-                'publishing_type' => 'integer',
+                'limit' => 'integer|min:1',
+                'publishing_type' => 'string|exists:publishing_types,name',
                 'language_id' => 'integer|exists:languages,id',
             ]);
 
@@ -213,10 +214,10 @@ class PublishingController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $allowedSortFields = ['id', 'title', 'created_at', 'updated_at', 'publishing_type'];
+            $allowedSortFields = ['id', 'title', 'created_at', 'updated_at'];
 
             $limit = $request->query('limit', 10);
-            $publishingType = $request->query('publishing_type', null);
+            $publishingTypeName = $request->query('publishing_type', null);
             $languageId = $request->query('language_id', 1);
             $search = $request->query('search', null);
             $category = $request->query('category', null);
@@ -234,12 +235,6 @@ class PublishingController extends Controller
             if ($search) {
                 $query->where('title', 'like', '%' . $search . '%');
             }
-            // if ($search) {
-            //     $query->whereHas('translations', function ($q) use ($search, $languageId) {
-            //         $q->where('language_id', $languageId)
-            //             ->where('title', 'like', '%' . $search . '%');
-            //     });
-            // }
 
             if ($isArchived !== null) {
                 $query->where('is_archived', $isArchived);
@@ -249,8 +244,11 @@ class PublishingController extends Controller
                 $query->where('category_id', $category);
             }
 
-            if ($publishingType) {
-                $query->where('publishing_type', $publishingType);
+            //Obtener el ID del tipo de publicación
+            $publishing_type = PublishingType::where('name', $publishingTypeName)->firstOrFail()->id;
+
+            if ($publishingTypeName) {
+                $query->where('publishing_type', $publishing_type);
             }
 
             if ($request->has('sort')) {
@@ -567,8 +565,7 @@ class PublishingController extends Controller
                 'title' => 'required|string|max:255|unique:publishings,title',
                 'URL' => 'nullable|string',
                 'category_id' => 'nullable|integer|exists:categories,id',
-                'publishing_type' => 'required|integer|exists:publishing_types,id',
-
+                'publishing_type' => 'string|exists:publishing_types,name',
                 // Traducciones
                 'translations' => 'required|array|min:1',
                 'translations.*.language_id' => 'required|integer|exists:languages,id',
@@ -579,7 +576,9 @@ class PublishingController extends Controller
                 throw new ValidationException($validator);
             }
 
-            DB::transaction(function () use ($request, &$publishing) {
+            $publishing_type = PublishingType::where('name', $request->input('publishing_type'))->firstOrFail()->id;
+
+            DB::transaction(function () use ($request, &$publishing, $publishing_type) {
                 $publishing = Publishing::create([
                     'title' => $request->input('title'),
                     'URL' => $request->input('URL'),
@@ -594,7 +593,7 @@ class PublishingController extends Controller
                     'publisher' => null,
                     'stock' => null,
                     'author_id' => null,
-                    'publishing_type' => $request->input('publishing_type'),
+                    'publishing_type' => $publishing_type,
                     'age_number' => null,
                     'pages' => null,
                 ]);
@@ -720,7 +719,6 @@ class PublishingController extends Controller
      *   "message": "Unauthenticated"
      * }
      */
-    //! Distinguir entre el idioma de la publicacion
     public function update(Request $request, $id = null)
     {
 
@@ -731,15 +729,14 @@ class PublishingController extends Controller
             }
 
             $updatedPublishing = Publishing::with(['authors', 'category', 'type', 'details'])->findOrFail($id);
+            $publishingTypeName = PublishingType::where('id', $request->input('publishing_type'))->firstOrFail()->name;
 
             //! Operacion para los libros
-            if ($request->has('publishing_type') && $request->input('publishing_type') == 1) {
-                if (!Publishing::where('id', $id)->where('publishing_type', 1)->exists()) {
+            if ($publishingTypeName == "Libro") {
+                if (!Publishing::where('id', $id)->where('publishing_type', $request->input('publishing_type'))->exists()) {
                     throw new NotFoundException('Publicación no encontrada');
                 }
-
                 $validator = Validator::make($request->all(), [
-                    'publishing_type' => 'required|integer|exists:publishing_types,id',
                     'title' => 'string|unique:publishings,title,' . $id,
                     'pages' => 'required|integer|min:1',
                     'publish_date' => 'required|date',
@@ -784,7 +781,6 @@ class PublishingController extends Controller
 
                     // Actualizar atributos principales
                     $updateData = $request->only([
-                        'publishing_type',
                         'URL',
                         'resource_URL',
                         'pages',
@@ -814,7 +810,7 @@ class PublishingController extends Controller
                                 ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
                                 [
                                     'title' => $translationData['title'],
-                                    'URL' => isset($translationData['URL']) ? $translationData['URL'] : null,
+                                    // 'URL' => isset($translationData['URL']) ? $translationData['URL'] : null,
                                 ]
                             );
                         }
@@ -826,10 +822,8 @@ class PublishingController extends Controller
             }
 
             //? Operacion para las revistas
-            if ($request->has('publishing_type') && $request->input('publishing_type') == 2) {
-
-                //Esta validacion asegura que la publicación sea del tipo revista
-                if (!Publishing::where('id', $id)->where('publishing_type', 2)->exists()) {
+            if ($publishingTypeName == "Revista") {
+                if (!Publishing::where('id', $id)->where('publishing_type', $request->input('publishing_type'))->exists()) {
                     throw new NotFoundException('Publicación no encontrada');
                 }
 
@@ -850,7 +844,6 @@ class PublishingController extends Controller
                     'category_id' => 'integer|nullable',
                     'translations.*.language_id' => 'required|integer|exists:languages,id',
                     'translations.*.title' => 'required|string|max:255',
-                    'publishing_type' => 'required|integer|exists:publishing_types,id',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,id',
                     'cover' => 'nullable',
@@ -890,7 +883,6 @@ class PublishingController extends Controller
                         'volume',
                         'is_new_arrival',
                         'category_id',
-                        'publishing_type'
                     ]);
 
                     // Actualizar título principal solo si hay traducción en español
@@ -1035,8 +1027,11 @@ class PublishingController extends Controller
     public function summary()
     {
         try {
-            $booksCount = Publishing::where('publishing_type', 1)->count();
-            $magazinesCount = Publishing::where('publishing_type', 2)->count();
+
+            $publishing_type = PublishingType::whereIn('name', ['Libro', 'Revista'])->pluck('id', 'name');
+
+            $booksCount = Publishing::where('publishing_type', $publishing_type['Libro'])->count();
+            $magazinesCount = Publishing::where('publishing_type', $publishing_type['Revista'])->count();
 
             $data = [
                 'books' => $booksCount,
@@ -1148,15 +1143,18 @@ class PublishingController extends Controller
                 throw new BadRequestException('El parámetro de búsqueda es requerido');
             }
 
+            $publishing_type = PublishingType::whereIn('name', ['Libro', 'Revista'])->pluck('id', 'name');
+
+
             // Buscar libros (publishing_type = 1)
-            $libros = Publishing::where('publishing_type', 1)
+            $libros = Publishing::where('publishing_type', $publishing_type['Libro'])
                 ->where('title', 'like', '%' . $query . '%')
                 ->where('is_archived', 0)
                 ->select('id', 'title', 'resource_URL')
                 ->get();
 
             // Buscar revistas (publishing_type = 2)
-            $revistas = Publishing::where('publishing_type', 2)
+            $revistas = Publishing::where('publishing_type', $publishing_type['Revista'])
                 ->where('title', 'like', '%' . $query . '%')
                 ->where('is_archived', 0)
                 ->select('id', 'title', 'resource_URL')
