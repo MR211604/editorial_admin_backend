@@ -119,26 +119,22 @@ class PublishingController extends Controller
      * Obtiene una lista paginada de publicaciones (libros y revistas) con opciones de filtrado, búsqueda y ordenamiento.
      * 
      * **Autenticación requerida:**
-     * Este endpoint requiere un token JWT válido en el header de autorización.
+     * Este endpoint NO requiere autenticación (público).
      * 
      * **Parámetros de consulta (Query Parameters):**
      * - `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
-     * - `limit` (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: `10`
-     * - `publishing_type` (integer, opcional): Tipo de publicación (1=Libro, 2=Revista). Ejemplo: `1`
+     * - `limit` (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: `10`
+     * - `publishing_type` (string, opcional): Nombre del tipo de publicación (Libro, Revista). Ejemplo: `Libro`
      * - `language_id` (integer, opcional): ID del idioma para las traducciones. Por defecto: 1. Ejemplo: `1`
      * - `search` (string, opcional): Búsqueda por título. Ejemplo: `Laravel`
      * - `category` (integer, opcional): Filtrar por ID de categoría. Ejemplo: `3`
      * - `is_archived` (integer, opcional): Filtrar por estado (0=Activo, 1=Archivado). Ejemplo: `0`
-     * - `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at, publishing_type). Ejemplo: `title:asc`
-     * 
+     * - `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at). Ejemplo: `title:asc`
      * 
      * ```bash
-     * curl -X GET "http://localhost/api/publishings/getPublishings?page=1&limit=10&publishing_type=1&search=Laravel" \
-     *   -H "Accept: application/json" \
-     *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+     * curl -X GET "http://localhost/api/publishings/getPublishings?page=1&limit=10&publishing_type=Libro&search=Laravel" \
+     *   -H "Accept: application/json"
      * ```
-     * 
-     * @authenticated
      * 
      * @response {
      *   "ok": true,
@@ -168,6 +164,7 @@ class PublishingController extends Controller
      *           "lastname": "García"
      *         }
      *       ],
+     *       "details": [],
      *       "translation": {
      *         "id": 1,
      *         "title": "Laravel para Principiantes",
@@ -184,10 +181,6 @@ class PublishingController extends Controller
      *     "from": 1,
      *     "to": 10
      *   }
-     * }
-     * 
-     * @response 401 {
-     *   "message": "Unauthenticated"
      * }
      * 
      * @response 422 {
@@ -245,9 +238,8 @@ class PublishingController extends Controller
             }
 
             //Obtener el ID del tipo de publicación
-            $publishing_type = PublishingType::where('name', $publishingTypeName)->firstOrFail()->id;
-
-            if ($publishingTypeName) {
+            if ($publishingTypeName != null && $publishingTypeName != '') {
+                $publishing_type = PublishingType::where('name', $publishingTypeName)->firstOrFail()->id;
                 $query->where('publishing_type', $publishing_type);
             }
 
@@ -386,15 +378,16 @@ class PublishingController extends Controller
      * 
      * Obtiene la información detallada de una publicación específica usando su URL/slug con todas sus relaciones.
      * Esta función es para uso público del frontend usando URLs amigables.
+     * Solo retorna publicaciones activas (is_archived=0).
      * 
      * **Autenticación requerida:**
      * Este endpoint NO requiere autenticación (público).
      * 
-     * **Parámetros de consulta (Query Parameters):**
-     * - `publishing_URL` (string, requerido): URL/slug de la publicación a consultar. Ejemplo: `laravel-para-principiantes`
+     * **Parámetros de ruta (URL Parameters):**
+     * - `publishingURL` (string, requerido): URL/slug de la publicación a consultar. Ejemplo: `laravel-para-principiantes`
      * 
      * ```bash
-     * curl -X GET "http://localhost/api/publishings/searchByURL?publishing_URL=laravel-para-principiantes" \
+     * curl -X GET "http://localhost/api/publishings/searchByURL/laravel-para-principiantes" \
      *   -H "Accept: application/json"
      * ```
      * 
@@ -424,6 +417,7 @@ class PublishingController extends Controller
      *         "lastname": "García"
      *       }
      *     ],
+     *     "details": [],
      *     "translations": [
      *       {
      *         "id": 1,
@@ -488,11 +482,11 @@ class PublishingController extends Controller
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
      * 
-     * **Parámetros del Body:**
-     * - `title` (string, requerido): Título principal de la publicación (máximo 255 caracteres). Ejemplo: `Laravel para Principiantes`
+     * **Parámetros del Body (JSON):**
+     * - `title` (string, requerido): Título principal de la publicación (máximo 255 caracteres, único). Ejemplo: `Laravel para Principiantes`
      * - `URL` (string, opcional): URL slug de la publicación. Ejemplo: `laravel-para-principiantes`
      * - `category_id` (integer, opcional): ID de la categoría. Ejemplo: `3`
-     * - `publishing_type` (integer, requerido): Tipo de publicación (1=Libro, 2=Revista). Ejemplo: `1`
+     * - `publishing_type` (string, requerido): Nombre del tipo de publicación (Libro, Revista). Ejemplo: `Libro`
      * - `translations` (array, requerido): Array de traducciones (mínimo 1)
      * - `translations[].language_id` (integer, requerido): ID del idioma. Ejemplo: `1`
      * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres). Ejemplo: `Laravel for Beginners`
@@ -503,7 +497,7 @@ class PublishingController extends Controller
      *   "title": "Laravel para Principiantes",
      *   "URL": "laravel-para-principiantes",
      *   "category_id": 3,
-     *   "publishing_type": 1,
+     *   "publishing_type": "Libro",
      *   "translations": [
      *     {
      *       "language_id": 1,
@@ -524,7 +518,7 @@ class PublishingController extends Controller
      *   -H "Accept: application/json" \
      *   -H "Content-Type: application/json" \
      *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-     *   -d '{"title":"Laravel para Principiantes","publishing_type":1,"translations":[{"language_id":1,"title":"Laravel para Principiantes"}]}'
+     *   -d '{"title":"Laravel para Principiantes","publishing_type":"Libro","translations":[{"language_id":1,"title":"Laravel para Principiantes"}]}'
      * ```
      * 
      * @authenticated
@@ -621,7 +615,7 @@ class PublishingController extends Controller
      * Actualizar una publicación
      * 
      * Actualiza una publicación existente. Los campos requeridos varían según el tipo de publicación:
-     * - **Libros (publishing_type=1)**: Requiere páginas, fecha de publicación, código ISBN, y puede incluir portada
+     * - **Libros (publishing_type=1)**: Requiere páginas, fecha de publicación, código ISBN
      * - **Revistas (publishing_type=2)**: Además de lo anterior, puede incluir año, número, volumen
      * 
      * **Autenticación requerida:**
@@ -632,31 +626,39 @@ class PublishingController extends Controller
      * 
      * **Parámetros del Body (para Libros - publishing_type=1):**
      * - `publishing_type` (integer, requerido): Debe ser 1 para libros
-     * - `pages` (integer, requerido): Número de páginas. Ejemplo: `320`
+     * - `title` (string, opcional): Título de la publicación (único excepto para el registro actual)
+     * - `pages` (integer, requerido): Número de páginas (mínimo 1). Ejemplo: `320`
      * - `publish_date` (date, requerido): Fecha de publicación. Ejemplo: `2025-01-15`
      * - `publish_code` (string, requerido): Código ISBN (formato: XXX-XX-XXXX-XXX-X). Ejemplo: `978-84-9876-123-4`
      * - `category_id` (integer, opcional): ID de categoría. Ejemplo: `3`
      * - `is_new_arrival` (boolean, opcional): ¿Es novedad? Ejemplo: `true`
+     * - `URL` (string, opcional): URL slug de la publicación
+     * - `resource_URL` (string, opcional): URL del recurso/documento
      * - `translations` (array, requerido): Array de traducciones
      * - `translations[].language_id` (integer, requerido): ID del idioma
-     * - `translations[].title` (string, requerido): Título traducido
-     * - `translations[].URL` (string, opcional): URL slug
+     * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
      * - `authors` (array, opcional): Array de IDs de autores. Ejemplo: `[1, 2]`
      * - `cover` (file, opcional): Imagen de portada (JPEG, PNG)
      * 
      * **Parámetros del Body (para Revistas - publishing_type=2):**
      * - `publishing_type` (integer, requerido): Debe ser 2 para revistas
-     * - `pages` (integer, requerido): Número de páginas
+     * - `title` (string, opcional): Título de la publicación (único excepto para el registro actual)
+     * - `pages` (integer, requerido): Número de páginas (mínimo 1)
      * - `publish_date` (date, requerido): Fecha de publicación
-     * - `publish_code` (string, requerido): Código ISSN
-     * - `age` (integer, opcional): Año de la revista. Ejemplo: `2025`
-     * - `age_number` (integer, opcional): Número dentro del año. Ejemplo: `3`
-     * - `volume` (integer, opcional): Volumen. Ejemplo: `12`
+     * - `publish_code` (string, requerido): Código ISSN (formato: XXX-XX-XXXX-XXX-X)
+     * - `age` (integer, opcional): Año de la revista (mínimo 1). Ejemplo: `2025`
+     * - `age_number` (integer, opcional): Número dentro del año (mínimo 1). Ejemplo: `3`
+     * - `volume` (integer, opcional): Volumen (mínimo 1). Ejemplo: `12`
+     * - `URL` (string, opcional): URL slug de la publicación
      * - `is_new_arrival` (boolean, opcional): ¿Es novedad?
      * - `category_id` (integer, opcional): ID de categoría
      * - `translations` (array, requerido): Array de traducciones
+     * - `translations[].language_id` (integer, requerido): ID del idioma
+     * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
      * - `authors` (array, opcional): Array de IDs de autores
      * - `cover` (file, opcional): Imagen de portada
+     * 
+     * **Nota:** Si se actualiza la traducción en español (language_id=1), el título principal de la publicación también se actualiza automáticamente.
      * 
      * ```bash
      * curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
@@ -689,7 +691,14 @@ class PublishingController extends Controller
      *     "publish_code": "978-84-9876-123-4",
      *     "category_id": 3,
      *     "publishing_type": 1,
-     *     "is_new_arrival": true
+     *     "is_new_arrival": true,
+     *     "authors": [],
+     *     "category": null,
+     *     "type": {
+     *       "id": 1,
+     *       "name": "Libro"
+     *     },
+     *     "details": []
      *   }
      * }
      * 
@@ -779,9 +788,8 @@ class PublishingController extends Controller
                         $publishing->cover = $coverPath;
                     }
 
-                    // Actualizar atributos principales
+                    // Actualizar atributos principales (sin URL, se actualiza solo si hay traducción en español)
                     $updateData = $request->only([
-                        'URL',
                         'resource_URL',
                         'pages',
                         'publish_date',
@@ -790,31 +798,27 @@ class PublishingController extends Controller
                         'is_new_arrival',
                     ]);
 
-                    //Actualizar el titulo principal si la traduccion en español cambia
+                    // Procesar traducciones: actualizar título/URL principal si es español y sincronizar todas las traducciones
                     if ($request->has('translations')) {
                         foreach ($request->input('translations') as $translationData) {
-                            // Si la traducción es en español (id: 1), actualizar el título principal
+                            // Si la traducción es en español (id: 1), actualizar el título principal y URL
                             if ($translationData['language_id'] == 1) {
                                 $updateData['title'] = $translationData['title'];
-                                break;
+                                if ($request->has('URL')) {
+                                    $updateData['URL'] = $request->input('URL');
+                                }
                             }
+
+                            // Actualizar o crear la traducción
+                            $publishing->translations()->updateOrCreate(
+                                ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
+                                ['title' => $translationData['title']]
+                            );
                         }
                     }
 
                     $publishing->update($updateData);
 
-                    //Actualizar la traduccion asociada 
-                    if ($request->has('translations')) {
-                        foreach ($request->input('translations') as $translationData) {
-                            $publishing->translations()->updateOrCreate(
-                                ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
-                                [
-                                    'title' => $translationData['title'],
-                                    // 'URL' => isset($translationData['URL']) ? $translationData['URL'] : null,
-                                ]
-                            );
-                        }
-                    }
                     // Sincronizar autores
                     $publishing->authors()->sync($request->input('authors'));
                 });
@@ -872,11 +876,10 @@ class PublishingController extends Controller
                         $publishing->cover = $coverPath;
                     }
 
-                    // Actualizar atributos principales
+                    // Actualizar atributos principales (sin URL, se actualiza solo si hay traducción en español)
                     $updateData = $request->only([
                         'publish_date',
                         'publish_code',
-                        'URL',
                         'age',
                         'age_number',
                         'pages',
@@ -885,28 +888,26 @@ class PublishingController extends Controller
                         'category_id',
                     ]);
 
-                    // Actualizar título principal solo si hay traducción en español
+                    // Procesar traducciones: actualizar título/URL principal si es español y sincronizar todas las traducciones
                     if ($request->has('translations')) {
                         foreach ($request->input('translations') as $translationData) {
+                            // Si la traducción es en español (id: 1), actualizar el título principal y URL
                             if ($translationData['language_id'] == 1) {
                                 $updateData['title'] = $translationData['title'];
-                                break;
+                                if ($request->has('URL')) {
+                                    $updateData['URL'] = $request->input('URL');
+                                }
                             }
+
+                            // Actualizar o crear la traducción
+                            $publishing->translations()->updateOrCreate(
+                                ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
+                                ['title' => $translationData['title']]
+                            );
                         }
                     }
 
                     $publishing->update($updateData);
-
-                    if ($request->has('translations')) {
-                        foreach ($request->input('translations') as $translationData) {
-                            $publishing->translations()->updateOrCreate(
-                                ['publishing_id' => $id, 'language_id' => $translationData['language_id']],
-                                [
-                                    'title' => $translationData['title'],
-                                ]
-                            );
-                        }
-                    }
 
                     // Sincronizar autores
                     $publishing->authors()->sync($request->input('authors'));
@@ -931,7 +932,7 @@ class PublishingController extends Controller
      * Cambiar estado de archivo de una publicación
      * 
      * Alterna el estado de archivo de una publicación entre activo (0) y archivado (1).
-     * Las publicaciones archivadas no aparecen en las búsquedas normales pero pueden ser recuperadas.
+     * Las publicaciones archivadas no aparecen en las búsquedas públicas pero pueden ser recuperadas.
      * 
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
@@ -945,7 +946,9 @@ class PublishingController extends Controller
      *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
      * ```
      * 
-     * **Nota:** Este endpoint alterna el estado automáticamente. Si está activo (0) lo archiva (1) y viceversa.
+     * **Nota:** Este endpoint alterna el estado automáticamente:
+     * - Si `is_archived=0` (activo) → cambia a `is_archived=1` (archivado) → mensaje: "Publicación reactivada exitosamente"
+     * - Si `is_archived=1` (archivado) → cambia a `is_archived=0` (activo) → mensaje: "Publicación archivada exitosamente"
      * 
      * @authenticated
      * 
@@ -965,6 +968,12 @@ class PublishingController extends Controller
      *   "ok": false,
      *   "error": "Bad Request",
      *   "message": "El ID de publicación es requerido"
+     * }
+     * 
+     * @response 404 {
+     *   "ok": false,
+     *   "error": "Not Found",
+     *   "message": "Publicación no encontrada"
      * }
      * 
      * @response 401 {
@@ -1134,6 +1143,59 @@ class PublishingController extends Controller
         }
     }
 
+    /**
+     * Búsqueda global
+     * 
+     * Realiza una búsqueda global en libros, revistas y artículos por título.
+     * Solo retorna resultados de publicaciones activas (is_archived=0).
+     * 
+     * **Autenticación requerida:**
+     * Este endpoint NO requiere autenticación (público).
+     * 
+     * **Parámetros de consulta (Query Parameters):**
+     * - `search` (string, requerido): Término de búsqueda por título. Ejemplo: `Laravel`
+     * 
+     * ```bash
+     * curl -X GET "http://localhost/api/publishings/globalSearch?search=Laravel" \
+     *   -H "Accept: application/json"
+     * ```
+     * 
+     * @response {
+     *   "ok": true,
+     *   "message": "Búsqueda global realizada exitosamente",
+     *   "data": {
+     *     "libros": [
+     *       {
+     *         "id": 1,
+     *         "title": "Laravel para Principiantes",
+     * "URL": "laravel_para_principiantes",
+     *         "resource_URL": "https://example.com/laravel.pdf"
+     *       }
+     *     ],
+     *     "revistas": [
+     *       {
+     *         "id": 5,
+     *         "title": "Revista Laravel Magazine",
+     * "URL": "revista_laravel_magazine",
+     *         "resource_URL": "https://example.com/magazine.pdf"
+     *       }
+     *     ],
+     *     "articulos": [
+     *       {
+     *         "id": 10,
+     *         "title": "Introducción a Laravel",
+     *         "URL": "introduccion-a-laravel"
+     *       }
+     *     ]
+     *   }
+     * }
+     * 
+     * @response 400 {
+     *   "ok": false,
+     *   "error": "Bad Request",
+     *   "message": "El parámetro de búsqueda es requerido"
+     * }
+     */
     public function globalSearch(Request $request)
     {
         try {
@@ -1150,14 +1212,14 @@ class PublishingController extends Controller
             $libros = Publishing::where('publishing_type', $publishing_type['Libro'])
                 ->where('title', 'like', '%' . $query . '%')
                 ->where('is_archived', 0)
-                ->select('id', 'title', 'resource_URL')
+                ->select('id', 'title', 'URL', 'resource_URL')
                 ->get();
 
             // Buscar revistas (publishing_type = 2)
             $revistas = Publishing::where('publishing_type', $publishing_type['Revista'])
                 ->where('title', 'like', '%' . $query . '%')
                 ->where('is_archived', 0)
-                ->select('id', 'title', 'resource_URL')
+                ->select('id', 'title', 'URL', 'resource_URL')
                 ->get();
 
             // Buscar artículos en PublishingDetail

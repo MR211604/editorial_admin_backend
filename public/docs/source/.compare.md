@@ -1189,7 +1189,7 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 
 **Parámetros del Body:**
 - `title` (string, requerido): Título del artículo/detalle. Ejemplo: `Avances en Inteligencia Artificial`
-- `summary` (string, requerido): Resumen del artículo. Ejemplo: `Este artículo explora los últimos avances...`
+- `summary` (string, opcional): Resumen del artículo. Ejemplo: `Este artículo explora los últimos avances...`
 - `URL` (string, opcional): URL del artículo completo. Ejemplo: `https://revista.udb.edu.sv/articulo/123`
 - `repository_URL` (string, opcional): URL del repositorio académico. Ejemplo: `https://repositorio.udb.edu.sv/123`
 - `language_id` (integer, requerido): ID del idioma (debe existir en tabla languages). Ejemplo: `1`
@@ -1273,7 +1273,7 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 
 **Parámetros del Body:**
 - `title` (string, requerido): Nuevo título del artículo. Ejemplo: `Inteligencia Artificial en la Educación`
-- `summary` (string, requerido): Nuevo resumen del artículo. Ejemplo: `Resumen actualizado del contenido...`
+- `summary` (string, opcional): Nuevo resumen del artículo. Ejemplo: `Resumen actualizado del contenido...`
 - `URL` (string, opcional): Nueva URL del artículo completo. Ejemplo: `https://revista.udb.edu.sv/articulo/123-v2`
 - `repository_URL` (string, opcional): Nueva URL del repositorio. Ejemplo: `https://repositorio.udb.edu.sv/123-v2`
 - `publishing_id` (integer, requerido): ID de la publicación padre (debe existir en tabla publishings). Ejemplo: `5`
@@ -1424,23 +1424,21 @@ Usa JWT en el header: `Authorization: Bearer {token}`.
 Obtiene una lista paginada de publicaciones (libros y revistas) con opciones de filtrado, búsqueda y ordenamiento.
 
 **Autenticación requerida:**
-Este endpoint requiere un token JWT válido en el header de autorización.
+Este endpoint NO requiere autenticación (público).
 
 **Parámetros de consulta (Query Parameters):**
 - `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
-- `limit` (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: `10`
-- `publishing_type` (integer, opcional): Tipo de publicación (1=Libro, 2=Revista). Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: `10`
+- `publishing_type` (string, opcional): Nombre del tipo de publicación (Libro, Revista). Ejemplo: `Libro`
 - `language_id` (integer, opcional): ID del idioma para las traducciones. Por defecto: 1. Ejemplo: `1`
 - `search` (string, opcional): Búsqueda por título. Ejemplo: `Laravel`
 - `category` (integer, opcional): Filtrar por ID de categoría. Ejemplo: `3`
 - `is_archived` (integer, opcional): Filtrar por estado (0=Activo, 1=Archivado). Ejemplo: `0`
-- `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at, publishing_type). Ejemplo: `title:asc`
-
+- `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at). Ejemplo: `title:asc`
 
 ```bash
-curl -X GET "http://localhost/api/publishings/getPublishings?page=1&limit=10&publishing_type=1&search=Laravel" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+curl -X GET "http://localhost/api/publishings/getPublishings?page=1&limit=10&publishing_type=Libro&search=Laravel" \
+  -H "Accept: application/json"
 ```
 
 > Example request:
@@ -1497,6 +1495,7 @@ $.ajax(settings).done(function (response) {
                     "lastname": "García"
                 }
             ],
+            "details": [],
             "translation": {
                 "id": 1,
                 "title": "Laravel para Principiantes",
@@ -1617,15 +1616,16 @@ $.ajax(settings).done(function (response) {
 
 Obtiene la información detallada de una publicación específica usando su URL/slug con todas sus relaciones.
 Esta función es para uso público del frontend usando URLs amigables.
+Solo retorna publicaciones activas (is_archived=0).
 
 **Autenticación requerida:**
 Este endpoint NO requiere autenticación (público).
 
-**Parámetros de consulta (Query Parameters):**
-- `publishing_URL` (string, requerido): URL/slug de la publicación a consultar. Ejemplo: `laravel-para-principiantes`
+**Parámetros de ruta (URL Parameters):**
+- `publishingURL` (string, requerido): URL/slug de la publicación a consultar. Ejemplo: `laravel-para-principiantes`
 
 ```bash
-curl -X GET "http://localhost/api/publishings/searchByURL?publishing_URL=laravel-para-principiantes" \
+curl -X GET "http://localhost/api/publishings/searchByURL/laravel-para-principiantes" \
   -H "Accept: application/json"
 ```
 
@@ -1681,6 +1681,7 @@ $.ajax(settings).done(function (response) {
                 "lastname": "García"
             }
         ],
+        "details": [],
         "translations": [
             {
                 "id": 1,
@@ -1711,11 +1712,11 @@ Esta es una operación inicial que crea la publicación base, luego debe actuali
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
 
-**Parámetros del Body:**
-- `title` (string, requerido): Título principal de la publicación (máximo 255 caracteres). Ejemplo: `Laravel para Principiantes`
+**Parámetros del Body (JSON):**
+- `title` (string, requerido): Título principal de la publicación (máximo 255 caracteres, único). Ejemplo: `Laravel para Principiantes`
 - `URL` (string, opcional): URL slug de la publicación. Ejemplo: `laravel-para-principiantes`
 - `category_id` (integer, opcional): ID de la categoría. Ejemplo: `3`
-- `publishing_type` (integer, requerido): Tipo de publicación (1=Libro, 2=Revista). Ejemplo: `1`
+- `publishing_type` (string, requerido): Nombre del tipo de publicación (Libro, Revista). Ejemplo: `Libro`
 - `translations` (array, requerido): Array de traducciones (mínimo 1)
 - `translations[].language_id` (integer, requerido): ID del idioma. Ejemplo: `1`
 - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres). Ejemplo: `Laravel for Beginners`
@@ -1726,7 +1727,7 @@ Este endpoint requiere un token JWT válido en el header de autorización.
   "title": "Laravel para Principiantes",
   "URL": "laravel-para-principiantes",
   "category_id": 3,
-  "publishing_type": 1,
+  "publishing_type": "Libro",
   "translations": [
     {
       "language_id": 1,
@@ -1747,7 +1748,7 @@ curl -X POST "http://localhost/api/publishings/createPublishing" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Laravel para Principiantes","publishing_type":1,"translations":[{"language_id":1,"title":"Laravel para Principiantes"}]}'
+  -d '{"title":"Laravel para Principiantes","publishing_type":"Libro","translations":[{"language_id":1,"title":"Laravel para Principiantes"}]}'
 ```
 
 > Example request:
@@ -1801,7 +1802,7 @@ $.ajax(settings).done(function (response) {
 ## Actualizar una publicación
 
 Actualiza una publicación existente. Los campos requeridos varían según el tipo de publicación:
-- **Libros (publishing_type=1)**: Requiere páginas, fecha de publicación, código ISBN, y puede incluir portada
+- **Libros (publishing_type=1)**: Requiere páginas, fecha de publicación, código ISBN
 - **Revistas (publishing_type=2)**: Además de lo anterior, puede incluir año, número, volumen
 
 **Autenticación requerida:**
@@ -1812,31 +1813,39 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 
 **Parámetros del Body (para Libros - publishing_type=1):**
 - `publishing_type` (integer, requerido): Debe ser 1 para libros
-- `pages` (integer, requerido): Número de páginas. Ejemplo: `320`
+- `title` (string, opcional): Título de la publicación (único excepto para el registro actual)
+- `pages` (integer, requerido): Número de páginas (mínimo 1). Ejemplo: `320`
 - `publish_date` (date, requerido): Fecha de publicación. Ejemplo: `2025-01-15`
 - `publish_code` (string, requerido): Código ISBN (formato: XXX-XX-XXXX-XXX-X). Ejemplo: `978-84-9876-123-4`
 - `category_id` (integer, opcional): ID de categoría. Ejemplo: `3`
 - `is_new_arrival` (boolean, opcional): ¿Es novedad? Ejemplo: `true`
+- `URL` (string, opcional): URL slug de la publicación
+- `resource_URL` (string, opcional): URL del recurso/documento
 - `translations` (array, requerido): Array de traducciones
 - `translations[].language_id` (integer, requerido): ID del idioma
-- `translations[].title` (string, requerido): Título traducido
-- `translations[].URL` (string, opcional): URL slug
+- `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
 - `authors` (array, opcional): Array de IDs de autores. Ejemplo: `[1, 2]`
 - `cover` (file, opcional): Imagen de portada (JPEG, PNG)
 
 **Parámetros del Body (para Revistas - publishing_type=2):**
 - `publishing_type` (integer, requerido): Debe ser 2 para revistas
-- `pages` (integer, requerido): Número de páginas
+- `title` (string, opcional): Título de la publicación (único excepto para el registro actual)
+- `pages` (integer, requerido): Número de páginas (mínimo 1)
 - `publish_date` (date, requerido): Fecha de publicación
-- `publish_code` (string, requerido): Código ISSN
-- `age` (integer, opcional): Año de la revista. Ejemplo: `2025`
-- `age_number` (integer, opcional): Número dentro del año. Ejemplo: `3`
-- `volume` (integer, opcional): Volumen. Ejemplo: `12`
+- `publish_code` (string, requerido): Código ISSN (formato: XXX-XX-XXXX-XXX-X)
+- `age` (integer, opcional): Año de la revista (mínimo 1). Ejemplo: `2025`
+- `age_number` (integer, opcional): Número dentro del año (mínimo 1). Ejemplo: `3`
+- `volume` (integer, opcional): Volumen (mínimo 1). Ejemplo: `12`
+- `URL` (string, opcional): URL slug de la publicación
 - `is_new_arrival` (boolean, opcional): ¿Es novedad?
 - `category_id` (integer, opcional): ID de categoría
 - `translations` (array, requerido): Array de traducciones
+- `translations[].language_id` (integer, requerido): ID del idioma
+- `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
 - `authors` (array, opcional): Array de IDs de autores
 - `cover` (file, opcional): Imagen de portada
+
+**Nota:** Si se actualiza la traducción en español (language_id=1), el título principal de la publicación también se actualiza automáticamente.
 
 ```bash
 curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
@@ -1893,7 +1902,14 @@ $.ajax(settings).done(function (response) {
         "publish_code": "978-84-9876-123-4",
         "category_id": 3,
         "publishing_type": 1,
-        "is_new_arrival": true
+        "is_new_arrival": true,
+        "authors": [],
+        "category": null,
+        "type": {
+            "id": 1,
+            "name": "Libro"
+        },
+        "details": []
     }
 }
 ```
@@ -1908,7 +1924,7 @@ $.ajax(settings).done(function (response) {
 ## Cambiar estado de archivo de una publicación
 
 Alterna el estado de archivo de una publicación entre activo (0) y archivado (1).
-Las publicaciones archivadas no aparecen en las búsquedas normales pero pueden ser recuperadas.
+Las publicaciones archivadas no aparecen en las búsquedas públicas pero pueden ser recuperadas.
 
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
@@ -1922,7 +1938,9 @@ curl -X POST "http://localhost/api/publishings/updateStatus/1" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
 ```
 
-**Nota:** Este endpoint alterna el estado automáticamente. Si está activo (0) lo archiva (1) y viceversa.
+**Nota:** Este endpoint alterna el estado automáticamente:
+- Si `is_archived=0` (activo) → cambia a `is_archived=1` (archivado) → mensaje: "Publicación reactivada exitosamente"
+- Si `is_archived=1` (archivado) → cambia a `is_archived=0` (activo) → mensaje: "Publicación archivada exitosamente"
 
 > Example request:
 
@@ -2081,6 +2099,84 @@ $.ajax(settings).done(function (response) {
 
 
 <!-- END_5d4088a4940540ba2e40f3f61016e478 -->
+
+<!-- START_d02233462a1778f8d4210a33836160cb -->
+## Búsqueda global
+
+Realiza una búsqueda global en libros, revistas y artículos por título.
+Solo retorna resultados de publicaciones activas (is_archived=0).
+
+**Autenticación requerida:**
+Este endpoint NO requiere autenticación (público).
+
+**Parámetros de consulta (Query Parameters):**
+- `search` (string, requerido): Término de búsqueda por título. Ejemplo: `Laravel`
+
+```bash
+curl -X GET "http://localhost/api/publishings/globalSearch?search=Laravel" \
+  -H "Accept: application/json"
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/publishings/globalSearch" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/publishings/globalSearch",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Búsqueda global realizada exitosamente",
+    "data": {
+        "libros": [
+            {
+                "id": 1,
+                "title": "Laravel para Principiantes",
+                "resource_URL": "https:\/\/example.com\/laravel.pdf"
+            }
+        ],
+        "revistas": [
+            {
+                "id": 5,
+                "title": "Revista Laravel Magazine",
+                "resource_URL": "https:\/\/example.com\/magazine.pdf"
+            }
+        ],
+        "articulos": [
+            {
+                "id": 10,
+                "title": "Introducción a Laravel",
+                "URL": "introduccion-a-laravel"
+            }
+        ]
+    }
+}
+```
+
+### HTTP Request
+`GET api/publishings/globalSearch`
+
+
+<!-- END_d02233462a1778f8d4210a33836160cb -->
 
 #Roles
 
