@@ -30,7 +30,7 @@ class CategoryController extends Controller
    */
   public function __construct()
   {
-    $this->middleware('auth:api')->except(['searchByURL']);
+    $this->middleware('auth:api')->except(['index', 'searchByURL']);
   }
 
   /**
@@ -106,11 +106,12 @@ class CategoryController extends Controller
       $query = Category::getModel();
 
       //Obteniendo las categorías padres con las hijas
+      // Cuando getAll es true, obtener todas las categorías planas (sin jerarquía).
       $categories = in_array($request->query('getAll'), ['1', 'true', true], true)
-        ? $query->get(['id', 'title', 'description', 'category_type', 'state'])
+        ? $query->get(['id', 'title', 'description', 'category_type', 'state', 'URL'])
         : $query->with('childrenRecursive')
           ->whereNull('main_category')
-          ->get(['id', 'title', 'description', 'category_type', 'state']);
+          ->get(['id', 'title', 'description', 'category_type', 'state', 'URL']);
 
       return $this->successResponse($categories, 'Categorías obtenidas correctamente');
 

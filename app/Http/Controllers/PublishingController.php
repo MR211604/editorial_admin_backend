@@ -87,13 +87,13 @@ class PublishingController extends Controller
             }
 
             // Sanitizar nombre de la publicación
-            $titleFolder = $this->sanitizeFileName($title);
+            $fileTitle = $this->sanitizeFileName($title);
 
             // Generar nombre único para el archivo
             $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '_' . uniqid() . '.' . $extension;
+            $fileName = $fileTitle . '_' . time() . '_' . uniqid() . '.' . $extension;
 
-            // Ruta completa: editorial_files/libros|revistas/categoria/titulo/imagen.jpg
+            // Ruta completa: editorial_files/libros|revistas/categoria/{imagen}.{jpg/png}
             $relativePath = "editorial_files/{$typeFolder}/{$categoryFolder}";
             $fullPath = public_path($relativePath);
 
@@ -226,7 +226,10 @@ class PublishingController extends Controller
             ]);
 
             if ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('publish_code', 'like', '%' . $search . '%');
+                });
             }
 
             if ($isArchived !== null) {
@@ -595,7 +598,6 @@ class PublishingController extends Controller
                     $publishing->translations()->create([
                         'language_id' => $translation['language_id'],
                         'title' => $translation['title'],
-                        'URL' => $translation['URL'] ? $translation['URL'] : null,
                     ]);
                 }
             });
@@ -752,7 +754,8 @@ class PublishingController extends Controller
                     'publish_code' => [
                         'required',
                         'string',
-                        'regex:/^\d{3}-\d{2}-\d{4}-\d{3}-\d$/'
+                        // 978-99923-50-36-2
+                        'regex:/^\d{3}-\d{5}-\d{2}-\d{2}-\d$/',
                     ],
                     'category_id' => 'integer|nullable',
                     'is_new_arrival' => 'boolean',
@@ -838,7 +841,7 @@ class PublishingController extends Controller
                     'publish_code' => [
                         'required',
                         'string',
-                        'regex:/^\d{3}-\d{2}-\d{4}-\d{3}-\d$/'
+                        'regex:/^\d{4}-\d{4}$/'
                     ],
                     'age' => 'nullable|integer|min:1',
                     'URL' => 'nullable|string',
@@ -1210,14 +1213,20 @@ class PublishingController extends Controller
 
             // Buscar libros (publishing_type = 1)
             $libros = Publishing::where('publishing_type', $publishing_type['Libro'])
-                ->where('title', 'like', '%' . $query . '%')
+                ->where(function ($q) use ($query) {
+                    $q->where('title', 'like', '%' . $query . '%')
+                        ->orWhere('publish_code', 'like', '%' . $query . '%');
+                })
                 ->where('is_archived', 0)
                 ->select('id', 'title', 'URL', 'resource_URL')
                 ->get();
 
             // Buscar revistas (publishing_type = 2)
             $revistas = Publishing::where('publishing_type', $publishing_type['Revista'])
-                ->where('title', 'like', '%' . $query . '%')
+                ->where(function ($q) use ($query) {
+                    $q->where('title', 'like', '%' . $query . '%')
+                        ->orWhere('publish_code', 'like', '%' . $query . '%');
+                })
                 ->where('is_archived', 0)
                 ->select('id', 'title', 'URL', 'resource_URL')
                 ->get();
