@@ -55,7 +55,7 @@ class CategoryController extends Controller
 
       // Generar nombre único para el archivo
       $extension = $file->getClientOriginalExtension();
-      $fileName = $sanitizedTitle . '_' . time() . '_' . uniqid() . '.' . $extension;
+      $fileName = $sanitizedTitle . '.' . $extension;
 
       // Ruta completa: editorial_files/libros|revistas/categoria/{imagen}.{jpg/png}
       $relativePath = "imagescontent";

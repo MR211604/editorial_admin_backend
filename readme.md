@@ -32,7 +32,8 @@ chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
 chown -R www-data:www-data /var/www/html/public
-chmod -R 755 /var/www/html/public
+chmod -R 755 /var/www/html/public/editorial_files
+chmod -R 755 /var/www/html/public/imagescontent
 
 ```
 
