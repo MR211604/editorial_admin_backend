@@ -15,7 +15,7 @@ RUN apt-get update -y && \
 # 2. Instalar Composer 1 (compatible con Laravel 5.4)
 RUN curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer && \
-    composer self-update --1
+    composer self-update --2
 
 # 3. Habilitar mod_rewrite y headers en Apache y configurar VirtualHost
 RUN a2enmod rewrite headers php5.6 && \
