@@ -131,7 +131,6 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'page' => 'integer|min:1',
                 'limit' => 'integer|min:10',
-                'rol_id' => 'integer'
             ]);
 
             if ($validator->fails()) {
@@ -139,13 +138,9 @@ class UserController extends Controller
             }
 
             $limit = $request->query('limit', 10);
-            $rol_id = $request->query('rol_id', null);
             $search = $request->query('search', null);
 
-            $query = User::with(['rol'])
-                ->when($rol_id, function ($query) use ($rol_id) {
-                    return $query->where('rol_id', $rol_id);
-                });
+            $query = User::with(['userRoles']);
 
             if ($search) {
                 $query->where(function ($q) use ($search) {

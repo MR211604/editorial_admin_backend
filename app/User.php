@@ -26,11 +26,6 @@ class User extends Authenticatable implements JWTSubject
         'password', // Oculta el campo en respuestas JSON
     ];
 
-    public function rol()
-    {
-        return $this->belongsTo('App\Rol', 'rol_id');
-    }
-
     public function userRoles()
     {
         return $this->belongsToMany('App\Rol', 'rol_users', 'user_id', 'rol_id');

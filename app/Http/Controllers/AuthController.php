@@ -101,14 +101,14 @@ class AuthController extends Controller
 
       $user->save();
 
+      // Obtener el usuario con sus roles para incluirlos en la respuesta
+      $userQuery = User::with('userRoles')->where('id', $user->id)->first();
+
       return response()->json([
         'ok' => true,
         'message' => 'Usuario conectado correctamente',
         'token' => $token,
-        'user' => $user,
-        'rol' => $user->rol,
-        'first_login' => $user->first_login_at,
-        'last_login' => $user->last_login_at
+        'user' => $userQuery,
       ]);
     } catch (\Exception $e) {
       throw new ServerErrorException('No se pudo iniciar sesión', null, $e);

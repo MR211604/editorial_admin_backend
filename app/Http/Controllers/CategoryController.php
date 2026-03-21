@@ -33,55 +33,6 @@ class CategoryController extends Controller
     $this->middleware('auth:api')->except(['index', 'searchByURL']);
   }
 
-
-  public function storeCategoryImage(Request $request)
-  {
-    try {
-
-      $validator = Validator::make($request->all(), [
-        'file' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
-        'title' => 'required|string|max:100'
-      ]);
-
-      if ($validator->fails()) {
-        throw new ValidationException($validator);
-      }
-
-      $file = $request->file('file');
-      $title = $request->input('title');
-
-      // Sanitizar el título para nombre de archivo
-      $sanitizedTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', $title);
-
-      // Generar nombre único para el archivo
-      $extension = $file->getClientOriginalExtension();
-      $fileName = $sanitizedTitle . '_' . time() . '_' . uniqid() . '.' . $extension;
-
-      // Ruta completa: editorial_files/libros|revistas/categoria/{imagen}.{jpg/png}
-      $relativePath = "imagescontent";
-      $fullPath = public_path($relativePath);
-
-      // Crear directorio si no existe
-      if (!file_exists($fullPath)) {
-        mkdir($fullPath, 0755, true);
-      }
-
-      // Mover archivo
-      $file->move($fullPath, $fileName);
-
-      // Retornar respuesta JSON
-      return $this->successResponse([
-        'path' => "{$relativePath}/{$fileName}",
-        'url' => url("{$relativePath}/{$fileName}")
-      ], 'Imagen subida correctamente');
-
-    } catch (ValidationException $e) {
-      throw $e;
-    } catch (Exception $e) {
-      throw new ServerErrorException('Error al almacenar la imagen', $e->getMessage(), $e);
-    }
-  }
-
   /**
    * Listar categorías
    * 

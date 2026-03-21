@@ -77,8 +77,10 @@ class PublishingController extends Controller
             // Determinar tipo de publicación
             $typeFolder = $publishingType == 1 ? 'libros' : 'revistas';
 
-            // Obtener nombre de categoría
+            // Nombre de categoria por defecto
             $categoryFolder = 'sin_categoria';
+
+            // Obtener nombre de categoría
             if ($categoryId) {
                 $category = \App\Category::find($categoryId);
                 if ($category) {
@@ -220,6 +222,7 @@ class PublishingController extends Controller
                 'type',
                 'authors',
                 'details',
+                'category',
                 'translation' => function ($q) use ($languageId) {
                     $q->where('language_id', $languageId);
                 }
@@ -361,7 +364,7 @@ class PublishingController extends Controller
                 throw new NotFoundException('Publicación no encontrada');
             }
 
-            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])->where('id', $id)->firstOrFail();
+            $publishing = Publishing::with(['type', 'category', 'authors', 'details', 'translations.language'])->where('id', $id)->firstOrFail();
             return $this->successResponse($publishing, 'Publicación obtenida exitosamente');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -455,7 +458,7 @@ class PublishingController extends Controller
             }
 
             // Buscar por URL principal de la publicación
-            $publishing = Publishing::with(['type', 'authors', 'details', 'translations.language'])
+            $publishing = Publishing::with(['type', 'authors', 'details', 'category', 'translations.language'])
                 ->where('URL', $publishingURL)
                 ->where('is_archived', 0) // Solo publicaciones activas para frontend
                 ->first();
@@ -781,14 +784,16 @@ class PublishingController extends Controller
                         if ($publishing->cover) {
                             $this->deleteCoverImage($publishing->cover);
                         }
-                        $coverPath = $this->storeCoverImage(
+
+                        // Almacenar nueva imagen y actualizar campo cover con la ruta
+                        $this->storeCoverImage(
                             $request->file('cover'),
                             $request->input('publishing_type'),
                             $request->input('category_id'),
                             $request->input('title')
                         );
 
-                        $publishing->cover = $coverPath;
+                        $publishing->cover = $this->sanitizeFileName($request->input('title'));
                     }
 
                     // Actualizar atributos principales (sin URL, se actualiza solo si hay traducción en español)
