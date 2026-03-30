@@ -111,7 +111,7 @@ class PublishingController extends Controller
             return "{$relativePath}/{$fileName}";
 
         } catch (Exception $e) {
-            throw new ServerErrorException('Error al almacenar la imagen', $e->getMessage(), $e);
+            throw new ServerErrorException('Error al almacenar la imagen', null, $e);
         }
     }
 
@@ -612,7 +612,7 @@ class PublishingController extends Controller
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException('Error al crear la publicación', $e->getMessage(), $e);
+            throw new ServerErrorException('Error al crear la publicación', null, $e);
         }
     }
 
@@ -932,7 +932,7 @@ class PublishingController extends Controller
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException('Error al actualizar la publicación', $e->getMessage(), $e);
+            throw new ServerErrorException('Error al actualizar la publicación', null, $e);
         }
     }
 

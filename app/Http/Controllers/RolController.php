@@ -205,7 +205,7 @@ class RolController extends Controller
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new ServerErrorException('Error al crear el rol', $e->getMessage(), $e);
+            throw new ServerErrorException('Error al crear el rol', null, $e);
         }
     }
 
