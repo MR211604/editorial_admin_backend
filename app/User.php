@@ -9,6 +9,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable implements JWTSubject
 {
     //
+    protected $primaryKey = 'idUser';
+
     use Notifiable;
     public $timestamps = false;
 

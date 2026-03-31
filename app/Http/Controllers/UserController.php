@@ -148,12 +148,12 @@ class UserController extends Controller
                 });
             }
 
-            $allowedSortFields = ['id', 'name', 'token'];
+            $allowedSortFields = ['idUser', 'name', 'token'];
 
             if ($request->has('sort')) {
                 $this->search($request, $query, $allowedSortFields);
             } else {
-                $query->orderBy('id', 'desc');
+                $query->orderBy('idUser', 'desc');
             }
 
             $users = $query->paginate($limit);
@@ -267,7 +267,6 @@ class UserController extends Controller
                 $user = User::create([
                     'name' => $request->input('name'),
                     'password' => bcrypt($request->input('password')),
-                    'rol_id' => $request->input('rol_id'),
                     'active' => 1,
                     'join_date' => null,
                     'last_login_date' => null,
@@ -475,7 +474,7 @@ class UserController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|min:2|max:255|unique:users,name,' . $id,
+                'name' => 'required|string|min:2|max:255|unique:users,name,' . $id . ',idUser',
                 'rol_id' => 'required|integer|exists:rol,id'
             ]);
 
@@ -486,7 +485,6 @@ class UserController extends Controller
             $user = DB::transaction(function () use ($request, $id) {
                 $user = User::findOrFail($id);
                 $user->name = $request->input('name');
-                $user->rol_id = $request->input('rol_id');
                 $user->save();
                 // Actualizar la relación de roles del usuario
                 $user->userRoles()->sync([$request->input('rol_id')]);

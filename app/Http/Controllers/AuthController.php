@@ -102,7 +102,7 @@ class AuthController extends Controller
       $user->save();
 
       // Obtener el usuario con sus roles para incluirlos en la respuesta
-      $userQuery = User::with('userRoles')->where('id', $user->id)->first();
+      $userQuery = User::with('userRoles')->where('idUser', $user->idUser)->first();
 
       return response()->json([
         'ok' => true,
