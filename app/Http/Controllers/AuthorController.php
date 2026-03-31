@@ -125,12 +125,12 @@ class AuthorController extends Controller
         });
       }
 
-      $allowedSortFields = ['id', 'name', 'lastname'];
+      $allowedSortFields = ['idAuthor', 'name', 'lastname'];
 
       if ($request->has('sort')) {
         $this->search($request, $query, $allowedSortFields);
       } else {
-        $query->orderBy('id', 'desc');
+        $query->orderBy('idAuthor', 'desc');
       }
 
       $authors = $query->paginate($limit);
@@ -382,7 +382,7 @@ class AuthorController extends Controller
   {
     try {
 
-      if (!Author::where('id', $id)->exists()) {
+      if (!Author::where('idAuthor', $id)->exists()) {
         throw new NotFoundException('Autor no encontrado');
       }
 
@@ -466,7 +466,7 @@ class AuthorController extends Controller
     try {
 
       $validator = Validator::make(['id' => $id], [
-        'id' => 'required|integer|exists:authors,id',
+        'id' => 'required|integer|exists:authors,idAuthor',
       ]);
 
       if ($validator->fails()) {

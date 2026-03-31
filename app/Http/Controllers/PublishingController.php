@@ -766,7 +766,7 @@ class PublishingController extends Controller
                     'translations.*.language_id' => 'required|integer|exists:languages,idLanguage',
                     'translations.*.title' => 'required|string|max:255',
                     'authors' => 'array',
-                    'authors.*' => 'integer|exists:authors,id',
+                    'authors.*' => 'integer|exists:authors,idAuthor',
                     'cover' => 'nullable',
                 ]);
 
@@ -853,10 +853,10 @@ class PublishingController extends Controller
                     'volume' => 'nullable|integer|min:1',
                     'is_new_arrival' => 'boolean',
                     'category_id' => 'integer|nullable',
-                    'translations.*.language_id' => 'required|integer|exists:languages,id',
+                    'translations.*.language_id' => 'required|integer|exists:languages,idLanguage',
                     'translations.*.title' => 'required|string|max:255',
                     'authors' => 'array',
-                    'authors.*' => 'integer|exists:authors,id',
+                    'authors.*' => 'integer|exists:authors,idAuthor',
                     'cover' => 'nullable',
                 ]);
 
@@ -931,7 +931,7 @@ class PublishingController extends Controller
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException('Error al actualizar la publicación', null, $e);
+            throw new ServerErrorException($e->getMessage(), null, $e);
         }
     }
 
@@ -1212,7 +1212,7 @@ class PublishingController extends Controller
                 throw new BadRequestException('El parámetro de búsqueda es requerido');
             }
 
-            $publishing_type = PublishingType::whereIn('name', ['Libro', 'Revista'])->pluck('id', 'name');
+            $publishing_type = PublishingType::whereIn('name', ['Libro', 'Revista'])->pluck('idPublishingType', 'name');
 
             // Buscar libros (publishing_type = 1)
             $libros = Publishing::where('publishing_type', $publishing_type['Libro'])
@@ -1239,7 +1239,7 @@ class PublishingController extends Controller
                 $q->where('state', 1); // Solo artículos de publicaciones activas
             })
                 ->where('title', 'like', '%' . $query . '%')
-                ->select('idPublishing', 'title', 'URL')
+                ->select('idPublishingDetail', 'title', 'URL')
                 ->get();
 
             $data = [
