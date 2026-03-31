@@ -216,7 +216,7 @@ class PublishingController extends Controller
             $languageId = $request->query('language_id', 1);
             $search = $request->query('search', null);
             $category = $request->query('category', null);
-            $isArchived = $request->has('is_archived') ? (int) $request->query('is_archived') : null;
+            $isArchived = $request->has('state') ? (int) $request->query('state') : null;
 
             $query = Publishing::with([
                 'type',
@@ -236,7 +236,7 @@ class PublishingController extends Controller
             }
 
             if ($isArchived !== null) {
-                $query->where('is_archived', $isArchived);
+                $query->where('state', $isArchived);
             }
 
             if ($category) {
@@ -460,7 +460,7 @@ class PublishingController extends Controller
             // Buscar por URL principal de la publicación
             $publishing = Publishing::with(['type', 'authors', 'details', 'category', 'translations.language'])
                 ->where('URL', $publishingURL)
-                ->where('is_archived', 0) // Solo publicaciones activas para frontend
+                ->where('state', 0) // Solo publicaciones activas para frontend
                 ->first();
 
             if (!$publishing) {
@@ -988,9 +988,9 @@ class PublishingController extends Controller
      *   "message": "Unauthenticated"
      * }
      */
-    //Actualizando el estado de la publicacion  (campo is_archived)
-    // 1 - Archivado
-    // 0 - No archivado
+    //Actualizando el estado de la publicacion  (campo state)
+    // 1 - Activo
+    // 0 - Inactivo
     public function toggleStatus($id = null)
     {
         try {
@@ -999,10 +999,10 @@ class PublishingController extends Controller
                 throw new BadRequestException('El ID de publicación es requerido');
             }
             $publishing = Publishing::findOrFail($id);
-            $publishing->is_archived = !$publishing->is_archived;
+            $publishing->state = !$publishing->state;
             $publishing->save();
 
-            $message = $publishing->is_archived ? 'Publicación reactivada exitosamente' : 'Publicación archivada exitosamente';
+            $message = $publishing->state ? 'Publicación archivada exitosamente' : 'Publicación reactivada exitosamente';
 
             return $this->successResponse(null, $message, null, 200);
 
@@ -1123,8 +1123,8 @@ class PublishingController extends Controller
 
             $publishing = Publishing::findOrFail($id);
 
-            //Si el campo is_archived es 0, no se puede eliminar
-            if ($publishing->is_archived == 0) {
+            //Si el campo state es 1, no se puede eliminar
+            if ($publishing->state == 1) {
                 throw new BadRequestException('La publicación debe estar archivada para poder eliminarla');
             }
 
@@ -1222,7 +1222,7 @@ class PublishingController extends Controller
                     $q->where('title', 'like', '%' . $query . '%')
                         ->orWhere('publish_code', 'like', '%' . $query . '%');
                 })
-                ->where('is_archived', 0)
+                ->where('state', 1)
                 ->select('id', 'title', 'URL', 'resource_URL')
                 ->get();
 
@@ -1232,13 +1232,13 @@ class PublishingController extends Controller
                     $q->where('title', 'like', '%' . $query . '%')
                         ->orWhere('publish_code', 'like', '%' . $query . '%');
                 })
-                ->where('is_archived', 0)
+                ->where('state', 1)
                 ->select('id', 'title', 'URL', 'resource_URL')
                 ->get();
 
             // Buscar artículos en PublishingDetail
             $articulos = \App\PublishingDetail::whereHas('publishing', function ($q) {
-                $q->where('is_archived', 0); // Solo artículos de publicaciones activas
+                $q->where('state', 1); // Solo artículos de publicaciones activas
             })
                 ->where('title', 'like', '%' . $query . '%')
                 ->select('id', 'title', 'URL')

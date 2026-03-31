@@ -19,7 +19,7 @@ class Publishing extends Model
         'category_id',
         'publishing_type',
         'resource_URL',
-        'is_archived',
+        'state',
         'URL',
         'cover'
     ];
