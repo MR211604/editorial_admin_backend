@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     //
+    protected $primaryKey = "idCategory";
     protected $table = "categories";
+
     public $timestamps = false;
 
-    protected $fillable = ['id', 'title', 'description', 'main_category', 'state', 'is_featured', 'language_id', 'category_type', 'URL'];
+    protected $fillable = ['idCategory', 'title', 'description', 'main_category', 'state', 'is_featured', 'language_id', 'category_type', 'URL'];
 
     public function detail()
     {
@@ -29,7 +31,7 @@ class Category extends Model
 
     public function parent()
     {
-        return $this->hasMany(self::class, 'id', 'main_category');
+        return $this->hasMany(self::class, 'idCategory', 'main_category');
     }
 
     public function childrenRecursive()

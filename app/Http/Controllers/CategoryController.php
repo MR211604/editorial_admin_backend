@@ -5,7 +5,6 @@ use App\Category;
 use App\Http\Traits\ApiResponse;
 use Exception;
 use Illuminate\Validation\ValidationException;
-use App\Exceptions\ConflictException;
 use App\Exceptions\BadRequestException;
 use App\Exceptions\ServerErrorException;
 use Illuminate\Http\Request;
@@ -108,10 +107,10 @@ class CategoryController extends Controller
       //Obteniendo las categorías padres con las hijas
       // Cuando getAll es true, obtener todas las categorías planas (sin jerarquía).
       $categories = in_array($request->query('getAll'), ['1', 'true', true], true)
-        ? $query->get(['id', 'title', 'description', 'category_type', 'state', 'URL'])
+        ? $query->get(['idCategory', 'title', 'description', 'category_type', 'state', 'URL'])
         : $query->with('childrenRecursive')
           ->whereNull('main_category')
-          ->get(['id', 'title', 'description', 'category_type', 'state', 'URL']);
+          ->get(['idCategory', 'title', 'description', 'category_type', 'state', 'URL']);
 
       return $this->successResponse($categories, 'Categorías obtenidas correctamente');
 
@@ -272,7 +271,7 @@ class CategoryController extends Controller
       // Buscar por URL principal de la publicación
       $category = Category::with(['detail'])
         ->where('URL', $categoryURL)
-        ->where('state', 1) // Solo publicaciones activas para frontend
+        ->where('state', 1) // Solo categorias activas para frontend
         ->first();
 
       if (!$category) {
@@ -521,8 +520,8 @@ class CategoryController extends Controller
       $updatedCategory = Category::with(['detail'])->findOrFail($id);
 
       $validator = Validator::make($request->all(), [
-        'title' => 'required|string|max:255|unique:categories,title,' . $id,
-        'URL' => 'string|unique:categories,URL,' . $id,
+        'title' => 'required|string|max:255|unique:categories,title,' . $id . ',idCategory',
+        'URL' => 'string|unique:categories,URL,' . $id . ',idCategory',
         'description' => 'string',
         'main_category' => 'integer|nullable',
         'is_featured' => 'boolean',
@@ -595,7 +594,7 @@ class CategoryController extends Controller
       // Dejar que las excepciones de API lleguen al Handler
       throw $e;
     } catch (Exception $e) {
-      throw new ServerErrorException('Error al actualizar la categoría', null, $e);
+      throw new ServerErrorException($e->getMessage(), null, $e);
     }
   }
 
