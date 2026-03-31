@@ -256,7 +256,7 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|min:2|max:255|unique:users,name',
                 'password' => 'required|string|min:8',
-                'rol_id' => 'required|integer|exists:rol,id'
+                'rol_id' => 'required|integer|exists:rol,idRol'
             ]);
 
             if ($validator->fails()) {
@@ -475,7 +475,7 @@ class UserController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|min:2|max:255|unique:users,name,' . $id . ',idUser',
-                'rol_id' => 'required|integer|exists:rol,id'
+                'rol_id' => 'required|integer|exists:rol,idRol'
             ]);
 
             if ($validator->fails()) {
