@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class PublishingDetail extends Model
 {
+
+    protected $primaryKey = 'idPublishingDetail';
+
     protected $fillable = [
         'title',
         'summary',

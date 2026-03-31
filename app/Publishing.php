@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Publishing extends Model
 {
 
+    protected $primaryKey = 'idPublishing';
+
     protected $fillable = [
         'title',
         'publish_date',
@@ -28,7 +30,7 @@ class Publishing extends Model
 
     public function translations()
     {
-        return $this->hasMany(PublishingTranslations::class);
+        return $this->hasMany(PublishingTranslations::class, 'publishing_id');
     }
 
     public function translation($languageId = null)
@@ -36,7 +38,7 @@ class Publishing extends Model
         if ($languageId) {
             $languageId = app()->getLocale() === 'es' ? 1 : 2;
         }
-        return $this->hasOne(PublishingTranslations::class)->where('language_id', $languageId);
+        return $this->hasOne(PublishingTranslations::class, 'publishing_id')->where('language_id', $languageId);
     }
 
     public function category()

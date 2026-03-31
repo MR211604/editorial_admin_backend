@@ -120,8 +120,8 @@ class PublishingDetailController extends Controller
         'summary' => 'nullable|string',
         'URL' => 'nullable|string',
         'repository_URL' => 'nullable|string',
-        'language_id' => 'required|integer|exists:languages,id',
-        'publishing_id' => 'required|integer|exists:publishings,id',
+        'language_id' => 'required|integer|exists:languages,idLanguage',
+        'publishing_id' => 'required|integer|exists:publishings,idPublishing',
       ]);
 
       if ($validator->fails()) {
@@ -229,7 +229,7 @@ class PublishingDetailController extends Controller
         'summary' => 'nullable|string',
         'URL' => 'nullable|string',
         'repository_URL' => 'nullable|string',
-        'publishing_id' => 'required|integer|exists:publishings,id',
+        'publishing_id' => 'required|integer|exists:publishings,idPublishing',
       ]);
 
       if ($validator->fails()) {

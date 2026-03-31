@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PublishingTranslations extends Model
 {
+  protected $primaryKey = 'idPublishingTranslation';
 
   protected $fillable = [
     'publishing_id',
@@ -19,12 +20,12 @@ class PublishingTranslations extends Model
 
   public function publishing()
   {
-    return $this->belongsTo(Publishing::class);
+    return $this->belongsTo(Publishing::class, 'publishing_id', 'idPublishing');
   }
 
   public function language()
   {
-    return $this->belongsTo(Language::class);
+    return $this->belongsTo(Language::class, 'language_id', 'idLanguage');
   }
 
 }
