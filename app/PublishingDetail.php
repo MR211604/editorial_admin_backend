@@ -24,11 +24,11 @@ class PublishingDetail extends Model
     //Relacionando el language_id con la tabla Language
     public function language()
     {
-        return $this->belongsTo('App\Language');
+        return $this->belongsTo('App\Language', 'language_id');
     }
 
     public function publishing()
     {
-        return $this->belongsTo('App\Publishing');
+        return $this->belongsTo('App\Publishing', 'publishing_id');
     }
 }

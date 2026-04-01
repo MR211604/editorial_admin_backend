@@ -573,7 +573,7 @@ class CategoryController extends Controller
         if (!empty(array_filter($detailFields))) {
           if ($category->detail) {
             // Si ya existe el detalle, actualizarlo
-            $category->detail->update($detailFields);
+            $category->detail()->update($detailFields);
           } else {
             // Si no existe el detalle, crearlo
             $detailFields['category_id'] = $id;
@@ -594,7 +594,7 @@ class CategoryController extends Controller
       // Dejar que las excepciones de API lleguen al Handler
       throw $e;
     } catch (Exception $e) {
-      throw new ServerErrorException($e->getMessage(), null, $e);
+      throw new ServerErrorException('Error actualizando detalle de categoria', null, $e);
     }
   }
 
@@ -773,6 +773,54 @@ class CategoryController extends Controller
     } catch (Exception $e) {
       DB::rollBack();
       throw new ServerErrorException('Error al cambiar el estado de la categoría', null, $e);
+    }
+  }
+
+  public function storeCategoryImage(Request $request)
+  {
+    try {
+
+      $validator = Validator::make($request->all(), [
+        'file' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+        'title' => 'required|string|max:100'
+      ]);
+
+      if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
+
+      $file = $request->file('file');
+      $title = $request->input('title');
+
+      // Sanitizar el título para nombre de archivo
+      $sanitizedTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', $title);
+
+      // Generar nombre único para el archivo
+      $extension = $file->getClientOriginalExtension();
+      $fileName = $sanitizedTitle . '_' . time() . '_' . uniqid() . '.' . $extension;
+
+      // Ruta completa: editorial_files/libros|revistas/categoria/{imagen}.{jpg/png}
+      $relativePath = "imagescontent";
+      $fullPath = public_path($relativePath);
+
+      // Crear directorio si no existe
+      if (!file_exists($fullPath)) {
+        mkdir($fullPath, 0755, true);
+      }
+
+      // Mover archivo
+      $file->move($fullPath, $fileName);
+
+      // Retornar respuesta JSON
+      return $this->successResponse([
+        'path' => "{$relativePath}/{$fileName}",
+        'url' => url("{$relativePath}/{$fileName}")
+      ], 'Imagen subida correctamente');
+
+    } catch (ValidationException $e) {
+      throw $e;
+    } catch (Exception $e) {
+      throw new ServerErrorException('Error al almacenar la imagen', $e->getMessage(), $e);
     }
   }
 

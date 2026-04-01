@@ -459,7 +459,7 @@ class PublishingController extends Controller
             // Buscar por URL principal de la publicación
             $publishing = Publishing::with(['type', 'authors', 'details', 'category', 'translations.language'])
                 ->where('URL', $publishingURL)
-                ->where('state', 0) // Solo publicaciones activas para frontend
+                ->where('state', 1)
                 ->first();
 
             if (!$publishing) {
@@ -1255,7 +1255,7 @@ class PublishingController extends Controller
         } catch (\App\Exceptions\ApiException $e) {
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException('Error al realizar la búsqueda global', null, $e);
+            throw new ServerErrorException($e->getMessage(), null, $e);
         }
     }
 
