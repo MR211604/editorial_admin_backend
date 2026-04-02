@@ -179,7 +179,7 @@ class BannerController extends Controller
     } catch (\App\Exceptions\ApiException $e) {
       throw $e;
     } catch (Exception $e) {
-      throw new ServerErrorException($e->getMessage(), null, $e);
+      throw new ServerErrorException('Error al actualizar banner', null, $e);
     }
   }
 

@@ -820,7 +820,7 @@ class CategoryController extends Controller
     } catch (ValidationException $e) {
       throw $e;
     } catch (Exception $e) {
-      throw new ServerErrorException('Error al almacenar la imagen', $e->getMessage(), $e);
+      throw new ServerErrorException('Error al almacenar la imagen', null, $e);
     }
   }
 

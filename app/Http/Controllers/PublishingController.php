@@ -273,7 +273,7 @@ class PublishingController extends Controller
         } catch (\App\Exceptions\ApiException $e) {
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException($e->getMessage(), null, $e);
+            throw new ServerErrorException('Error al obtener las publicaciones', null, $e);
         }
     }
 
@@ -931,7 +931,7 @@ class PublishingController extends Controller
             // Dejar que las excepciones de API lleguen al Handler
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException($e->getMessage(), null, $e);
+            throw new ServerErrorException('Error al actualizar la publicacion', null, $e);
         }
     }
 
@@ -1255,7 +1255,7 @@ class PublishingController extends Controller
         } catch (\App\Exceptions\ApiException $e) {
             throw $e;
         } catch (Exception $e) {
-            throw new ServerErrorException($e->getMessage(), null, $e);
+            throw new ServerErrorException('Error al buscar las publicaciones', null, $e);
         }
     }
 
