@@ -84,3 +84,8 @@ Route::group(['middleware' => ['api'], 'prefix' => 'banners'], function () {
     Route::post('updateBanner/{id?}', 'BannerController@update');
     Route::post('toggleState/{id?}', 'BannerController@toggleState');
 });
+
+Route::group(['middleware' => ['api'], 'prefix' => 'emails'], function () {
+    Route::get('getEmails', 'EmailController@index');
+    Route::post('saveEmail', 'EmailController@saveEmail');
+});
