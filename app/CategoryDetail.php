@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryDetail extends Model
 {
     //
+    protected $primaryKey = "idCategoryDetail";
     protected $table = "categories_details";
     public $timestamps = false;
 
     protected $fillable = [
-        'about', 
+        'about',
         'editorial_board',
         'policy',
         'norms',
