@@ -143,7 +143,7 @@ class PublishingController extends Controller
      *   "message": "Publicaciones obtenidas correctamente",
      *   "data": [
      *     {
-     *       "id": 1,
+     *       "idPublishing": 1,
      *       "title": "Laravel para Principiantes",
      *       "cover": "editorial_files/libros/programacion/laravel_principiantes/1234567890.jpg",
      *       "pages": 320,
@@ -151,24 +151,24 @@ class PublishingController extends Controller
      *       "publish_code": "978-84-9876-123-4",
      *       "category_id": 3,
      *       "publishing_type": 1,
-     *       "is_new_arrival": true,
-     *       "is_archived": false,
+     *       "is_new_arrival": 1,
+     *       "state": 1,
      *       "created_at": "2025-11-15 10:30:00",
      *       "updated_at": "2025-11-15 10:30:00",
      *       "type": {
-     *         "id": 1,
+     *         "idPublishingType": 1,
      *         "name": "Libro"
      *       },
      *       "authors": [
      *         {
-     *           "id": 1,
+     *           "idAuthor": 1,
      *           "name": "Juan",
      *           "lastname": "García"
      *         }
      *       ],
      *       "details": [],
      *       "translation": {
-     *         "id": 1,
+     *         "idPublishingTranslation": 1,
      *         "title": "Laravel para Principiantes",
      *         "URL": "laravel-para-principiantes",
      *         "language_id": 1
@@ -301,7 +301,7 @@ class PublishingController extends Controller
      *   "ok": true,
      *   "message": "Publicación obtenida exitosamente",
      *   "data": {
-     *     "id": 1,
+     *     "idPublishing": 1,
      *     "title": "Laravel para Principiantes",
      *     "cover": "editorial_files/libros/programacion/laravel_principiantes/1234567890.jpg",
      *     "pages": 320,
@@ -309,26 +309,26 @@ class PublishingController extends Controller
      *     "publish_code": "978-84-9876-123-4",
      *     "category_id": 3,
      *     "publishing_type": 1,
-     *     "is_new_arrival": true,
-     *     "is_archived": false,
+     *     "is_new_arrival": 1,
+     *     "state": 1,
      *     "type": {
-     *       "id": 1,
+     *       "idPublishingType": 1,
      *       "name": "Libro"
      *     },
      *     "authors": [
      *       {
-     *         "id": 1,
+     *         "idAuthor": 1,
      *         "name": "Juan",
      *         "lastname": "García"
      *       }
      *     ],
      *     "translations": [
      *       {
-     *         "id": 1,
+     *         "idPublishingTranslation": 1,
      *         "title": "Laravel para Principiantes",
      *         "URL": "laravel-para-principiantes",
      *         "language": {
-     *           "id": 1,
+     *           "idLanguage": 1,
      *           "name": "Español"
      *         }
      *       }
@@ -400,7 +400,7 @@ class PublishingController extends Controller
      *   "ok": true,
      *   "message": "Publicación encontrada exitosamente",
      *   "data": {
-     *     "id": 1,
+     *     "idPublishing": 1,
      *     "title": "Laravel para Principiantes",
      *     "URL": "laravel-para-principiantes",
      *     "cover": "editorial_files/libros/programacion/laravel_principiantes/1234567890.jpg",
@@ -409,15 +409,15 @@ class PublishingController extends Controller
      *     "publish_code": "978-84-9876-123-4",
      *     "category_id": 3,
      *     "publishing_type": 1,
-     *     "is_new_arrival": true,
-     *     "is_archived": false,
+     *     "is_new_arrival": 1,
+     *     "state": 1,
      *     "type": {
-     *       "id": 1,
+     *       "idPublishingType": 1,
      *       "name": "Libro"
      *     },
      *     "authors": [
      *       {
-     *         "id": 1,
+     *         "idAuthor": 1,
      *         "name": "Juan",
      *         "lastname": "García"
      *       }
@@ -425,11 +425,11 @@ class PublishingController extends Controller
      *     "details": [],
      *     "translations": [
      *       {
-     *         "id": 1,
+     *         "idPublishingTranslation": 1,
      *         "title": "Laravel para Principiantes",
      *         "URL": "laravel-para-principiantes",
      *         "language": {
-     *           "id": 1,
+     *           "idLanguage": 1,
      *           "name": "Español"
      *         }
      *       }
@@ -532,7 +532,7 @@ class PublishingController extends Controller
      *   "ok": true,
      *   "message": "Publicacion creada exitosamente",
      *   "data": {
-     *     "id": 1,
+     *     "idPublishing": 1,
      *     "title": "Laravel para Principiantes",
      *     "URL": "laravel-para-principiantes",
      *     "category_id": 3,
@@ -687,7 +687,7 @@ class PublishingController extends Controller
      *   "ok": true,
      *   "message": "Publicación actualizada exitosamente",
      *   "data": {
-     *     "id": 1,
+     *     "idPublishing": 1,
      *     "title": "Laravel para Principiantes",
      *     "cover": "editorial_files/libros/programacion/laravel_principiantes/1234567890.jpg",
      *     "pages": 320,
@@ -695,11 +695,11 @@ class PublishingController extends Controller
      *     "publish_code": "978-84-9876-123-4",
      *     "category_id": 3,
      *     "publishing_type": 1,
-     *     "is_new_arrival": true,
+     *     "is_new_arrival": 1,
      *     "authors": [],
      *     "category": null,
      *     "type": {
-     *       "id": 1,
+     *       "idPublishingType": 1,
      *       "name": "Libro"
      *     },
      *     "details": []
@@ -1173,23 +1173,23 @@ class PublishingController extends Controller
      *   "data": {
      *     "libros": [
      *       {
-     *         "id": 1,
+     *         "idPublishing": 1,
      *         "title": "Laravel para Principiantes",
-     * "URL": "laravel_para_principiantes",
+     *         "URL": "laravel_para_principiantes",
      *         "resource_URL": "https://example.com/laravel.pdf"
      *       }
      *     ],
      *     "revistas": [
      *       {
-     *         "id": 5,
+     *         "idPublishing": 5,
      *         "title": "Revista Laravel Magazine",
-     * "URL": "revista_laravel_magazine",
+     *         "URL": "revista_laravel_magazine",
      *         "resource_URL": "https://example.com/magazine.pdf"
      *       }
      *     ],
      *     "articulos": [
      *       {
-     *         "id": 10,
+     *         "idPublishingDetail": 10,
      *         "title": "Introducción a Laravel",
      *         "URL": "introduccion-a-laravel"
      *       }

@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @resource Banners
+ *
+ * Endpoints para la gestión de banners.
+ * Usa JWT en el header: `Authorization: Bearer {token}`.
+ */
 class BannerController extends Controller
 {
   use ApiResponse;
@@ -23,7 +29,13 @@ class BannerController extends Controller
     $this->middleware('auth:api')->except(['getLastActiveBanner']);
   }
 
-
+  /**
+   * Listar banners
+   * 
+   * Obtiene una lista paginada de banners con opciones de búsqueda y filtrado.
+   * 
+   * @authenticated
+   */
   public function index(Request $request)
   {
 
@@ -87,6 +99,13 @@ class BannerController extends Controller
 
   }
 
+  /**
+   * Crear un banner
+   * 
+   * Crea un nuevo banner en el sistema.
+   * 
+   * @authenticated
+   */
   public function create(Request $request)
   {
     try {
@@ -121,6 +140,13 @@ class BannerController extends Controller
     }
   }
 
+  /**
+   * Actualizar un banner
+   * 
+   * Actualiza la información de un banner existente.
+   * 
+   * @authenticated
+   */
   public function update(Request $request, $id = null)
   {
     try {
@@ -160,6 +186,13 @@ class BannerController extends Controller
     }
   }
 
+  /**
+   * Alternar estado de un banner
+   * 
+   * Habilita o deshabilita un banner específico.
+   * 
+   * @authenticated
+   */
   public function toggleState($id = null)
   {
     try {
@@ -183,7 +216,11 @@ class BannerController extends Controller
     }
   }
 
-  // Obtener el ultimo banner activo
+  /**
+   * Obtener el ultimo banner activo
+   * 
+   * Retorna el último banner que se encuentra en estado activo.
+   */
   public function getLastActiveBanner()
   {
     try {

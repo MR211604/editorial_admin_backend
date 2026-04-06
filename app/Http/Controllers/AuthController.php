@@ -52,22 +52,26 @@ class AuthController extends Controller
    * @response {
    *   "ok": true,
    *   "message": "Usuario conectado correctamente",
-   *   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTczMTY5NjAwMCwiZXhwIjoxNzMxNjk5NjAwLCJuYmYiOjE3MzE2OTYwMDAsImp0aSI6ImFiY2RlZjEyMzQ1IiwidXNlcl9pZCI6MX0",
+   *   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvZWRpdG9yaWFsL2FwaS9wdWJsaWMvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NzU1MTUyNzAsImV4cCI6MTc3NTUxODg3MCwibmJmIjoxNzc1NTE1MjcwLCJqdGkiOiI4SkY2bUdtdlh5UU1nR2k5Iiwic3ViIjozLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.jgkC__hycWzG29nRfgzGq7I5CeOmhCY0wqkXcDhY05Y",
    *   "user": {
-   *     "id": 1,
-   *     "name": "Juan Pérez",
-   *     "email": "juan@example.com",
-   *     "token": "admin123",
+   *     "idUser": 3,
+   *     "name": "admin",
    *     "active": 1,
-   *     "join_date": "2025-11-15 10:30:00",
-   *     "last_login_date": "2025-11-15 10:30:00"
-   *   },
-   *   "rol": {
-   *     "id": 1,
-   *     "name": "Administrador"
-   *   },
-   *   "first_login": "2025-01-10 08:00:00",
-   *   "last_login": "2025-11-14 15:45:00"
+   *     "join_date": "2025-07-06 19:48:15",
+   *     "last_login_date": "2026-04-06 16:41:10",
+   *     "token": "admin",
+   *     "user_roles": [
+   *       {
+   *         "idRol": 2,
+   *         "name": "Administrador",
+   *         "description": "Control total dentro de la aplicacion",
+   *         "pivot": {
+   *           "user_id": 3,
+   *           "rol_id": 2
+   *         }
+   *       }
+   *     ]
+   *   }
    * }
    * 
    * @response 401 {

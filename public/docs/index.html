@@ -25,12 +25,7 @@
       </span>
     </a>
     <div class="tocify-wrapper">
-        <img src="images/logo.png" style="
-                    object-fit: contain;
-                    width: -webkit-fill-available;
-                    height: 60px;
-                    background: #ffffff;
-                    ">
+        <img src="images/logo.png" />
                     <div class="lang-selector">
                                   <a href="#" data-language-name="bash">bash</a>
                                   <a href="#" data-language-name="javascript">javascript</a>
@@ -93,22 +88,26 @@ $.ajax(settings).done(function (response) {
 <pre><code class="language-json">{
     "ok": true,
     "message": "Usuario conectado correctamente",
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTczMTY5NjAwMCwiZXhwIjoxNzMxNjk5NjAwLCJuYmYiOjE3MzE2OTYwMDAsImp0aSI6ImFiY2RlZjEyMzQ1IiwidXNlcl9pZCI6MX0",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvZWRpdG9yaWFsL2FwaS9wdWJsaWMvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NzU1MTUyNzAsImV4cCI6MTc3NTUxODg3MCwibmJmIjoxNzc1NTE1MjcwLCJqdGkiOiI4SkY2bUdtdlh5UU1nR2k5Iiwic3ViIjozLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.jgkC__hycWzG29nRfgzGq7I5CeOmhCY0wqkXcDhY05Y",
     "user": {
-        "id": 1,
-        "name": "Juan Pérez",
-        "email": "juan@example.com",
-        "token": "admin123",
+        "idUser": 3,
+        "name": "admin",
         "active": 1,
-        "join_date": "2025-11-15 10:30:00",
-        "last_login_date": "2025-11-15 10:30:00"
-    },
-    "rol": {
-        "id": 1,
-        "name": "Administrador"
-    },
-    "first_login": "2025-01-10 08:00:00",
-    "last_login": "2025-11-14 15:45:00"
+        "join_date": "2025-07-06 19:48:15",
+        "last_login_date": "2026-04-06 16:41:10",
+        "token": "admin",
+        "user_roles": [
+            {
+                "idRol": 2,
+                "name": "Administrador",
+                "description": "Control total dentro de la aplicacion",
+                "pivot": {
+                    "user_id": 3,
+                    "rol_id": 2
+                }
+            }
+        ]
+    }
 }</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/auth/login</code></p>
@@ -464,6 +463,178 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>POST api/authors/deleteAuthor/{id?}</code></p>
 <!-- END_e1321a8b15fdbe094d92f98e3e9e5c4d -->
+<h1>Banners</h1>
+<p>Endpoints para la gestión de banners.
+Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
+<!-- START_ea57fc4cbab9bc046c292cf8f114056e -->
+<h2>Listar banners</h2>
+<p>Obtiene una lista paginada de banners con opciones de búsqueda y filtrado.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/banners/getBanners" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/getBanners",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Publicaciones obtenidas correctamente",
+    "data": [
+        {
+            "idBanner": 6,
+            "title": "Video banner UDB",
+            "resourceURL": "https:\/\/www.youtube.com\/watch?v=UMMirV54iDg",
+            "state": 1
+        },
+        {
+            "idBanner": 5,
+            "title": "Worlds fastest lego clicker",
+            "resourceURL": "https:\/\/www.youtube.com\/watch?v=JmQeSDkcNjc",
+            "state": 1
+        },
+        {
+            "idBanner": 4,
+            "title": "Video de pruebaaaa",
+            "resourceURL": "https:\/\/www.youtube.com\/watch?v=f78EA9rsMyo",
+            "state": 0
+        }
+    ],
+    "pagination": {
+        "total": 3,
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 10,
+        "from": 1,
+        "to": 3
+    }
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/banners/getBanners</code></p>
+<!-- END_ea57fc4cbab9bc046c292cf8f114056e -->
+<!-- START_d0ea90067e2cd05ba7a52b2fee8957c7 -->
+<h2>Obtener el ultimo banner activo</h2>
+<p>Retorna el último banner que se encuentra en estado activo.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/banners/getLastActiveBanner" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/getLastActiveBanner",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Operación exitosa",
+    "data": {
+        "idBanner": 6,
+        "title": "Video banner UDB",
+        "resourceURL": "https:\/\/www.youtube.com\/watch?v=UMMirV54iDg",
+        "state": 1
+    },
+    "pagination": null
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/banners/getLastActiveBanner</code></p>
+<!-- END_d0ea90067e2cd05ba7a52b2fee8957c7 -->
+<!-- START_5f83d81e469a9707d89d7b83ccaef869 -->
+<h2>Crear un banner</h2>
+<p>Crea un nuevo banner en el sistema.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/banners/createBanner" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/createBanner",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/banners/createBanner</code></p>
+<!-- END_5f83d81e469a9707d89d7b83ccaef869 -->
+<!-- START_40b11e520c8a7e6a4b8a9bc35b2438d6 -->
+<h2>Actualizar un banner</h2>
+<p>Actualiza la información de un banner existente.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/banners/updateBanner/{id?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/updateBanner/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/banners/updateBanner/{id?}</code></p>
+<!-- END_40b11e520c8a7e6a4b8a9bc35b2438d6 -->
+<!-- START_67fcb4da59fbb669316b7c1783a6115a -->
+<h2>Alternar estado de un banner</h2>
+<p>Habilita o deshabilita un banner específico.</p>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/banners/toggleState/{id?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/toggleState/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/banners/toggleState/{id?}</code></p>
+<!-- END_67fcb4da59fbb669316b7c1783a6115a -->
 <h1>Categories</h1>
 <p>Endpoints para la gestión de categorías y subcategorías del sistema editorial.
 Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
@@ -902,6 +1073,29 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>POST api/categories/toggleState/{id?}</code></p>
 <!-- END_4feae160b9ae5351c9386deab52228dc -->
+<!-- START_7396e5e5dcabd33dc7f12c1ee5cd2242 -->
+<h2>api/categories/uploadCategoryImage</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/categories/uploadCategoryImage" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/uploadCategoryImage",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/categories/uploadCategoryImage</code></p>
+<!-- END_7396e5e5dcabd33dc7f12c1ee5cd2242 -->
 <h1>Category Types</h1>
 <p>Endpoints para la gestión de tipos de categorías.
 Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
@@ -1201,7 +1395,7 @@ $.ajax(settings).done(function (response) {
     "message": "Publicaciones obtenidas correctamente",
     "data": [
         {
-            "id": 1,
+            "idPublishing": 1,
             "title": "Laravel para Principiantes",
             "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
             "pages": 320,
@@ -1209,24 +1403,24 @@ $.ajax(settings).done(function (response) {
             "publish_code": "978-84-9876-123-4",
             "category_id": 3,
             "publishing_type": 1,
-            "is_new_arrival": true,
-            "is_archived": false,
+            "is_new_arrival": 1,
+            "state": 1,
             "created_at": "2025-11-15 10:30:00",
             "updated_at": "2025-11-15 10:30:00",
             "type": {
-                "id": 1,
+                "idPublishingType": 1,
                 "name": "Libro"
             },
             "authors": [
                 {
-                    "id": 1,
+                    "idAuthor": 1,
                     "name": "Juan",
                     "lastname": "García"
                 }
             ],
             "details": [],
             "translation": {
-                "id": 1,
+                "idPublishingTranslation": 1,
                 "title": "Laravel para Principiantes",
                 "URL": "laravel-para-principiantes",
                 "language_id": 1
@@ -1283,7 +1477,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicación obtenida exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
         "pages": 320,
@@ -1291,26 +1485,26 @@ $.ajax(settings).done(function (response) {
         "publish_code": "978-84-9876-123-4",
         "category_id": 3,
         "publishing_type": 1,
-        "is_new_arrival": true,
-        "is_archived": false,
+        "is_new_arrival": 1,
+        "state": 1,
         "type": {
-            "id": 1,
+            "idPublishingType": 1,
             "name": "Libro"
         },
         "authors": [
             {
-                "id": 1,
+                "idAuthor": 1,
                 "name": "Juan",
                 "lastname": "García"
             }
         ],
         "translations": [
             {
-                "id": 1,
+                "idPublishingTranslation": 1,
                 "title": "Laravel para Principiantes",
                 "URL": "laravel-para-principiantes",
                 "language": {
-                    "id": 1,
+                    "idLanguage": 1,
                     "name": "Español"
                 }
             }
@@ -1358,7 +1552,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicación encontrada exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "URL": "laravel-para-principiantes",
         "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
@@ -1367,15 +1561,15 @@ $.ajax(settings).done(function (response) {
         "publish_code": "978-84-9876-123-4",
         "category_id": 3,
         "publishing_type": 1,
-        "is_new_arrival": true,
-        "is_archived": false,
+        "is_new_arrival": 1,
+        "state": 1,
         "type": {
-            "id": 1,
+            "idPublishingType": 1,
             "name": "Libro"
         },
         "authors": [
             {
-                "id": 1,
+                "idAuthor": 1,
                 "name": "Juan",
                 "lastname": "García"
             }
@@ -1383,11 +1577,11 @@ $.ajax(settings).done(function (response) {
         "details": [],
         "translations": [
             {
-                "id": 1,
+                "idPublishingTranslation": 1,
                 "title": "Laravel para Principiantes",
                 "URL": "laravel-para-principiantes",
                 "language": {
-                    "id": 1,
+                    "idLanguage": 1,
                     "name": "Español"
                 }
             }
@@ -1462,7 +1656,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicacion creada exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "URL": "laravel-para-principiantes",
         "category_id": 3,
@@ -1563,7 +1757,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicación actualizada exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
         "pages": 320,
@@ -1571,11 +1765,11 @@ $.ajax(settings).done(function (response) {
         "publish_code": "978-84-9876-123-4",
         "category_id": 3,
         "publishing_type": 1,
-        "is_new_arrival": true,
+        "is_new_arrival": 1,
         "authors": [],
         "category": null,
         "type": {
-            "id": 1,
+            "idPublishingType": 1,
             "name": "Libro"
         },
         "details": []
@@ -1759,21 +1953,23 @@ $.ajax(settings).done(function (response) {
     "data": {
         "libros": [
             {
-                "id": 1,
+                "idPublishing": 1,
                 "title": "Laravel para Principiantes",
+                "URL": "laravel_para_principiantes",
                 "resource_URL": "https:\/\/example.com\/laravel.pdf"
             }
         ],
         "revistas": [
             {
-                "id": 5,
+                "idPublishing": 5,
                 "title": "Revista Laravel Magazine",
+                "URL": "revista_laravel_magazine",
                 "resource_URL": "https:\/\/example.com\/magazine.pdf"
             }
         ],
         "articulos": [
             {
-                "id": 10,
+                "idPublishingDetail": 10,
                 "title": "Introducción a Laravel",
                 "URL": "introduccion-a-laravel"
             }
@@ -2163,6 +2359,77 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>POST api/users/toggleActive/{id?}</code></p>
 <!-- END_887a98664fab32daa6f1f4e4045eadcb -->
+<h1>general</h1>
+<!-- START_3ed9d9d3f8a472b4597b2c9c89f6603f -->
+<h2>api/emails/getEmails</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/emails/getEmails" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/emails/getEmails",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Correos obtenidos exitosamente",
+    "data": [
+        {
+            "name": "Esto es un test",
+            "subject": "Pruebaaa",
+            "message": "Esto es una prueba",
+            "email": "correo@test.com",
+            "idUserEmail": 1
+        }
+    ],
+    "pagination": {
+        "total": 1,
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 10,
+        "from": 1,
+        "to": 1
+    }
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/emails/getEmails</code></p>
+<!-- END_3ed9d9d3f8a472b4597b2c9c89f6603f -->
+<!-- START_249b2dd1bae35f8413b5c10084efdf78 -->
+<h2>api/emails/saveEmail</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/emails/saveEmail" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/emails/saveEmail",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/emails/saveEmail</code></p>
+<!-- END_249b2dd1bae35f8413b5c10084efdf78 -->
       </div>
       <div class="dark-box">
                         <div class="lang-selector">
