@@ -57,14 +57,14 @@ class CategoryTypeController extends Controller
      *   "message": "Tipos de categoría obtenidos exitosamente",
      *   "data": [
      *     {
-     *       "id": 1,
+     *       "idCategoryType": 1,
      *       "name": "Revista",
      *       "description": "Publicaciones periódicas",
      *       "created_at": "2025-11-15 10:30:00",
      *       "updated_at": "2025-11-15 10:30:00"
      *     },
      *     {
-     *       "id": 2,
+     *       "idCategoryType": 2,
      *       "name": "Libro",
      *       "description": "Publicaciones en formato libro",
      *       "created_at": "2025-11-15 10:30:00",

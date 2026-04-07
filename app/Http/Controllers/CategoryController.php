@@ -45,18 +45,6 @@ class CategoryController extends Controller
    *   Si es `false` u omitido, obtiene solo categorías padre con sus subcategorías anidadas. 
    *   Ejemplo: `1`, `true`, `false`
    * 
-   * ```bash
-   * # Obtener solo categorías padre con hijas
-   * curl -X GET "http://localhost/api/categories/getCategories" \
-   *   -H "Accept: application/json" \
-   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-   * 
-   * # Obtener todas las categorías planas
-   * curl -X GET "http://localhost/api/categories/getCategories?getAll=true" \
-   *   -H "Accept: application/json" \
-   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-   * ```
-   * 
    * @authenticated
    * 
    * @response {
@@ -64,7 +52,7 @@ class CategoryController extends Controller
    *   "message": "Categorías obtenidas correctamente",
    *   "data": [
    *     {
-   *       "id": 1,
+   *       "idCategory": 1,
    *       "title": "Ciencias",
    *       "description": "Categoría de ciencias",
    *       "category_type": 1,
@@ -72,7 +60,7 @@ class CategoryController extends Controller
    *       "state": 1,
    *       "children_recursive": [
    *         {
-   *           "id": 2,
+   *           "idCategory": 2,
    *           "title": "Física",
    *           "description": "Subcategoría de física",
    *           "category_type": 1,
@@ -81,7 +69,7 @@ class CategoryController extends Controller
    *           "children_recursive": []
    *         },
    *         {
-   *           "id": 3,
+   *           "idCategory": 3,
    *           "title": "Química",
    *           "description": "Subcategoría de química",
    *           "category_type": 1,
@@ -132,22 +120,13 @@ class CategoryController extends Controller
    * **Autenticación requerida:**
    * Este endpoint requiere un token JWT válido en el header de autorización.
    * 
-   * **Parámetros de ruta (URL Parameters):**
-   * - `id` (integer, requerido): ID de la categoría a consultar. Ejemplo: `1`
-   * 
-   * ```bash
-   * curl -X GET "http://localhost/api/categories/getCategory/1" \
-   *   -H "Accept: application/json" \
-   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-   * ```
-   * 
    * @authenticated
    * 
    * @response {
    *   "ok": true,
    *   "message": "Categoría obtenida correctamente",
    *   "data": {
-   *     "id": 1,
+   *     "idCategory": 1,
    *     "title": "Ciencias",
    *     "description": "Categoría de ciencias",
    *     "main_category": null,
@@ -159,7 +138,7 @@ class CategoryController extends Controller
    *     "created_at": "2025-11-15 10:30:00",
    *     "updated_at": "2025-11-15 10:30:00",
    *     "detail": {
-   *       "id": 1,
+   *       "idCategoryDetail": 1,
    *       "category_id": 1,
    *       "language_id": 1,
    *       "about": "Información sobre la categoría",
@@ -212,19 +191,11 @@ class CategoryController extends Controller
    * **Autenticación requerida:**
    * Este endpoint NO requiere autenticación (público).
    * 
-   * **Parámetros de consulta (Query Parameters):**
-   * - `categoryURL` (string, requerido): URL/slug de la categoria a consultar. Ejemplo: `ciencias`
-   * 
-   * ```bash
-   * curl -X GET "http://localhost/api/categories/searchByURL/ciencias" \
-   *   -H "Accept: application/json"
-   * ```
-   * 
    * @response {
    *   "ok": true,
    *   "message": "Categoría encontrada exitosamente",
    *   "data": {
-   *     "id": 1,
+   *     "idCategory": 1,
    *     "title": "Ciencias",
    *     "description": "Categoría de ciencias",
    *     "main_category": null,
@@ -236,7 +207,7 @@ class CategoryController extends Controller
    *     "created_at": "2025-11-15 10:30:00",
    *     "updated_at": "2025-11-15 10:30:00",
    *     "detail": {
-   *       "id": 1,
+   *       "idCategoryDetail": 1,
    *       "category_id": 1,
    *       "language_id": 1,
    *       "about": "Información sobre la categoría",
@@ -297,39 +268,13 @@ class CategoryController extends Controller
    * **Autenticación requerida:**
    * Este endpoint requiere un token JWT válido en el header de autorización.
    * 
-   * **Parámetros del Body:**
-   * - `title` (string, requerido): Título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias`
-   * - `description` (string, opcional): Descripción de la categoría. Ejemplo: `Categoría de ciencias`
-   * - `category_type` (integer, opcional): Tipo de categoría. Ejemplo: `1`
-   * - `language_id` (integer, opcional): ID del idioma. Por defecto: `1`. Ejemplo: `1`
-   * 
-   * ```json
-   * {
-   *   "title": "Ciencias",
-   *   "description": "Categoría de ciencias exactas",
-   *   "category_type": 1,
-   *   "language_id": 1,
-   *   "URL": "ciencias"
-   * }
-   * ```
-   * 
-   * ```bash
-   * curl -X POST "http://localhost/api/categories/createCategory" \
-   *   -H "Accept: application/json" \
-   *   -H "Content-Type: application/json" \
-   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-   *   -d '{"title":"Ciencias","description":"Categoría de ciencias exactas","category_type":1}'
-   * ```
-   * 
-   * **Nota:** La categoría se crea activa (`state=1`) y como categoría padre (`main_category=null`) por defecto.
-   * 
    * @authenticated
    * 
    * @response {
    *   "ok": true,
    *   "message": "Categoría creada correctamente",
    *   "data": {
-   *     "id": 1,
+   *     "idCategory": 1,
    *     "title": "Ciencias",
    *     "description": "Categoría de ciencias exactas",
    *     "main_category": null,
@@ -412,54 +357,13 @@ class CategoryController extends Controller
    * **Autenticación requerida:**
    * Este endpoint requiere un token JWT válido en el header de autorización.
    * 
-   * **Parámetros de ruta (URL Parameters):**
-   * - `id` (integer, requerido): ID de la categoría a actualizar. Ejemplo: `1`
-   * 
-   * **Parámetros del Body:**
-   * - `title` (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias Exactas`
-   * - `description` (string, opcional): Nueva descripción. Ejemplo: `Categoría actualizada`
-   * - `URL` (string, opcional): Nueva URL/slug de la categoría. Ejemplo: `ciencias_exactas`
-   * - `main_category` (integer, nullable): ID de la categoría padre. Si es `null` o vacío, se mantiene como categoría padre. Ejemplo: `2`
-   * - `is_featured` (boolean, opcional): Si la categoría es destacada. Ejemplo: `true`
-   * - `about` (string, opcional): Información sobre la categoría. Ejemplo: `Sobre esta categoría`
-   * - `editorial_board` (string, opcional): Consejo editorial. Ejemplo: `Lista de editores`
-   * - `policy` (string, opcional): Políticas de publicación. Ejemplo: `Políticas editoriales`
-   * - `norms` (string, opcional): Normas de la categoría. Ejemplo: `Normas de publicación`
-   * - `process` (string, opcional): Proceso de publicación. Ejemplo: `Proceso editorial`
-   * - `contact` (string, opcional): Información de contacto. Ejemplo: `editorial@example.com`
-   * 
-   * ```json
-   * {
-   *   "title": "Ciencias Exactas",
-   *   "description": "Categoría actualizada de ciencias",
-   *   "main_category": null,
-   *   "is_featured": true,
-   *   "about": "Información sobre la categoría",
-   *   "editorial_board": "Dr. Juan Pérez, Dra. María López",
-   *   "policy": "Políticas de revisión por pares",
-   *   "norms": "Normas APA 7",
-   *   "process": "Proceso de revisión en 30 días",
-   *   "contact": "ciencias@example.com"
-   * }
-   * ```
-   * 
-   * ```bash
-   * curl -X POST "http://localhost/api/categories/updateCategory/1" \
-   *   -H "Accept: application/json" \
-   *   -H "Content-Type: application/json" \
-   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-   *   -d '{"title":"Ciencias Exactas","description":"Categoría actualizada","is_featured":true}'
-   * ```
-   * 
-   * **Nota:** Si se envían campos de detalle (about, editorial_board, etc.), se creará o actualizará el registro en `categories_details`.
-   * 
    * @authenticated
    * 
    * @response {
    *   "ok": true,
    *   "message": "Categoría actualizada correctamente",
    *   "data": {
-   *     "id": 1,
+   *     "idCategory": 1,
    *     "title": "Ciencias Exactas",
    *     "URL": "ciencias_exactas",
    *     "description": "Categoría actualizada de ciencias",
@@ -471,7 +375,7 @@ class CategoryController extends Controller
    *     "created_at": "2025-11-15 10:30:00",
    *     "updated_at": "2025-11-15 12:00:00",
    *     "detail": {
-   *       "id": 1,
+   *       "idCategoryDetail": 1,
    *       "category_id": 1,
    *       "language_id": 1,
    *       "about": "Información sobre la categoría",
@@ -645,29 +549,13 @@ class CategoryController extends Controller
    * **Autenticación requerida:**
    * Este endpoint requiere un token JWT válido en el header de autorización.
    * 
-   * **Parámetros de ruta (URL Parameters):**
-   * - `id` (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: `1`
-   * 
-   * ```bash
-   * curl -X POST "http://localhost/api/categories/toggleState/1" \
-   *   -H "Accept: application/json" \
-   *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-   * ```
-   * 
-   * **Comportamiento:**
-   * - Si la categoría está **activa** y tiene subcategorías: se desactiva junto con todas sus subcategorías recursivamente
-   * - Si la categoría está **inactiva** y tiene subcategorías: se activa junto con todas sus subcategorías recursivamente
-   * - Si es una categoría sin hijas: solo cambia su propio estado
-   * 
-   * **Nota importante:** Esta operación usa transacciones de base de datos para garantizar la consistencia.
-   * 
    * @authenticated
    * 
    * @response {
    *   "ok": true,
    *   "message": "Categoría activada correctamente",
    *   "data": {
-   *     "id": 1,
+   *     "idCategory": 1,
    *     "title": "Ciencias",
    *     "description": "Categoría de ciencias",
    *     "main_category": null,
@@ -680,7 +568,7 @@ class CategoryController extends Controller
    *     "updated_at": "2025-11-15 12:30:00",
    *     "children_recursive": [
    *       {
-   *         "id": 2,
+   *         "idCategory": 2,
    *         "title": "Física",
    *         "state": 1,
    *         "main_category": 1
@@ -693,7 +581,7 @@ class CategoryController extends Controller
    *   "ok": true,
    *   "message": "Categoría y sus subcategorías desactivadas correctamente",
    *   "data": {
-   *     "id": 1,
+   *     "idCategory": 1,
    *     "title": "Ciencias",
    *     "description": "Categoría de ciencias",
    *     "main_category": null,
@@ -706,7 +594,7 @@ class CategoryController extends Controller
    *     "updated_at": "2025-11-15 12:30:00",
    *     "children_recursive": [
    *       {
-   *         "id": 2,
+   *         "idCategory": 2,
    *         "title": "Física",
    *         "state": 0,
    *         "main_category": 1
@@ -776,6 +664,21 @@ class CategoryController extends Controller
     }
   }
 
+  /**
+   * Subir imagen de categoría
+   * 
+   * Sube una imagen para el contenido de la categoría (detalles/cuerpo).
+   * 
+   * @authenticated
+   * 
+   * @response {
+   *   "ok": true,
+   *   "message": "Imagen subida correctamente",
+   *   "data": {
+   *     "url": "http://localhost/imagescontent/ciencias_123456_uniqid.jpg"
+   *   }
+   * }
+   */
   public function storeCategoryImage(Request $request)
   {
     try {

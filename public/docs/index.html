@@ -469,6 +469,19 @@ Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
 <!-- START_ea57fc4cbab9bc046c292cf8f114056e -->
 <h2>Listar banners</h2>
 <p>Obtiene una lista paginada de banners con opciones de búsqueda y filtrado.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros de consulta (Query Parameters):</strong></p>
+<ul>
+<li><code>page</code> (integer, opcional): Número de página. Por defecto: 1. Ejemplo: <code>1</code></li>
+<li><code>limit</code> (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: <code>10</code></li>
+<li><code>search</code> (string, opcional): Búsqueda por título. Ejemplo: <code>Promoción</code></li>
+<li><code>state</code> (integer, opcional): Filtrar por estado (0=Inactivo, 1=Activo). Ejemplo: <code>1</code></li>
+<li><code>sort</code> (string, opcional): Campo para ordenar (idBanner, title, state). Ejemplo: <code>idBanner:desc</code></li>
+</ul>
+<pre><code class="language-bash">curl -X GET "http://localhost/api/banners/getBanners?page=1&amp;limit=10&amp;state=1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -495,31 +508,21 @@ $.ajax(settings).done(function (response) {
     "message": "Publicaciones obtenidas correctamente",
     "data": [
         {
-            "idBanner": 6,
-            "title": "Video banner UDB",
-            "resourceURL": "https:\/\/www.youtube.com\/watch?v=UMMirV54iDg",
-            "state": 1
-        },
-        {
-            "idBanner": 5,
-            "title": "Worlds fastest lego clicker",
-            "resourceURL": "https:\/\/www.youtube.com\/watch?v=JmQeSDkcNjc",
-            "state": 1
-        },
-        {
-            "idBanner": 4,
-            "title": "Video de pruebaaaa",
-            "resourceURL": "https:\/\/www.youtube.com\/watch?v=f78EA9rsMyo",
-            "state": 0
+            "idBanner": 1,
+            "title": "Promoción 2025",
+            "resourceURL": "https:\/\/example.com\/banner1.jpg",
+            "state": 1,
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
         }
     ],
     "pagination": {
-        "total": 3,
+        "total": 5,
         "current_page": 1,
         "last_page": 1,
         "per_page": 10,
         "from": 1,
-        "to": 3
+        "to": 5
     }
 }</code></pre>
 <h3>HTTP Request</h3>
@@ -527,7 +530,11 @@ $.ajax(settings).done(function (response) {
 <!-- END_ea57fc4cbab9bc046c292cf8f114056e -->
 <!-- START_d0ea90067e2cd05ba7a52b2fee8957c7 -->
 <h2>Obtener el ultimo banner activo</h2>
-<p>Retorna el último banner que se encuentra en estado activo.</p>
+<p>Retorna el último banner que se encuentra en estado activo, ordenado por ID descendente.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint NO requiere autenticación (público).</p>
+<pre><code class="language-bash">curl -X GET "http://localhost/api/banners/getLastActiveBanner" \
+  -H "Accept: application/json"</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -553,12 +560,13 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Operación exitosa",
     "data": {
-        "idBanner": 6,
-        "title": "Video banner UDB",
-        "resourceURL": "https:\/\/www.youtube.com\/watch?v=UMMirV54iDg",
-        "state": 1
-    },
-    "pagination": null
+        "idBanner": 5,
+        "title": "Gran Promoción",
+        "resourceURL": "https:\/\/example.com\/banner_new.jpg",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
 }</code></pre>
 <h3>HTTP Request</h3>
 <p><code>GET api/banners/getLastActiveBanner</code></p>
@@ -566,6 +574,24 @@ $.ajax(settings).done(function (response) {
 <!-- START_5f83d81e469a9707d89d7b83ccaef869 -->
 <h2>Crear un banner</h2>
 <p>Crea un nuevo banner en el sistema.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros del Body:</strong></p>
+<ul>
+<li><code>title</code> (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: <code>Promoción 2025</code></li>
+<li><code>resourceURL</code> (string, requerido): URL del recurso/imagen (debe ser única y válida). Ejemplo: <code>https://example.com/banner1.jpg</code></li>
+<li><code>state</code> (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: <code>1</code></li>
+</ul>
+<pre><code class="language-json">{
+  "title": "Promoción 2025",
+  "resourceURL": "https://example.com/banner1.jpg",
+  "state": 1
+}</code></pre>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/banners/createBanner" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"title":"Promoción 2025","resourceURL":"https://example.com/banner1.jpg","state":1}'</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -584,12 +610,49 @@ $.ajax(settings).done(function (response) {
 $.ajax(settings).done(function (response) {
     console.log(response);
 });</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Banner creado correctamente",
+    "data": {
+        "idBanner": 1,
+        "title": "Promoción 2025",
+        "resourceURL": "https:\/\/example.com\/banner1.jpg",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/banners/createBanner</code></p>
 <!-- END_5f83d81e469a9707d89d7b83ccaef869 -->
 <!-- START_40b11e520c8a7e6a4b8a9bc35b2438d6 -->
 <h2>Actualizar un banner</h2>
 <p>Actualiza la información de un banner existente.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros de ruta (URL Parameters):</strong></p>
+<ul>
+<li><code>id</code> (integer, requerido): ID del banner a actualizar. Ejemplo: <code>1</code></li>
+</ul>
+<p><strong>Parámetros del Body (JSON o Form Data):</strong></p>
+<ul>
+<li><code>title</code> (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: <code>Promoción Actualizada 2025</code></li>
+<li><code>resourceURL</code> (string, requerido): URL del recurso/imagen (debe ser única y válida excepto para el ID actual). Ejemplo: <code>https://example.com/banner_actualizado.jpg</code></li>
+<li><code>state</code> (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: <code>0</code></li>
+</ul>
+<pre><code class="language-json">{
+  "title": "Promoción Actualizada 2025",
+  "resourceURL": "https://example.com/banner_actualizado.jpg",
+  "state": 0
+}</code></pre>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/banners/updateBanner/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"title":"Promoción Actualizada 2025","resourceURL":"https://example.com/banner_actualizado.jpg","state":0}'</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -608,12 +671,36 @@ $.ajax(settings).done(function (response) {
 $.ajax(settings).done(function (response) {
     console.log(response);
 });</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Banner actualizado correctamente",
+    "data": {
+        "idBanner": 1,
+        "title": "Promoción Actualizada 2025",
+        "resourceURL": "https:\/\/example.com\/banner_actualizado.jpg",
+        "state": 0,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 11:30:00"
+    }
+}</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/banners/updateBanner/{id?}</code></p>
 <!-- END_40b11e520c8a7e6a4b8a9bc35b2438d6 -->
 <!-- START_67fcb4da59fbb669316b7c1783a6115a -->
 <h2>Alternar estado de un banner</h2>
 <p>Habilita o deshabilita un banner específico.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros de ruta (URL Parameters):</strong></p>
+<ul>
+<li><code>id</code> (integer, requerido): ID del banner a alternar. Ejemplo: <code>1</code></li>
+</ul>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/banners/toggleState/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -632,6 +719,21 @@ $.ajax(settings).done(function (response) {
 $.ajax(settings).done(function (response) {
     console.log(response);
 });</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Estado del banner actualizado correctamente",
+    "data": {
+        "idBanner": 1,
+        "title": "Promoción Actualizada 2025",
+        "resourceURL": "https:\/\/example.com\/banner1_mod.jpg",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 12:30:00"
+    }
+}</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/banners/toggleState/{id?}</code></p>
 <!-- END_67fcb4da59fbb669316b7c1783a6115a -->
@@ -649,15 +751,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 Si es <code>false</code> u omitido, obtiene solo categorías padre con sus subcategorías anidadas.
 Ejemplo: <code>1</code>, <code>true</code>, <code>false</code></li>
 </ul>
-<pre><code class="language-bash"># Obtener solo categorías padre con hijas
-curl -X GET "http://localhost/api/categories/getCategories" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-
-# Obtener todas las categorías planas
-curl -X GET "http://localhost/api/categories/getCategories?getAll=true" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -684,7 +777,7 @@ $.ajax(settings).done(function (response) {
     "message": "Categorías obtenidas correctamente",
     "data": [
         {
-            "id": 1,
+            "idCategory": 1,
             "title": "Ciencias",
             "description": "Categoría de ciencias",
             "category_type": 1,
@@ -692,7 +785,7 @@ $.ajax(settings).done(function (response) {
             "state": 1,
             "children_recursive": [
                 {
-                    "id": 2,
+                    "idCategory": 2,
                     "title": "Física",
                     "description": "Subcategoría de física",
                     "category_type": 1,
@@ -701,7 +794,7 @@ $.ajax(settings).done(function (response) {
                     "children_recursive": []
                 },
                 {
-                    "id": 3,
+                    "idCategory": 3,
                     "title": "Química",
                     "description": "Subcategoría de química",
                     "category_type": 1,
@@ -721,13 +814,6 @@ $.ajax(settings).done(function (response) {
 <p>Obtiene la información detallada de una categoría específica por su ID, incluyendo sus detalles adicionales.</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint requiere un token JWT válido en el header de autorización.</p>
-<p><strong>Parámetros de ruta (URL Parameters):</strong></p>
-<ul>
-<li><code>id</code> (integer, requerido): ID de la categoría a consultar. Ejemplo: <code>1</code></li>
-</ul>
-<pre><code class="language-bash">curl -X GET "http://localhost/api/categories/getCategory/1" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -753,7 +839,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría obtenida correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias",
         "main_category": null,
@@ -765,7 +851,7 @@ $.ajax(settings).done(function (response) {
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 10:30:00",
         "detail": {
-            "id": 1,
+            "idCategoryDetail": 1,
             "category_id": 1,
             "language_id": 1,
             "about": "Información sobre la categoría",
@@ -786,12 +872,6 @@ $.ajax(settings).done(function (response) {
 Esta función es para uso público del frontend usando URLs amigables.</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint NO requiere autenticación (público).</p>
-<p><strong>Parámetros de consulta (Query Parameters):</strong></p>
-<ul>
-<li><code>categoryURL</code> (string, requerido): URL/slug de la categoria a consultar. Ejemplo: <code>ciencias</code></li>
-</ul>
-<pre><code class="language-bash">curl -X GET "http://localhost/api/categories/searchByURL/ciencias" \
-  -H "Accept: application/json"</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -817,7 +897,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría encontrada exitosamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias",
         "main_category": null,
@@ -829,7 +909,7 @@ $.ajax(settings).done(function (response) {
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 10:30:00",
         "detail": {
-            "id": 1,
+            "idCategoryDetail": 1,
             "category_id": 1,
             "language_id": 1,
             "about": "Información sobre la categoría",
@@ -849,26 +929,6 @@ $.ajax(settings).done(function (response) {
 <p>Crea una nueva categoría en el sistema. Por defecto se crea como categoría padre (sin categoría principal).</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint requiere un token JWT válido en el header de autorización.</p>
-<p><strong>Parámetros del Body:</strong></p>
-<ul>
-<li><code>title</code> (string, requerido): Título de la categoría (máximo 255 caracteres). Ejemplo: <code>Ciencias</code></li>
-<li><code>description</code> (string, opcional): Descripción de la categoría. Ejemplo: <code>Categoría de ciencias</code></li>
-<li><code>category_type</code> (integer, opcional): Tipo de categoría. Ejemplo: <code>1</code></li>
-<li><code>language_id</code> (integer, opcional): ID del idioma. Por defecto: <code>1</code>. Ejemplo: <code>1</code></li>
-</ul>
-<pre><code class="language-json">{
-  "title": "Ciencias",
-  "description": "Categoría de ciencias exactas",
-  "category_type": 1,
-  "language_id": 1,
-  "URL": "ciencias"
-}</code></pre>
-<pre><code class="language-bash">curl -X POST "http://localhost/api/categories/createCategory" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Ciencias","description":"Categoría de ciencias exactas","category_type":1}'</code></pre>
-<p><strong>Nota:</strong> La categoría se crea activa (<code>state=1</code>) y como categoría padre (<code>main_category=null</code>) por defecto.</p>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -894,7 +954,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría creada correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias exactas",
         "main_category": null,
@@ -916,42 +976,6 @@ $.ajax(settings).done(function (response) {
 Permite convertir una categoría padre en subcategoría o viceversa.</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint requiere un token JWT válido en el header de autorización.</p>
-<p><strong>Parámetros de ruta (URL Parameters):</strong></p>
-<ul>
-<li><code>id</code> (integer, requerido): ID de la categoría a actualizar. Ejemplo: <code>1</code></li>
-</ul>
-<p><strong>Parámetros del Body:</strong></p>
-<ul>
-<li><code>title</code> (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: <code>Ciencias Exactas</code></li>
-<li><code>description</code> (string, opcional): Nueva descripción. Ejemplo: <code>Categoría actualizada</code></li>
-<li><code>URL</code> (string, opcional): Nueva URL/slug de la categoría. Ejemplo: <code>ciencias_exactas</code></li>
-<li><code>main_category</code> (integer, nullable): ID de la categoría padre. Si es <code>null</code> o vacío, se mantiene como categoría padre. Ejemplo: <code>2</code></li>
-<li><code>is_featured</code> (boolean, opcional): Si la categoría es destacada. Ejemplo: <code>true</code></li>
-<li><code>about</code> (string, opcional): Información sobre la categoría. Ejemplo: <code>Sobre esta categoría</code></li>
-<li><code>editorial_board</code> (string, opcional): Consejo editorial. Ejemplo: <code>Lista de editores</code></li>
-<li><code>policy</code> (string, opcional): Políticas de publicación. Ejemplo: <code>Políticas editoriales</code></li>
-<li><code>norms</code> (string, opcional): Normas de la categoría. Ejemplo: <code>Normas de publicación</code></li>
-<li><code>process</code> (string, opcional): Proceso de publicación. Ejemplo: <code>Proceso editorial</code></li>
-<li><code>contact</code> (string, opcional): Información de contacto. Ejemplo: <code>editorial@example.com</code></li>
-</ul>
-<pre><code class="language-json">{
-  "title": "Ciencias Exactas",
-  "description": "Categoría actualizada de ciencias",
-  "main_category": null,
-  "is_featured": true,
-  "about": "Información sobre la categoría",
-  "editorial_board": "Dr. Juan Pérez, Dra. María López",
-  "policy": "Políticas de revisión por pares",
-  "norms": "Normas APA 7",
-  "process": "Proceso de revisión en 30 días",
-  "contact": "ciencias@example.com"
-}</code></pre>
-<pre><code class="language-bash">curl -X POST "http://localhost/api/categories/updateCategory/1" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Ciencias Exactas","description":"Categoría actualizada","is_featured":true}'</code></pre>
-<p><strong>Nota:</strong> Si se envían campos de detalle (about, editorial_board, etc.), se creará o actualizará el registro en <code>categories_details</code>.</p>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -977,7 +1001,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría actualizada correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias Exactas",
         "URL": "ciencias_exactas",
         "description": "Categoría actualizada de ciencias",
@@ -989,7 +1013,7 @@ $.ajax(settings).done(function (response) {
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 12:00:00",
         "detail": {
-            "id": 1,
+            "idCategoryDetail": 1,
             "category_id": 1,
             "language_id": 1,
             "about": "Información sobre la categoría",
@@ -1010,20 +1034,6 @@ $.ajax(settings).done(function (response) {
 Si es una categoría padre, también afecta recursivamente a todas sus subcategorías.</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint requiere un token JWT válido en el header de autorización.</p>
-<p><strong>Parámetros de ruta (URL Parameters):</strong></p>
-<ul>
-<li><code>id</code> (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: <code>1</code></li>
-</ul>
-<pre><code class="language-bash">curl -X POST "http://localhost/api/categories/toggleState/1" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
-<p><strong>Comportamiento:</strong></p>
-<ul>
-<li>Si la categoría está <strong>activa</strong> y tiene subcategorías: se desactiva junto con todas sus subcategorías recursivamente</li>
-<li>Si la categoría está <strong>inactiva</strong> y tiene subcategorías: se activa junto con todas sus subcategorías recursivamente</li>
-<li>Si es una categoría sin hijas: solo cambia su propio estado</li>
-</ul>
-<p><strong>Nota importante:</strong> Esta operación usa transacciones de base de datos para garantizar la consistencia.</p>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -1049,7 +1059,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría activada correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias",
         "main_category": null,
@@ -1062,7 +1072,7 @@ $.ajax(settings).done(function (response) {
         "updated_at": "2025-11-15 12:30:00",
         "children_recursive": [
             {
-                "id": 2,
+                "idCategory": 2,
                 "title": "Física",
                 "state": 1,
                 "main_category": 1
@@ -1074,7 +1084,8 @@ $.ajax(settings).done(function (response) {
 <p><code>POST api/categories/toggleState/{id?}</code></p>
 <!-- END_4feae160b9ae5351c9386deab52228dc -->
 <!-- START_7396e5e5dcabd33dc7f12c1ee5cd2242 -->
-<h2>api/categories/uploadCategoryImage</h2>
+<h2>Subir imagen de categoría</h2>
+<p>Sube una imagen para el contenido de la categoría (detalles/cuerpo).</p>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -1093,6 +1104,16 @@ $.ajax(settings).done(function (response) {
 $.ajax(settings).done(function (response) {
     console.log(response);
 });</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Imagen subida correctamente",
+    "data": {
+        "url": "http:\/\/localhost\/imagescontent\/ciencias_123456_uniqid.jpg"
+    }
+}</code></pre>
 <h3>HTTP Request</h3>
 <p><code>POST api/categories/uploadCategoryImage</code></p>
 <!-- END_7396e5e5dcabd33dc7f12c1ee5cd2242 -->
@@ -1140,14 +1161,14 @@ $.ajax(settings).done(function (response) {
     "message": "Tipos de categoría obtenidos exitosamente",
     "data": [
         {
-            "id": 1,
+            "idCategoryType": 1,
             "name": "Revista",
             "description": "Publicaciones periódicas",
             "created_at": "2025-11-15 10:30:00",
             "updated_at": "2025-11-15 10:30:00"
         },
         {
-            "id": 2,
+            "idCategoryType": 2,
             "name": "Libro",
             "description": "Publicaciones en formato libro",
             "created_at": "2025-11-15 10:30:00",
@@ -1158,6 +1179,119 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>GET api/categoryTypes/getCategoryTypes</code></p>
 <!-- END_658bb2bbcd93a39102798b891f308fdc -->
+<h1>Emails</h1>
+<p>Endpoints para la gestión de correos y mensajes de contacto recibidos.
+Usa JWT en el header: <code>Authorization: Bearer {token}</code> (solo para listado).</p>
+<!-- START_3ed9d9d3f8a472b4597b2c9c89f6603f -->
+<h2>Listar correos</h2>
+<p>Obtiene una lista paginada de correos y mensajes de contacto con opciones de búsqueda y ordenamiento.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint requiere un token JWT válido en el header de autorización.</p>
+<p><strong>Parámetros de consulta (Query Parameters):</strong></p>
+<ul>
+<li><code>page</code> (integer, opcional): Número de página. Por defecto: 1. Ejemplo: <code>1</code></li>
+<li><code>limit</code> (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: <code>10</code></li>
+<li><code>search</code> (string, opcional): Búsqueda por nombre, correo electrónico o asunto. Ejemplo: <code>Consulta</code></li>
+<li><code>sort</code> (string, opcional): Campo para ordenar (idUserEmail, name, email, subject, message). Ejemplo: <code>idUserEmail:desc</code></li>
+</ul>
+<pre><code class="language-bash">curl -X GET "http://localhost/api/emails/getEmails?page=1&amp;limit=10&amp;search=Consulta" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."</code></pre>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/emails/getEmails" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/emails/getEmails",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Correos obtenidos exitosamente",
+    "data": [
+        {
+            "idUserEmail": 1,
+            "name": "Juan Pérez",
+            "subject": "Consulta sobre publicaciones",
+            "email": "juan.perez@example.com",
+            "message": "Me gustaría saber más sobre los procesos de publicación.",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        }
+    ],
+    "pagination": {
+        "total": 50,
+        "current_page": 1,
+        "last_page": 5,
+        "per_page": 10,
+        "from": 1,
+        "to": 10
+    }
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/emails/getEmails</code></p>
+<!-- END_3ed9d9d3f8a472b4597b2c9c89f6603f -->
+<!-- START_249b2dd1bae35f8413b5c10084efdf78 -->
+<h2>Guardar correo</h2>
+<p>Guarda un nuevo mensaje de contacto enviado desde el formulario público.
+Este endpoint tiene un límite de peticiones (throttle: 5 peticiones por minuto por IP) para evitar spam.</p>
+<p><strong>Autenticación requerida:</strong>
+Este endpoint NO requiere autenticación (público).</p>
+<p><strong>Parámetros del Body:</strong></p>
+<ul>
+<li><code>name</code> (string, requerido): Nombre del remitente (máximo 255 caracteres). Ejemplo: <code>Carlos López</code></li>
+<li><code>subject</code> (string, requerido): Asunto del mensaje (máximo 255 caracteres). Ejemplo: <code>Duda sobre compra</code></li>
+<li><code>email</code> (string, requerido): Dirección de correo válida (máximo 255 caracteres). Ejemplo: <code>carlos@example.com</code></li>
+<li><code>message</code> (string, opcional): Cuerpo del mensaje. Ejemplo: <code>Quiero comprar un libro pero tengo problemas con mi tarjeta...</code></li>
+</ul>
+<pre><code class="language-json">{
+  "name": "Carlos López",
+  "subject": "Duda sobre compra",
+  "email": "carlos@example.com",
+  "message": "Quiero comprar un libro pero tengo problemas con mi tarjeta..."
+}</code></pre>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/emails/saveEmail" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Carlos López","subject":"Duda sobre compra","email":"carlos@example.com","message":"Texto del mensaje"}'</code></pre>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/emails/saveEmail" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/emails/saveEmail",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">null</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/emails/saveEmail</code></p>
+<!-- END_249b2dd1bae35f8413b5c10084efdf78 -->
 <h1>PublishingDetail</h1>
 <p>Endpoints para la gestión de detalles de publicaciones (revistas).
 Usa JWT en el header: <code>Authorization: Bearer {token}</code>.</p>
@@ -2359,77 +2493,6 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>POST api/users/toggleActive/{id?}</code></p>
 <!-- END_887a98664fab32daa6f1f4e4045eadcb -->
-<h1>general</h1>
-<!-- START_3ed9d9d3f8a472b4597b2c9c89f6603f -->
-<h2>api/emails/getEmails</h2>
-<blockquote>
-<p>Example request:</p>
-</blockquote>
-<pre><code class="language-bash">curl -X GET -G "http://localhost/api/emails/getEmails" \
-    -H "Accept: application/json"</code></pre>
-<pre><code class="language-javascript">var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/emails/getEmails",
-    "method": "GET",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});</code></pre>
-<blockquote>
-<p>Example response:</p>
-</blockquote>
-<pre><code class="language-json">{
-    "ok": true,
-    "message": "Correos obtenidos exitosamente",
-    "data": [
-        {
-            "name": "Esto es un test",
-            "subject": "Pruebaaa",
-            "message": "Esto es una prueba",
-            "email": "correo@test.com",
-            "idUserEmail": 1
-        }
-    ],
-    "pagination": {
-        "total": 1,
-        "current_page": 1,
-        "last_page": 1,
-        "per_page": 10,
-        "from": 1,
-        "to": 1
-    }
-}</code></pre>
-<h3>HTTP Request</h3>
-<p><code>GET api/emails/getEmails</code></p>
-<!-- END_3ed9d9d3f8a472b4597b2c9c89f6603f -->
-<!-- START_249b2dd1bae35f8413b5c10084efdf78 -->
-<h2>api/emails/saveEmail</h2>
-<blockquote>
-<p>Example request:</p>
-</blockquote>
-<pre><code class="language-bash">curl -X POST "http://localhost/api/emails/saveEmail" \
-    -H "Accept: application/json"</code></pre>
-<pre><code class="language-javascript">var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://localhost/api/emails/saveEmail",
-    "method": "POST",
-    "headers": {
-        "accept": "application/json"
-    }
-}
-
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});</code></pre>
-<h3>HTTP Request</h3>
-<p><code>POST api/emails/saveEmail</code></p>
-<!-- END_249b2dd1bae35f8413b5c10084efdf78 -->
       </div>
       <div class="dark-box">
                         <div class="lang-selector">

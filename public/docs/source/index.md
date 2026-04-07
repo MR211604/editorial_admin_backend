@@ -70,22 +70,26 @@ $.ajax(settings).done(function (response) {
 {
     "ok": true,
     "message": "Usuario conectado correctamente",
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4MFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTczMTY5NjAwMCwiZXhwIjoxNzMxNjk5NjAwLCJuYmYiOjE3MzE2OTYwMDAsImp0aSI6ImFiY2RlZjEyMzQ1IiwidXNlcl9pZCI6MX0",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvZWRpdG9yaWFsL2FwaS9wdWJsaWMvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NzU1MTUyNzAsImV4cCI6MTc3NTUxODg3MCwibmJmIjoxNzc1NTE1MjcwLCJqdGkiOiI4SkY2bUdtdlh5UU1nR2k5Iiwic3ViIjozLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.jgkC__hycWzG29nRfgzGq7I5CeOmhCY0wqkXcDhY05Y",
     "user": {
-        "id": 1,
-        "name": "Juan Pérez",
-        "email": "juan@example.com",
-        "token": "admin123",
+        "idUser": 3,
+        "name": "admin",
         "active": 1,
-        "join_date": "2025-11-15 10:30:00",
-        "last_login_date": "2025-11-15 10:30:00"
-    },
-    "rol": {
-        "id": 1,
-        "name": "Administrador"
-    },
-    "first_login": "2025-01-10 08:00:00",
-    "last_login": "2025-11-14 15:45:00"
+        "join_date": "2025-07-06 19:48:15",
+        "last_login_date": "2026-04-06 16:41:10",
+        "token": "admin",
+        "user_roles": [
+            {
+                "idRol": 2,
+                "name": "Administrador",
+                "description": "Control total dentro de la aplicacion",
+                "pivot": {
+                    "user_id": 3,
+                    "rol_id": 2
+                }
+            }
+        ]
+    }
 }
 ```
 
@@ -559,6 +563,362 @@ $.ajax(settings).done(function (response) {
 
 <!-- END_e1321a8b15fdbe094d92f98e3e9e5c4d -->
 
+#Banners
+
+Endpoints para la gestión de banners.
+Usa JWT en el header: `Authorization: Bearer {token}`.
+<!-- START_ea57fc4cbab9bc046c292cf8f114056e -->
+## Listar banners
+
+Obtiene una lista paginada de banners con opciones de búsqueda y filtrado.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de consulta (Query Parameters):**
+- `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: `10`
+- `search` (string, opcional): Búsqueda por título. Ejemplo: `Promoción`
+- `state` (integer, opcional): Filtrar por estado (0=Inactivo, 1=Activo). Ejemplo: `1`
+- `sort` (string, opcional): Campo para ordenar (idBanner, title, state). Ejemplo: `idBanner:desc`
+
+```bash
+curl -X GET "http://localhost/api/banners/getBanners?page=1&limit=10&state=1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/banners/getBanners" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/getBanners",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Publicaciones obtenidas correctamente",
+    "data": [
+        {
+            "idBanner": 1,
+            "title": "Promoción 2025",
+            "resourceURL": "https:\/\/example.com\/banner1.jpg",
+            "state": 1,
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        }
+    ],
+    "pagination": {
+        "total": 5,
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 10,
+        "from": 1,
+        "to": 5
+    }
+}
+```
+
+### HTTP Request
+`GET api/banners/getBanners`
+
+
+<!-- END_ea57fc4cbab9bc046c292cf8f114056e -->
+
+<!-- START_d0ea90067e2cd05ba7a52b2fee8957c7 -->
+## Obtener el ultimo banner activo
+
+Retorna el último banner que se encuentra en estado activo, ordenado por ID descendente.
+
+**Autenticación requerida:**
+Este endpoint NO requiere autenticación (público).
+
+```bash
+curl -X GET "http://localhost/api/banners/getLastActiveBanner" \
+  -H "Accept: application/json"
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/banners/getLastActiveBanner" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/getLastActiveBanner",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Operación exitosa",
+    "data": {
+        "idBanner": 5,
+        "title": "Gran Promoción",
+        "resourceURL": "https:\/\/example.com\/banner_new.jpg",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}
+```
+
+### HTTP Request
+`GET api/banners/getLastActiveBanner`
+
+
+<!-- END_d0ea90067e2cd05ba7a52b2fee8957c7 -->
+
+<!-- START_5f83d81e469a9707d89d7b83ccaef869 -->
+## Crear un banner
+
+Crea un nuevo banner en el sistema.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros del Body:**
+- `title` (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: `Promoción 2025`
+- `resourceURL` (string, requerido): URL del recurso/imagen (debe ser única y válida). Ejemplo: `https://example.com/banner1.jpg`
+- `state` (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: `1`
+
+```json
+{
+  "title": "Promoción 2025",
+  "resourceURL": "https://example.com/banner1.jpg",
+  "state": 1
+}
+```
+
+```bash
+curl -X POST "http://localhost/api/banners/createBanner" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"title":"Promoción 2025","resourceURL":"https://example.com/banner1.jpg","state":1}'
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/banners/createBanner" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/createBanner",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Banner creado correctamente",
+    "data": {
+        "idBanner": 1,
+        "title": "Promoción 2025",
+        "resourceURL": "https:\/\/example.com\/banner1.jpg",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/banners/createBanner`
+
+
+<!-- END_5f83d81e469a9707d89d7b83ccaef869 -->
+
+<!-- START_40b11e520c8a7e6a4b8a9bc35b2438d6 -->
+## Actualizar un banner
+
+Actualiza la información de un banner existente.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del banner a actualizar. Ejemplo: `1`
+
+**Parámetros del Body (JSON o Form Data):**
+- `title` (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: `Promoción Actualizada 2025`
+- `resourceURL` (string, requerido): URL del recurso/imagen (debe ser única y válida excepto para el ID actual). Ejemplo: `https://example.com/banner_actualizado.jpg`
+- `state` (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: `0`
+
+```json
+{
+  "title": "Promoción Actualizada 2025",
+  "resourceURL": "https://example.com/banner_actualizado.jpg",
+  "state": 0
+}
+```
+
+```bash
+curl -X POST "http://localhost/api/banners/updateBanner/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
+  -d '{"title":"Promoción Actualizada 2025","resourceURL":"https://example.com/banner_actualizado.jpg","state":0}'
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/banners/updateBanner/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/updateBanner/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Banner actualizado correctamente",
+    "data": {
+        "idBanner": 1,
+        "title": "Promoción Actualizada 2025",
+        "resourceURL": "https:\/\/example.com\/banner_actualizado.jpg",
+        "state": 0,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 11:30:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/banners/updateBanner/{id?}`
+
+
+<!-- END_40b11e520c8a7e6a4b8a9bc35b2438d6 -->
+
+<!-- START_67fcb4da59fbb669316b7c1783a6115a -->
+## Alternar estado de un banner
+
+Habilita o deshabilita un banner específico.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de ruta (URL Parameters):**
+- `id` (integer, requerido): ID del banner a alternar. Ejemplo: `1`
+
+```bash
+curl -X POST "http://localhost/api/banners/toggleState/1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/banners/toggleState/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/toggleState/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Estado del banner actualizado correctamente",
+    "data": {
+        "idBanner": 1,
+        "title": "Promoción Actualizada 2025",
+        "resourceURL": "https:\/\/example.com\/banner1_mod.jpg",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 12:30:00"
+    }
+}
+```
+
+### HTTP Request
+`POST api/banners/toggleState/{id?}`
+
+
+<!-- END_67fcb4da59fbb669316b7c1783a6115a -->
+
 #Categories
 
 Endpoints para la gestión de categorías y subcategorías del sistema editorial.
@@ -575,18 +935,6 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 - `getAll` (boolean, opcional): Si es `true`, obtiene todas las categorías sin estructura jerárquica.
   Si es `false` u omitido, obtiene solo categorías padre con sus subcategorías anidadas.
   Ejemplo: `1`, `true`, `false`
-
-```bash
-# Obtener solo categorías padre con hijas
-curl -X GET "http://localhost/api/categories/getCategories" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-
-# Obtener todas las categorías planas
-curl -X GET "http://localhost/api/categories/getCategories?getAll=true" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-```
 
 > Example request:
 
@@ -619,7 +967,7 @@ $.ajax(settings).done(function (response) {
     "message": "Categorías obtenidas correctamente",
     "data": [
         {
-            "id": 1,
+            "idCategory": 1,
             "title": "Ciencias",
             "description": "Categoría de ciencias",
             "category_type": 1,
@@ -627,7 +975,7 @@ $.ajax(settings).done(function (response) {
             "state": 1,
             "children_recursive": [
                 {
-                    "id": 2,
+                    "idCategory": 2,
                     "title": "Física",
                     "description": "Subcategoría de física",
                     "category_type": 1,
@@ -636,7 +984,7 @@ $.ajax(settings).done(function (response) {
                     "children_recursive": []
                 },
                 {
-                    "id": 3,
+                    "idCategory": 3,
                     "title": "Química",
                     "description": "Subcategoría de química",
                     "category_type": 1,
@@ -663,15 +1011,6 @@ Obtiene la información detallada de una categoría específica por su ID, inclu
 
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
-
-**Parámetros de ruta (URL Parameters):**
-- `id` (integer, requerido): ID de la categoría a consultar. Ejemplo: `1`
-
-```bash
-curl -X GET "http://localhost/api/categories/getCategory/1" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-```
 
 > Example request:
 
@@ -703,7 +1042,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría obtenida correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias",
         "main_category": null,
@@ -715,7 +1054,7 @@ $.ajax(settings).done(function (response) {
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 10:30:00",
         "detail": {
-            "id": 1,
+            "idCategoryDetail": 1,
             "category_id": 1,
             "language_id": 1,
             "about": "Información sobre la categoría",
@@ -743,14 +1082,6 @@ Esta función es para uso público del frontend usando URLs amigables.
 
 **Autenticación requerida:**
 Este endpoint NO requiere autenticación (público).
-
-**Parámetros de consulta (Query Parameters):**
-- `categoryURL` (string, requerido): URL/slug de la categoria a consultar. Ejemplo: `ciencias`
-
-```bash
-curl -X GET "http://localhost/api/categories/searchByURL/ciencias" \
-  -H "Accept: application/json"
-```
 
 > Example request:
 
@@ -782,7 +1113,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría encontrada exitosamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias",
         "main_category": null,
@@ -794,7 +1125,7 @@ $.ajax(settings).done(function (response) {
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 10:30:00",
         "detail": {
-            "id": 1,
+            "idCategoryDetail": 1,
             "category_id": 1,
             "language_id": 1,
             "about": "Información sobre la categoría",
@@ -821,32 +1152,6 @@ Crea una nueva categoría en el sistema. Por defecto se crea como categoría pad
 
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
-
-**Parámetros del Body:**
-- `title` (string, requerido): Título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias`
-- `description` (string, opcional): Descripción de la categoría. Ejemplo: `Categoría de ciencias`
-- `category_type` (integer, opcional): Tipo de categoría. Ejemplo: `1`
-- `language_id` (integer, opcional): ID del idioma. Por defecto: `1`. Ejemplo: `1`
-
-```json
-{
-  "title": "Ciencias",
-  "description": "Categoría de ciencias exactas",
-  "category_type": 1,
-  "language_id": 1,
-  "URL": "ciencias"
-}
-```
-
-```bash
-curl -X POST "http://localhost/api/categories/createCategory" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Ciencias","description":"Categoría de ciencias exactas","category_type":1}'
-```
-
-**Nota:** La categoría se crea activa (`state=1`) y como categoría padre (`main_category=null`) por defecto.
 
 > Example request:
 
@@ -878,7 +1183,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría creada correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias exactas",
         "main_category": null,
@@ -907,47 +1212,6 @@ Permite convertir una categoría padre en subcategoría o viceversa.
 
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
-
-**Parámetros de ruta (URL Parameters):**
-- `id` (integer, requerido): ID de la categoría a actualizar. Ejemplo: `1`
-
-**Parámetros del Body:**
-- `title` (string, requerido): Nuevo título de la categoría (máximo 255 caracteres). Ejemplo: `Ciencias Exactas`
-- `description` (string, opcional): Nueva descripción. Ejemplo: `Categoría actualizada`
-- `URL` (string, opcional): Nueva URL/slug de la categoría. Ejemplo: `ciencias_exactas`
-- `main_category` (integer, nullable): ID de la categoría padre. Si es `null` o vacío, se mantiene como categoría padre. Ejemplo: `2`
-- `is_featured` (boolean, opcional): Si la categoría es destacada. Ejemplo: `true`
-- `about` (string, opcional): Información sobre la categoría. Ejemplo: `Sobre esta categoría`
-- `editorial_board` (string, opcional): Consejo editorial. Ejemplo: `Lista de editores`
-- `policy` (string, opcional): Políticas de publicación. Ejemplo: `Políticas editoriales`
-- `norms` (string, opcional): Normas de la categoría. Ejemplo: `Normas de publicación`
-- `process` (string, opcional): Proceso de publicación. Ejemplo: `Proceso editorial`
-- `contact` (string, opcional): Información de contacto. Ejemplo: `editorial@example.com`
-
-```json
-{
-  "title": "Ciencias Exactas",
-  "description": "Categoría actualizada de ciencias",
-  "main_category": null,
-  "is_featured": true,
-  "about": "Información sobre la categoría",
-  "editorial_board": "Dr. Juan Pérez, Dra. María López",
-  "policy": "Políticas de revisión por pares",
-  "norms": "Normas APA 7",
-  "process": "Proceso de revisión en 30 días",
-  "contact": "ciencias@example.com"
-}
-```
-
-```bash
-curl -X POST "http://localhost/api/categories/updateCategory/1" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Ciencias Exactas","description":"Categoría actualizada","is_featured":true}'
-```
-
-**Nota:** Si se envían campos de detalle (about, editorial_board, etc.), se creará o actualizará el registro en `categories_details`.
 
 > Example request:
 
@@ -979,7 +1243,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría actualizada correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias Exactas",
         "URL": "ciencias_exactas",
         "description": "Categoría actualizada de ciencias",
@@ -991,7 +1255,7 @@ $.ajax(settings).done(function (response) {
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 12:00:00",
         "detail": {
-            "id": 1,
+            "idCategoryDetail": 1,
             "category_id": 1,
             "language_id": 1,
             "about": "Información sobre la categoría",
@@ -1019,22 +1283,6 @@ Si es una categoría padre, también afecta recursivamente a todas sus subcatego
 
 **Autenticación requerida:**
 Este endpoint requiere un token JWT válido en el header de autorización.
-
-**Parámetros de ruta (URL Parameters):**
-- `id` (integer, requerido): ID de la categoría cuyo estado se alternará. Ejemplo: `1`
-
-```bash
-curl -X POST "http://localhost/api/categories/toggleState/1" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
-```
-
-**Comportamiento:**
-- Si la categoría está **activa** y tiene subcategorías: se desactiva junto con todas sus subcategorías recursivamente
-- Si la categoría está **inactiva** y tiene subcategorías: se activa junto con todas sus subcategorías recursivamente
-- Si es una categoría sin hijas: solo cambia su propio estado
-
-**Nota importante:** Esta operación usa transacciones de base de datos para garantizar la consistencia.
 
 > Example request:
 
@@ -1066,7 +1314,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Categoría activada correctamente",
     "data": {
-        "id": 1,
+        "idCategory": 1,
         "title": "Ciencias",
         "description": "Categoría de ciencias",
         "main_category": null,
@@ -1079,7 +1327,7 @@ $.ajax(settings).done(function (response) {
         "updated_at": "2025-11-15 12:30:00",
         "children_recursive": [
             {
-                "id": 2,
+                "idCategory": 2,
                 "title": "Física",
                 "state": 1,
                 "main_category": 1
@@ -1094,6 +1342,52 @@ $.ajax(settings).done(function (response) {
 
 
 <!-- END_4feae160b9ae5351c9386deab52228dc -->
+
+<!-- START_7396e5e5dcabd33dc7f12c1ee5cd2242 -->
+## Subir imagen de categoría
+
+Sube una imagen para el contenido de la categoría (detalles/cuerpo).
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/categories/uploadCategoryImage" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/categories/uploadCategoryImage",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Imagen subida correctamente",
+    "data": {
+        "url": "http:\/\/localhost\/imagescontent\/ciencias_123456_uniqid.jpg"
+    }
+}
+```
+
+### HTTP Request
+`POST api/categories/uploadCategoryImage`
+
+
+<!-- END_7396e5e5dcabd33dc7f12c1ee5cd2242 -->
 
 #Category Types
 
@@ -1151,14 +1445,14 @@ $.ajax(settings).done(function (response) {
     "message": "Tipos de categoría obtenidos exitosamente",
     "data": [
         {
-            "id": 1,
+            "idCategoryType": 1,
             "name": "Revista",
             "description": "Publicaciones periódicas",
             "created_at": "2025-11-15 10:30:00",
             "updated_at": "2025-11-15 10:30:00"
         },
         {
-            "id": 2,
+            "idCategoryType": 2,
             "name": "Libro",
             "description": "Publicaciones en formato libro",
             "created_at": "2025-11-15 10:30:00",
@@ -1173,6 +1467,153 @@ $.ajax(settings).done(function (response) {
 
 
 <!-- END_658bb2bbcd93a39102798b891f308fdc -->
+
+#Emails
+
+Endpoints para la gestión de correos y mensajes de contacto recibidos.
+Usa JWT en el header: `Authorization: Bearer {token}` (solo para listado).
+<!-- START_3ed9d9d3f8a472b4597b2c9c89f6603f -->
+## Listar correos
+
+Obtiene una lista paginada de correos y mensajes de contacto con opciones de búsqueda y ordenamiento.
+
+**Autenticación requerida:**
+Este endpoint requiere un token JWT válido en el header de autorización.
+
+**Parámetros de consulta (Query Parameters):**
+- `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
+- `limit` (integer, opcional): Resultados por página (mínimo 10). Por defecto: 10. Ejemplo: `10`
+- `search` (string, opcional): Búsqueda por nombre, correo electrónico o asunto. Ejemplo: `Consulta`
+- `sort` (string, opcional): Campo para ordenar (idUserEmail, name, email, subject, message). Ejemplo: `idUserEmail:desc`
+
+```bash
+curl -X GET "http://localhost/api/emails/getEmails?page=1&limit=10&search=Consulta" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
+```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/emails/getEmails" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/emails/getEmails",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Correos obtenidos exitosamente",
+    "data": [
+        {
+            "idUserEmail": 1,
+            "name": "Juan Pérez",
+            "subject": "Consulta sobre publicaciones",
+            "email": "juan.perez@example.com",
+            "message": "Me gustaría saber más sobre los procesos de publicación.",
+            "created_at": "2025-11-15 10:30:00",
+            "updated_at": "2025-11-15 10:30:00"
+        }
+    ],
+    "pagination": {
+        "total": 50,
+        "current_page": 1,
+        "last_page": 5,
+        "per_page": 10,
+        "from": 1,
+        "to": 10
+    }
+}
+```
+
+### HTTP Request
+`GET api/emails/getEmails`
+
+
+<!-- END_3ed9d9d3f8a472b4597b2c9c89f6603f -->
+
+<!-- START_249b2dd1bae35f8413b5c10084efdf78 -->
+## Guardar correo
+
+Guarda un nuevo mensaje de contacto enviado desde el formulario público.
+Este endpoint tiene un límite de peticiones (throttle: 5 peticiones por minuto por IP) para evitar spam.
+
+**Autenticación requerida:**
+Este endpoint NO requiere autenticación (público).
+
+**Parámetros del Body:**
+- `name` (string, requerido): Nombre del remitente (máximo 255 caracteres). Ejemplo: `Carlos López`
+- `subject` (string, requerido): Asunto del mensaje (máximo 255 caracteres). Ejemplo: `Duda sobre compra`
+- `email` (string, requerido): Dirección de correo válida (máximo 255 caracteres). Ejemplo: `carlos@example.com`
+- `message` (string, opcional): Cuerpo del mensaje. Ejemplo: `Quiero comprar un libro pero tengo problemas con mi tarjeta...`
+
+```json
+{
+  "name": "Carlos López",
+  "subject": "Duda sobre compra",
+  "email": "carlos@example.com",
+  "message": "Quiero comprar un libro pero tengo problemas con mi tarjeta..."
+}
+```
+
+```bash
+curl -X POST "http://localhost/api/emails/saveEmail" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Carlos López","subject":"Duda sobre compra","email":"carlos@example.com","message":"Texto del mensaje"}'
+```
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/emails/saveEmail" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/emails/saveEmail",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+null
+```
+
+### HTTP Request
+`POST api/emails/saveEmail`
+
+
+<!-- END_249b2dd1bae35f8413b5c10084efdf78 -->
 
 #PublishingDetail
 
@@ -1472,7 +1913,7 @@ $.ajax(settings).done(function (response) {
     "message": "Publicaciones obtenidas correctamente",
     "data": [
         {
-            "id": 1,
+            "idPublishing": 1,
             "title": "Laravel para Principiantes",
             "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
             "pages": 320,
@@ -1480,24 +1921,24 @@ $.ajax(settings).done(function (response) {
             "publish_code": "978-84-9876-123-4",
             "category_id": 3,
             "publishing_type": 1,
-            "is_new_arrival": true,
-            "is_archived": false,
+            "is_new_arrival": 1,
+            "state": 1,
             "created_at": "2025-11-15 10:30:00",
             "updated_at": "2025-11-15 10:30:00",
             "type": {
-                "id": 1,
+                "idPublishingType": 1,
                 "name": "Libro"
             },
             "authors": [
                 {
-                    "id": 1,
+                    "idAuthor": 1,
                     "name": "Juan",
                     "lastname": "García"
                 }
             ],
             "details": [],
             "translation": {
-                "id": 1,
+                "idPublishingTranslation": 1,
                 "title": "Laravel para Principiantes",
                 "URL": "laravel-para-principiantes",
                 "language_id": 1
@@ -1569,7 +2010,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicación obtenida exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
         "pages": 320,
@@ -1577,26 +2018,26 @@ $.ajax(settings).done(function (response) {
         "publish_code": "978-84-9876-123-4",
         "category_id": 3,
         "publishing_type": 1,
-        "is_new_arrival": true,
-        "is_archived": false,
+        "is_new_arrival": 1,
+        "state": 1,
         "type": {
-            "id": 1,
+            "idPublishingType": 1,
             "name": "Libro"
         },
         "authors": [
             {
-                "id": 1,
+                "idAuthor": 1,
                 "name": "Juan",
                 "lastname": "García"
             }
         ],
         "translations": [
             {
-                "id": 1,
+                "idPublishingTranslation": 1,
                 "title": "Laravel para Principiantes",
                 "URL": "laravel-para-principiantes",
                 "language": {
-                    "id": 1,
+                    "idLanguage": 1,
                     "name": "Español"
                 }
             }
@@ -1659,7 +2100,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicación encontrada exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "URL": "laravel-para-principiantes",
         "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
@@ -1668,15 +2109,15 @@ $.ajax(settings).done(function (response) {
         "publish_code": "978-84-9876-123-4",
         "category_id": 3,
         "publishing_type": 1,
-        "is_new_arrival": true,
-        "is_archived": false,
+        "is_new_arrival": 1,
+        "state": 1,
         "type": {
-            "id": 1,
+            "idPublishingType": 1,
             "name": "Libro"
         },
         "authors": [
             {
-                "id": 1,
+                "idAuthor": 1,
                 "name": "Juan",
                 "lastname": "García"
             }
@@ -1684,11 +2125,11 @@ $.ajax(settings).done(function (response) {
         "details": [],
         "translations": [
             {
-                "id": 1,
+                "idPublishingTranslation": 1,
                 "title": "Laravel para Principiantes",
                 "URL": "laravel-para-principiantes",
                 "language": {
-                    "id": 1,
+                    "idLanguage": 1,
                     "name": "Español"
                 }
             }
@@ -1781,7 +2222,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicacion creada exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "URL": "laravel-para-principiantes",
         "category_id": 3,
@@ -1894,7 +2335,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Publicación actualizada exitosamente",
     "data": {
-        "id": 1,
+        "idPublishing": 1,
         "title": "Laravel para Principiantes",
         "cover": "editorial_files\/libros\/programacion\/laravel_principiantes\/1234567890.jpg",
         "pages": 320,
@@ -1902,11 +2343,11 @@ $.ajax(settings).done(function (response) {
         "publish_code": "978-84-9876-123-4",
         "category_id": 3,
         "publishing_type": 1,
-        "is_new_arrival": true,
+        "is_new_arrival": 1,
         "authors": [],
         "category": null,
         "type": {
-            "id": 1,
+            "idPublishingType": 1,
             "name": "Libro"
         },
         "details": []
@@ -2149,21 +2590,23 @@ $.ajax(settings).done(function (response) {
     "data": {
         "libros": [
             {
-                "id": 1,
+                "idPublishing": 1,
                 "title": "Laravel para Principiantes",
+                "URL": "laravel_para_principiantes",
                 "resource_URL": "https:\/\/example.com\/laravel.pdf"
             }
         ],
         "revistas": [
             {
-                "id": 5,
+                "idPublishing": 5,
                 "title": "Revista Laravel Magazine",
+                "URL": "revista_laravel_magazine",
                 "resource_URL": "https:\/\/example.com\/magazine.pdf"
             }
         ],
         "articulos": [
             {
-                "id": 10,
+                "idPublishingDetail": 10,
                 "title": "Introducción a Laravel",
                 "URL": "introduccion-a-laravel"
             }
