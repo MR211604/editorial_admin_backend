@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 use App\Exceptions\ServerErrorException;
 use App\Http\Traits\ApiResponse;
+use App\Mail\ContactReceived;
 use App\UserEmail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -227,11 +229,13 @@ class EmailController extends Controller
         'message' => $request->input('message'),
       ]);
 
-      return $this->successResponse($createdUserEmail, 'Correo guardado exitosamente', null, 201);
+      Mail::to(env('MAIL_FROM_ADDRESS'))->send(new ContactReceived($createdUserEmail));
+
+      return $this->successResponse($createdUserEmail, 'Correo guardado y enviado exitosamente', null, 201);
     } catch (ValidationException $e) {
       throw $e;
     } catch (\Exception $e) {
-      throw new ServerErrorException('Error al crear el correo', null, $e);
+      throw new ServerErrorException('Error al crear el correo', $e->getMessage(), $e);
     }
   }
 }
