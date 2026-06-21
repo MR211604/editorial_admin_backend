@@ -117,12 +117,12 @@ class PublishingController extends Controller
 
     /**
      * Listar publicaciones
-     * 
+     *
      * Obtiene una lista paginada de publicaciones (libros y revistas) con opciones de filtrado, búsqueda y ordenamiento.
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint NO requiere autenticación (público).
-     * 
+     *
      * **Parámetros de consulta (Query Parameters):**
      * - `page` (integer, opcional): Número de página. Por defecto: 1. Ejemplo: `1`
      * - `limit` (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: `10`
@@ -132,12 +132,12 @@ class PublishingController extends Controller
      * - `category` (integer, opcional): Filtrar por ID de categoría. Ejemplo: `3`
      * - `is_archived` (integer, opcional): Filtrar por estado (0=Activo, 1=Archivado). Ejemplo: `0`
      * - `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at). Ejemplo: `title:asc`
-     * 
+     *
      * ```bash
      * curl -X GET "http://localhost/api/publishings/getPublishings?page=1&limit=10&publishing_type=Libro&search=Laravel" \
      *   -H "Accept: application/json"
      * ```
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicaciones obtenidas correctamente",
@@ -184,7 +184,7 @@ class PublishingController extends Controller
      *     "to": 10
      *   }
      * }
-     * 
+     *
      * @response 422 {
      *   "ok": false,
      *   "error": "Validation Error",
@@ -279,24 +279,24 @@ class PublishingController extends Controller
 
     /**
      * Obtener una publicación por ID
-     * 
+     *
      * Obtiene la información detallada de una publicación específica con todas sus relaciones (tipo, autores, detalles, traducciones).
      * Esta función es para uso interno del CMS usando ID numérico.
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
-     * 
+     *
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID de la publicación a consultar. Ejemplo: `1`
-     * 
+     *
      * ```bash
      * curl -X GET "http://localhost/api/publishings/getPublishing/1" \
      *   -H "Accept: application/json" \
      *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
      * ```
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicación obtenida exitosamente",
@@ -335,19 +335,19 @@ class PublishingController extends Controller
      *     ]
      *   }
      * }
-     * 
+     *
      * @response 400 {
      *   "ok": false,
      *   "error": "Bad Request",
      *   "message": "El numero de ID es requerido"
      * }
-     * 
+     *
      * @response 404 {
      *   "ok": false,
      *   "error": "Not Found",
      *   "message": "Publicación no encontrada"
      * }
-     * 
+     *
      * @response 401 {
      *   "message": "Unauthenticated"
      * }
@@ -380,22 +380,22 @@ class PublishingController extends Controller
 
     /**
      * Buscar una publicación por URL/slug
-     * 
+     *
      * Obtiene la información detallada de una publicación específica usando su URL/slug con todas sus relaciones.
      * Esta función es para uso público del frontend usando URLs amigables.
      * Solo retorna publicaciones activas (is_archived=0).
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint NO requiere autenticación (público).
-     * 
+     *
      * **Parámetros de ruta (URL Parameters):**
      * - `publishingURL` (string, requerido): URL/slug de la publicación a consultar. Ejemplo: `laravel-para-principiantes`
-     * 
+     *
      * ```bash
      * curl -X GET "http://localhost/api/publishings/searchByURL/laravel-para-principiantes" \
      *   -H "Accept: application/json"
      * ```
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicación encontrada exitosamente",
@@ -436,13 +436,13 @@ class PublishingController extends Controller
      *     ]
      *   }
      * }
-     * 
+     *
      * @response 400 {
      *   "ok": false,
      *   "error": "Bad Request",
      *   "message": "La URL de la publicación es requerida"
      * }
-     * 
+     *
      * @response 404 {
      *   "ok": false,
      *   "error": "Not Found",
@@ -480,13 +480,13 @@ class PublishingController extends Controller
 
     /**
      * Crear una publicación
-     * 
+     *
      * Crea una nueva publicación (libro o revista) con sus traducciones en múltiples idiomas.
      * Esta es una operación inicial que crea la publicación base, luego debe actualizarse con más detalles.
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
-     * 
+     *
      * **Parámetros del Body (JSON):**
      * - `title` (string, requerido): Título principal de la publicación (máximo 255 caracteres, único). Ejemplo: `Laravel para Principiantes`
      * - `URL` (string, opcional): URL slug de la publicación. Ejemplo: `laravel-para-principiantes`
@@ -496,7 +496,7 @@ class PublishingController extends Controller
      * - `translations[].language_id` (integer, requerido): ID del idioma. Ejemplo: `1`
      * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres). Ejemplo: `Laravel for Beginners`
      * - `translations[].URL` (string, opcional): URL slug traducida. Ejemplo: `laravel-for-beginners`
-     * 
+     *
      * ```json
      * {
      *   "title": "Laravel para Principiantes",
@@ -517,7 +517,7 @@ class PublishingController extends Controller
      *   ]
      * }
      * ```
-     * 
+     *
      * ```bash
      * curl -X POST "http://localhost/api/publishings/createPublishing" \
      *   -H "Accept: application/json" \
@@ -525,9 +525,9 @@ class PublishingController extends Controller
      *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
      *   -d '{"title":"Laravel para Principiantes","publishing_type":"Libro","translations":[{"language_id":1,"title":"Laravel para Principiantes"}]}'
      * ```
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicacion creada exitosamente",
@@ -541,7 +541,7 @@ class PublishingController extends Controller
      *     "updated_at": "2025-11-15 10:30:00"
      *   }
      * }
-     * 
+     *
      * @response 422 {
      *   "ok": false,
      *   "error": "Validation Error",
@@ -552,7 +552,7 @@ class PublishingController extends Controller
      *     "translations": ["The translations field is required."]
      *   }
      * }
-     * 
+     *
      * @response 401 {
      *   "message": "Unauthenticated"
      * }
@@ -563,7 +563,7 @@ class PublishingController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255|unique:publishings,title',
                 'URL' => 'nullable|string',
-                'category_id' => 'nullable|integer|exists:categories,id',
+                'category_id' => 'nullable|integer|exists:categories,idCategory',
                 'publishing_type' => 'string|exists:publishing_types,name',
                 // Traducciones
                 'translations' => 'required|array|min:1',
@@ -617,17 +617,17 @@ class PublishingController extends Controller
 
     /**
      * Actualizar una publicación
-     * 
+     *
      * Actualiza una publicación existente. Los campos requeridos varían según el tipo de publicación:
      * - **Libros (publishing_type=1)**: Requiere páginas, fecha de publicación, código ISBN
      * - **Revistas (publishing_type=2)**: Además de lo anterior, puede incluir año, número, volumen
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
-     * 
+     *
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID de la publicación a actualizar. Ejemplo: `1`
-     * 
+     *
      * **Parámetros del Body (para Libros - publishing_type=1):**
      * - `publishing_type` (integer, requerido): Debe ser 1 para libros
      * - `title` (string, opcional): Título de la publicación (único excepto para el registro actual)
@@ -643,7 +643,7 @@ class PublishingController extends Controller
      * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
      * - `authors` (array, opcional): Array de IDs de autores. Ejemplo: `[1, 2]`
      * - `cover` (file, opcional): Imagen de portada (JPEG, PNG)
-     * 
+     *
      * **Parámetros del Body (para Revistas - publishing_type=2):**
      * - `publishing_type` (integer, requerido): Debe ser 2 para revistas
      * - `title` (string, opcional): Título de la publicación (único excepto para el registro actual)
@@ -661,9 +661,9 @@ class PublishingController extends Controller
      * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
      * - `authors` (array, opcional): Array de IDs de autores
      * - `cover` (file, opcional): Imagen de portada
-     * 
+     *
      * **Nota:** Si se actualiza la traducción en español (language_id=1), el título principal de la publicación también se actualiza automáticamente.
-     * 
+     *
      * ```bash
      * curl -X POST "http://localhost/api/publishings/updatePublishing/1" \
      *   -H "Accept: application/json" \
@@ -680,9 +680,9 @@ class PublishingController extends Controller
      *   -F "authors[]=2" \
      *   -F "cover=@/path/to/cover.jpg"
      * ```
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicación actualizada exitosamente",
@@ -705,19 +705,19 @@ class PublishingController extends Controller
      *     "details": []
      *   }
      * }
-     * 
+     *
      * @response 400 {
      *   "ok": false,
      *   "error": "Bad Request",
      *   "message": "El numero de ID es requerido"
      * }
-     * 
+     *
      * @response 404 {
      *   "ok": false,
      *   "error": "Not Found",
      *   "message": "Publicación no encontrada"
      * }
-     * 
+     *
      * @response 422 {
      *   "ok": false,
      *   "error": "Validation Error",
@@ -727,7 +727,7 @@ class PublishingController extends Controller
      *     "publish_code": ["The publish code format is invalid."]
      *   }
      * }
-     * 
+     *
      * @response 401 {
      *   "message": "Unauthenticated"
      * }
@@ -937,52 +937,52 @@ class PublishingController extends Controller
 
     /**
      * Cambiar estado de archivo de una publicación
-     * 
+     *
      * Alterna el estado de archivo de una publicación entre activo (0) y archivado (1).
      * Las publicaciones archivadas no aparecen en las búsquedas públicas pero pueden ser recuperadas.
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
-     * 
+     *
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID de la publicación. Ejemplo: `1`
-     * 
+     *
      * ```bash
      * curl -X POST "http://localhost/api/publishings/updateStatus/1" \
      *   -H "Accept: application/json" \
      *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
      * ```
-     * 
+     *
      * **Nota:** Este endpoint alterna el estado automáticamente:
      * - Si `is_archived=0` (activo) → cambia a `is_archived=1` (archivado) → mensaje: "Publicación reactivada exitosamente"
      * - Si `is_archived=1` (archivado) → cambia a `is_archived=0` (activo) → mensaje: "Publicación archivada exitosamente"
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicación archivada exitosamente",
      *   "data": null
      * }
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicación reactivada exitosamente",
      *   "data": null
      * }
-     * 
+     *
      * @response 400 {
      *   "ok": false,
      *   "error": "Bad Request",
      *   "message": "El ID de publicación es requerido"
      * }
-     * 
+     *
      * @response 404 {
      *   "ok": false,
      *   "error": "Not Found",
      *   "message": "Publicación no encontrada"
      * }
-     * 
+     *
      * @response 401 {
      *   "message": "Unauthenticated"
      * }
@@ -1012,21 +1012,21 @@ class PublishingController extends Controller
 
     /**
      * Resumen del dashboard
-     * 
+     *
      * Obtiene un resumen estadístico con el conteo total de libros y revistas en el sistema.
      * Útil para mostrar en el dashboard o página principal.
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
-     * 
+     *
      * ```bash
      * curl -X GET "http://localhost/api/publishings/summary" \
      *   -H "Accept: application/json" \
      *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
      * ```
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Resumen del dashboard obtenido correctamente",
@@ -1035,7 +1035,7 @@ class PublishingController extends Controller
      *     "magazines": 87
      *   }
      * }
-     * 
+     *
      * @response 401 {
      *   "message": "Unauthenticated"
      * }
@@ -1062,53 +1062,53 @@ class PublishingController extends Controller
 
     /**
      * Eliminar una publicación
-     * 
+     *
      * Elimina permanentemente una publicación del sistema junto con todas sus relaciones (autores, detalles, traducciones).
      * También elimina la imagen de portada del servidor si existe.
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint requiere un token JWT válido en el header de autorización.
-     * 
+     *
      * **Parámetros de ruta (URL Parameters):**
      * - `id` (integer, requerido): ID de la publicación a eliminar. Ejemplo: `1`
-     * 
+     *
      * ```bash
      * curl -X POST "http://localhost/api/publishings/deletePublishing/1" \
      *   -H "Accept: application/json" \
      *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..."
      * ```
-     * 
-     * **IMPORTANTE:** 
+     *
+     * **IMPORTANTE:**
      * - La publicación DEBE estar archivada (is_archived=1) antes de poder eliminarla.
      * - Esta operación es IRREVERSIBLE y eliminará toda la información relacionada.
      * - Se eliminarán: autores asociados, detalles, traducciones y archivo de portada.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Publicación eliminada exitosamente",
      *   "data": null
      * }
-     * 
+     *
      * @response 400 {
      *   "ok": false,
      *   "error": "Bad Request",
      *   "message": "El ID de publicación es requerido"
      * }
-     * 
+     *
      * @response 400 {
      *   "ok": false,
      *   "error": "Bad Request",
      *   "message": "La publicación debe estar archivada para poder eliminarla"
      * }
-     * 
+     *
      * @response 404 {
      *   "ok": false,
      *   "error": "Not Found",
      *   "message": "Publicación no encontrada"
      * }
-     * 
+     *
      * @response 401 {
      *   "message": "Unauthenticated"
      * }
@@ -1152,21 +1152,21 @@ class PublishingController extends Controller
 
     /**
      * Búsqueda global
-     * 
+     *
      * Realiza una búsqueda global en libros, revistas y artículos por título.
      * Solo retorna resultados de publicaciones activas (is_archived=0).
-     * 
+     *
      * **Autenticación requerida:**
      * Este endpoint NO requiere autenticación (público).
-     * 
+     *
      * **Parámetros de consulta (Query Parameters):**
      * - `search` (string, requerido): Término de búsqueda por título. Ejemplo: `Laravel`
-     * 
+     *
      * ```bash
      * curl -X GET "http://localhost/api/publishings/globalSearch?search=Laravel" \
      *   -H "Accept: application/json"
      * ```
-     * 
+     *
      * @response {
      *   "ok": true,
      *   "message": "Búsqueda global realizada exitosamente",
@@ -1196,7 +1196,7 @@ class PublishingController extends Controller
      *     ]
      *   }
      * }
-     * 
+     *
      * @response 400 {
      *   "ok": false,
      *   "error": "Bad Request",
