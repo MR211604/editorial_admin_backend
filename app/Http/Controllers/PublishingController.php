@@ -37,18 +37,26 @@ class PublishingController extends Controller
         $this->middleware('auth:api')->except(['index', 'searchByURL', 'globalSearch']);
     }
 
-    private function deleteCoverImage($coverPath)
+    private function deleteCoverImage($publishing)
     {
         try {
-            if ($coverPath) {
-                $fullPath = public_path($coverPath);
+            if ($publishing->cover) {
+                $typeFolder = $publishing->publishing_type == 1 ? 'libros' : 'revistas';
+
+                $categoryFolder = 'sin_categoria';
+                if ($publishing->relationLoaded('category') && $publishing->category) {
+                    $categoryFolder = $this->sanitizeFileName($publishing->category->title);
+                }
+
+                $relativePath = "editorial_files/{$typeFolder}/{$categoryFolder}";
+                $fullPath = public_path($relativePath . '/' . $publishing->cover);
+
                 if (file_exists($fullPath)) {
                     unlink($fullPath);
                 }
             }
         } catch (Exception $e) {
-            // Log del error pero no detener la ejecución
-            \Log::warning("No se pudo eliminar la imagen: {$coverPath}");
+            \Log::warning("No se pudo eliminar la imagen: {$publishing->cover}");
         }
     }
 
@@ -107,8 +115,10 @@ class PublishingController extends Controller
             // Mover archivo
             $file->move($fullPath, $fileName);
 
-            // Retornar ruta relativa para guardar en BD
-            return "{$relativePath}/{$fileName}";
+            // Retornar nombre de archivo para guardar en la BD
+            // La ruta relativa sera manejada por el frontend (el servidor de archivos)
+            return $fileName;
+            // return "{$relativePath}/{$fileName}";
 
         } catch (Exception $e) {
             throw new ServerErrorException('Error al almacenar la imagen', null, $e);
@@ -778,23 +788,6 @@ class PublishingController extends Controller
                     // Buscar la publicación con algunas relaciones
                     $publishing = Publishing::with(['category', 'type', 'details', 'translations'])->findOrFail($id);
 
-                    if ($request->hasFile('cover')) {
-                        // Eliminar imagen anterior si existe
-                        if ($publishing->cover) {
-                            $this->deleteCoverImage($publishing->cover);
-                        }
-
-                        // Almacenar nueva imagen y actualizar campo cover con la ruta
-                        $this->storeCoverImage(
-                            $request->file('cover'),
-                            $request->input('publishing_type'),
-                            $request->input('category_id'),
-                            $request->input('title')
-                        );
-
-                        $publishing->cover = $this->sanitizeFileName($request->input('title'));
-                    }
-
                     // Actualizar atributos principales (sin URL, se actualiza solo si hay traducción en español)
                     $updateData = $request->only([
                         'resource_URL',
@@ -804,6 +797,21 @@ class PublishingController extends Controller
                         'category_id',
                         'is_new_arrival',
                     ]);
+
+                    if ($request->hasFile('cover')) {
+                        if ($publishing->cover) {
+                            $this->deleteCoverImage($publishing);
+                        }
+
+                        $coverName = $this->storeCoverImage(
+                            $request->file('cover'),
+                            $request->input('publishing_type'),
+                            $request->input('category_id'),
+                            $request->input('translations')[0]['title'] ? $request->input('translations')[0]['title'] : ''
+                        );
+
+                        $updateData['cover'] = $coverName;
+                    }
 
                     // Procesar traducciones: actualizar título/URL principal si es español y sincronizar todas las traducciones
                     if ($request->has('translations')) {
@@ -868,21 +876,6 @@ class PublishingController extends Controller
                 DB::transaction(function () use ($id, $request, &$publishing) {
                     $publishing = Publishing::with(['category', 'type', 'details', 'translations'])->findOrFail($id);
 
-                    if ($request->hasFile('cover')) {
-                        if ($publishing->cover) {
-                            $this->deleteCoverImage($publishing->cover);
-                        }
-
-                        $coverPath = $this->storeCoverImage(
-                            $request->file('cover'),
-                            $request->input('publishing_type'),
-                            $request->input('category_id'),
-                            $request->input('title')
-                        );
-
-                        $publishing->cover = $coverPath;
-                    }
-
                     // Actualizar atributos principales (sin URL, se actualiza solo si hay traducción en español)
                     $updateData = $request->only([
                         'publish_date',
@@ -894,6 +887,21 @@ class PublishingController extends Controller
                         'is_new_arrival',
                         'category_id',
                     ]);
+
+                    if ($request->hasFile('cover')) {
+                        if ($publishing->cover) {
+                            $this->deleteCoverImage($publishing);
+                        }
+
+                        $coverName = $this->storeCoverImage(
+                            $request->file('cover'),
+                            $request->input('publishing_type'),
+                            $request->input('category_id'),
+                            $request->input('title')
+                        );
+
+                        $updateData['cover'] = $coverName;
+                    }
 
                     // Procesar traducciones: actualizar título/URL principal si es español y sincronizar todas las traducciones
                     if ($request->has('translations')) {
@@ -921,7 +929,7 @@ class PublishingController extends Controller
                 });
             }
 
-            return $this->successResponse($updatedPublishing, 'Publicación actualizada exitosamente', null, 200);
+            return $this->successResponse($publishing, 'Publicación actualizada exitosamente', null, 200);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             throw new NotFoundException('Publicación no encontrada');
@@ -1130,7 +1138,7 @@ class PublishingController extends Controller
             DB::transaction(function () use ($publishing) {
 
                 if ($publishing->cover) {
-                    $this->deleteCoverImage($publishing->cover);
+                    $this->deleteCoverImage($publishing);
                 }
 
                 $publishing->authors()->detach();
