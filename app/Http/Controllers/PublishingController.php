@@ -1161,14 +1161,15 @@ class PublishingController extends Controller
     /**
      * Búsqueda global
      *
-     * Realiza una búsqueda global en libros, revistas y artículos por título.
-     * Solo retorna resultados de publicaciones activas (is_archived=0).
+     * Realiza una búsqueda global de libros por título, código ISBN o nombre/apellido del autor.
+     * Acepta nombre completo del autor (cada palabra puede coincidir con el nombre o el apellido) y no distingue mayúsculas ni acentos.
+     * Solo retorna libros activos (state=1).
      *
      * **Autenticación requerida:**
      * Este endpoint NO requiere autenticación (público).
      *
      * **Parámetros de consulta (Query Parameters):**
-     * - `search` (string, requerido): Término de búsqueda por título. Ejemplo: `Laravel`
+     * - `search` (string, requerido): Término de búsqueda por título, código ISBN o nombre del autor. Ejemplo: `Laravel`
      *
      * ```bash
      * curl -X GET "http://localhost/api/publishings/globalSearch?search=Laravel" \
@@ -1186,21 +1187,6 @@ class PublishingController extends Controller
      *         "URL": "laravel_para_principiantes",
      *         "resource_URL": "https://example.com/laravel.pdf"
      *       }
-     *     ],
-     *     "revistas": [
-     *       {
-     *         "idPublishing": 5,
-     *         "title": "Revista Laravel Magazine",
-     *         "URL": "revista_laravel_magazine",
-     *         "resource_URL": "https://example.com/magazine.pdf"
-     *       }
-     *     ],
-     *     "articulos": [
-     *       {
-     *         "idPublishingDetail": 10,
-     *         "title": "Introducción a Laravel",
-     *         "URL": "introduccion-a-laravel"
-     *       }
      *     ]
      *   }
      * }
@@ -1214,7 +1200,7 @@ class PublishingController extends Controller
     public function globalSearch(Request $request)
     {
       try {
-        $query = $request->query("search", "");
+        $query = trim($request->query("search", ""));
   
         if (empty($query)) {
           throw new BadRequestException("El parámetro de búsqueda es requerido");
@@ -1222,17 +1208,23 @@ class PublishingController extends Controller
   
         $libroTypeId = PublishingType::where("name", "Libro")->value("idPublishingType");
   
-        // Buscar libros (publishing_type = 1) por título, ISBN o nombre del autor
+        $terms = preg_split("/\s+/", $query, -1, PREG_SPLIT_NO_EMPTY);
+
+        // Buscar libros (publishing_type = 1) por título, ISBN o nombre completo del autor
         $libros = Publishing::where("publishing_type", $libroTypeId)
-          ->where(function ($q) use ($query) {
+          ->where(function ($q) use ($query, $terms) {
             $q->where("title", "like", "%" . $query . "%")
               ->orWhere("publish_code", "like", "%" . $query . "%")
-              ->orWhereHas("authors", function ($a) use ($query) {
-                $a->where("name", "like", "%" . $query . "%")->orWhere(
-                  "lastname",
-                  "like",
-                  "%" . $query . "%"
-                );
+              ->orWhereHas("authors", function ($a) use ($terms) {
+                foreach ($terms as $term) {
+                  $a->where(function ($t) use ($term) {
+                    $t->where("name", "like", "%" . $term . "%")->orWhere(
+                      "lastname",
+                      "like",
+                      "%" . $term . "%"
+                    );
+                  });
+                }
               });
           })
           ->where("state", 1)
