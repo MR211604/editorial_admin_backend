@@ -1213,58 +1213,51 @@ class PublishingController extends Controller
      */
     public function globalSearch(Request $request)
     {
-        try {
-            $query = $request->query('search', '');
-
-            if (empty($query)) {
-                throw new BadRequestException('El parámetro de búsqueda es requerido');
-            }
-
-            $publishing_type = PublishingType::whereIn('name', ['Libro', 'Revista'])->pluck('idPublishingType', 'name');
-
-            // Buscar libros (publishing_type = 1)
-            $libros = Publishing::where('publishing_type', $publishing_type['Libro'])
-                ->where(function ($q) use ($query) {
-                    $q->where('title', 'like', '%' . $query . '%')
-                        ->orWhere('publish_code', 'like', '%' . $query . '%');
-                })
-                ->where('state', 1)
-                ->select('idPublishing', 'title', 'URL', 'resource_URL')
-                ->get();
-
-            // Buscar revistas (publishing_type = 2)
-            $revistas = Publishing::where('publishing_type', $publishing_type['Revista'])
-                ->where(function ($q) use ($query) {
-                    $q->where('title', 'like', '%' . $query . '%')
-                        ->orWhere('publish_code', 'like', '%' . $query . '%');
-                })
-                ->where('state', 1)
-                ->select('idPublishing', 'title', 'URL', 'resource_URL')
-                ->get();
-
-            // Buscar artículos en PublishingDetail
-            $articulos = \App\PublishingDetail::whereHas('publishing', function ($q) {
-                $q->where('state', 1); // Solo artículos de publicaciones activas
-            })
-                ->where('title', 'like', '%' . $query . '%')
-                ->select('idPublishingDetail', 'title', 'URL')
-                ->get();
-
-            $data = [
-                'libros' => $libros,
-                'revistas' => $revistas,
-                'articulos' => $articulos
-            ];
-
-            return $this->successResponse($data, 'Búsqueda global realizada exitosamente');
-
-        } catch (ValidationException $e) {
-            throw $e;
-        } catch (\App\Exceptions\ApiException $e) {
-            throw $e;
-        } catch (Exception $e) {
-            throw new ServerErrorException('Error al buscar las publicaciones', null, $e);
+      try {
+        $query = $request->query("search", "");
+  
+        if (empty($query)) {
+          throw new BadRequestException("El parámetro de búsqueda es requerido");
         }
+  
+        $libroTypeId = PublishingType::where("name", "Libro")->value("idPublishingType");
+  
+        // Buscar libros (publishing_type = 1) por título, ISBN o nombre del autor
+        $libros = Publishing::where("publishing_type", $libroTypeId)
+          ->where(function ($q) use ($query) {
+            $q->where("title", "like", "%" . $query . "%")
+              ->orWhere("publish_code", "like", "%" . $query . "%")
+              ->orWhereHas("authors", function ($a) use ($query) {
+                $a->where("name", "like", "%" . $query . "%")->orWhere(
+                  "lastname",
+                  "like",
+                  "%" . $query . "%"
+                );
+              });
+          })
+          ->where("state", 1)
+          ->select("idPublishing", "title", "URL", "resource_URL")
+          ->get();
+  
+        $data = [
+          "libros" => $libros,
+        ];
+  
+        return $this->successResponse(
+          $data,
+          "Búsqueda global realizada exitosamente"
+        );
+      } catch (ValidationException $e) {
+        throw $e;
+      } catch (\App\Exceptions\ApiException $e) {
+        throw $e;
+      } catch (Exception $e) {
+        throw new ServerErrorException(
+          "Error al buscar las publicaciones",
+          null,
+          $e
+        );
+      }
     }
 
 }
