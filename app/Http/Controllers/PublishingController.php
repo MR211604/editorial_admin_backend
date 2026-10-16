@@ -60,6 +60,20 @@ class PublishingController extends Controller
         }
     }
 
+    private function getCategoryWithDescendantIds($categoryId)
+    {
+        $ids = [$categoryId];
+        $level = [$categoryId];
+
+        while (!empty($level)) {
+            $children = \App\Category::whereIn('main_category', $level)->pluck('idCategory')->all();
+            $level = array_values(array_diff($children, $ids));
+            $ids = array_merge($ids, $level);
+        }
+
+        return $ids;
+    }
+
     private function sanitizeFileName($name)
     {
         // Convertir a minúsculas
@@ -138,8 +152,8 @@ class PublishingController extends Controller
      * - `limit` (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: `10`
      * - `publishing_type` (string, opcional): Nombre del tipo de publicación (Libro, Revista). Ejemplo: `Libro`
      * - `language_id` (integer, opcional): ID del idioma para las traducciones. Por defecto: 1. Ejemplo: `1`
-     * - `search` (string, opcional): Búsqueda por título. Ejemplo: `Laravel`
-     * - `category` (integer, opcional): Filtrar por ID de categoría. Ejemplo: `3`
+     * - `search` (string, opcional): Búsqueda por título, código ISBN o nombre/apellido del autor. Ejemplo: `Laravel`
+     * - `category` (integer, opcional): Filtrar por ID de categoría (incluye sus subcategorías). Ejemplo: `3`
      * - `is_archived` (integer, opcional): Filtrar por estado (0=Activo, 1=Archivado). Ejemplo: `0`
      * - `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at). Ejemplo: `title:asc`
      *
@@ -239,9 +253,19 @@ class PublishingController extends Controller
             ]);
 
             if ($search) {
-                $query->where(function ($q) use ($search) {
+                $terms = preg_split("/\s+/", trim($search), -1, PREG_SPLIT_NO_EMPTY);
+
+                $query->where(function ($q) use ($search, $terms) {
                     $q->where('title', 'like', '%' . $search . '%')
-                        ->orWhere('publish_code', 'like', '%' . $search . '%');
+                        ->orWhere('publish_code', 'like', '%' . $search . '%')
+                        ->orWhereHas('authors', function ($a) use ($terms) {
+                            foreach ($terms as $term) {
+                                $a->where(function ($t) use ($term) {
+                                    $t->where('name', 'like', '%' . $term . '%')
+                                        ->orWhere('lastname', 'like', '%' . $term . '%');
+                                });
+                            }
+                        });
                 });
             }
 
@@ -249,8 +273,8 @@ class PublishingController extends Controller
                 $query->where('state', $isArchived);
             }
 
-            if ($category) {
-                $query->where('category_id', $category);
+            if ($category && is_numeric($category)) {
+                $query->whereIn('category_id', $this->getCategoryWithDescendantIds((int) $category));
             }
 
             //Obtener el ID del tipo de publicación
