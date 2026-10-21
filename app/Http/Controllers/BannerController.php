@@ -212,21 +212,19 @@ class BannerController extends Controller
 
       $validator = Validator::make($request->all(), [
         'title' => 'required|string|max:255',
-        'resourceURL' => [
-          'required',
-          'url',
-          'max:255',
-          'unique:banners,resourceURL',
-          function ($attribute, $value, $fail) {
-            if (!$this->isSupportedVideoURL($value)) {
-              $fail('La URL debe pertenecer a YouTube, TikTok, Facebook o Instagram.');
-            }
-          },
-        ],
+        'resourceURL' => 'required|url|max:255|unique:banners,resourceURL',
         'state' => 'required|boolean',
       ]);
 
       if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
+
+      if (!$this->isSupportedVideoURL($request->input('resourceURL'))) {
+        $validator->errors()->add(
+          'resourceURL',
+          'La URL debe pertenecer a YouTube, TikTok, Facebook o Instagram.'
+        );
         throw new ValidationException($validator);
       }
 
@@ -338,21 +336,19 @@ class BannerController extends Controller
 
       $validator = Validator::make($request->all(), [
         'title' => 'required|string|max:255',
-        'resourceURL' => [
-          'required',
-          'url',
-          'max:255',
-          'unique:banners,resourceURL,' . $id . ',idBanner',
-          function ($attribute, $value, $fail) {
-            if (!$this->isSupportedVideoURL($value)) {
-              $fail('La URL debe pertenecer a YouTube, TikTok, Facebook o Instagram.');
-            }
-          },
-        ],
+        'resourceURL' => 'required|url|max:255|unique:banners,resourceURL,' . $id . ',idBanner',
         'state' => 'required|boolean',
       ]);
 
       if ($validator->fails()) {
+        throw new ValidationException($validator);
+      }
+
+      if (!$this->isSupportedVideoURL($request->input('resourceURL'))) {
+        $validator->errors()->add(
+          'resourceURL',
+          'La URL debe pertenecer a YouTube, TikTok, Facebook o Instagram.'
+        );
         throw new ValidationException($validator);
       }
 
