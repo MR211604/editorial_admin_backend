@@ -79,6 +79,7 @@ Route::group(['middleware' => ['api'], 'prefix' => 'categoryTypes'], function ()
 
 Route::group(['middleware' => ['api'], 'prefix' => 'banners'], function () {
     Route::get('getBanners', 'BannerController@index');
+    Route::get('getActiveBanner', 'BannerController@getActiveBanner');
     Route::get('getLastActiveBanner', 'BannerController@getLastActiveBanner');
     Route::post('createBanner', 'BannerController@create');
     Route::post('updateBanner/{id?}', 'BannerController@update');

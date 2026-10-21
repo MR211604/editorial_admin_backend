@@ -26,7 +26,7 @@ class BannerController extends Controller
 
   public function __construct()
   {
-    $this->middleware('auth:api')->except(['getLastActiveBanner']);
+    $this->middleware('auth:api')->except(['getActiveBanner', 'getLastActiveBanner']);
   }
 
   /**
@@ -59,7 +59,7 @@ class BannerController extends Controller
    *     {
    *       "idBanner": 1,
    *       "title": "Promoción 2025",
-   *       "resourceURL": "https://example.com/banner1.jpg",
+    *       "resourceURL": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
    *       "state": 1,
    *       "created_at": "2025-11-15 10:30:00",
    *       "updated_at": "2025-11-15 10:30:00"
@@ -157,13 +157,13 @@ class BannerController extends Controller
    * 
    * **Parámetros del Body:**
    * - `title` (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: `Promoción 2025`
-   * - `resourceURL` (string, requerido): URL del recurso/imagen (debe ser única y válida). Ejemplo: `https://example.com/banner1.jpg`
+    * - `resourceURL` (string, requerido): URL única del video de YouTube, TikTok, Facebook o Instagram (máximo 255 caracteres).
    * - `state` (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: `1`
    * 
    * ```json
    * {
    *   "title": "Promoción 2025",
-   *   "resourceURL": "https://example.com/banner1.jpg",
+    *   "resourceURL": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
    *   "state": 1
    * }
    * ```
@@ -173,7 +173,7 @@ class BannerController extends Controller
    *   -H "Accept: application/json" \
    *   -H "Content-Type: application/json" \
    *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-   *   -d '{"title":"Promoción 2025","resourceURL":"https://example.com/banner1.jpg","state":1}'
+    *   -d '{"title":"Video editorial","resourceURL":"https://www.youtube.com/watch?v=dQw4w9WgXcQ","state":1}'
    * ```
    * 
    * @authenticated
@@ -184,7 +184,7 @@ class BannerController extends Controller
    *   "data": {
    *     "idBanner": 1,
    *     "title": "Promoción 2025",
-   *     "resourceURL": "https://example.com/banner1.jpg",
+    *     "resourceURL": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
    *     "state": 1,
    *     "created_at": "2025-11-15 10:30:00",
    *     "updated_at": "2025-11-15 10:30:00"
@@ -212,7 +212,17 @@ class BannerController extends Controller
 
       $validator = Validator::make($request->all(), [
         'title' => 'required|string|max:255',
-        'resourceURL' => 'required|url|unique:banners,resourceURL',
+        'resourceURL' => [
+          'required',
+          'url',
+          'max:255',
+          'unique:banners,resourceURL',
+          function ($attribute, $value, $fail) {
+            if (!$this->isSupportedVideoURL($value)) {
+              $fail('La URL debe pertenecer a YouTube, TikTok, Facebook o Instagram.');
+            }
+          },
+        ],
         'state' => 'required|boolean',
       ]);
 
@@ -221,6 +231,10 @@ class BannerController extends Controller
       }
 
       $createdBanner = DB::transaction(function () use ($request) {
+        if ((int) $request->input('state') === 1) {
+          Banner::where('state', 1)->update(['state' => 0]);
+        }
+
         $banner = Banner::create([
           'title' => $request->input('title'),
           'resourceURL' => $request->input('resourceURL'),
@@ -253,13 +267,13 @@ class BannerController extends Controller
    * 
    * **Parámetros del Body (JSON o Form Data):**
    * - `title` (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: `Promoción Actualizada 2025`
-   * - `resourceURL` (string, requerido): URL del recurso/imagen (debe ser única y válida excepto para el ID actual). Ejemplo: `https://example.com/banner_actualizado.jpg`
+    * - `resourceURL` (string, requerido): URL única del video de YouTube, TikTok, Facebook o Instagram (máximo 255 caracteres).
    * - `state` (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: `0`
    * 
    * ```json
    * {
    *   "title": "Promoción Actualizada 2025",
-   *   "resourceURL": "https://example.com/banner_actualizado.jpg",
+    *   "resourceURL": "https://www.instagram.com/reel/C0UDBvideo/",
    *   "state": 0
    * }
    * ```
@@ -269,7 +283,7 @@ class BannerController extends Controller
    *   -H "Accept: application/json" \
    *   -H "Content-Type: application/json" \
    *   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-   *   -d '{"title":"Promoción Actualizada 2025","resourceURL":"https://example.com/banner_actualizado.jpg","state":0}'
+    *   -d '{"title":"Video editorial actualizado","resourceURL":"https://www.instagram.com/reel/C0UDBvideo/","state":0}'
    * ```
    * 
    * @authenticated
@@ -280,7 +294,7 @@ class BannerController extends Controller
    *   "data": {
    *     "idBanner": 1,
    *     "title": "Promoción Actualizada 2025",
-   *     "resourceURL": "https://example.com/banner_actualizado.jpg",
+    *     "resourceURL": "https://www.instagram.com/reel/C0UDBvideo/",
    *     "state": 0,
    *     "created_at": "2025-11-15 10:30:00",
    *     "updated_at": "2025-11-15 11:30:00"
@@ -324,7 +338,17 @@ class BannerController extends Controller
 
       $validator = Validator::make($request->all(), [
         'title' => 'required|string|max:255',
-        'resourceURL' => 'required|url|unique:banners,resourceURL,' . $id . ',idBanner',
+        'resourceURL' => [
+          'required',
+          'url',
+          'max:255',
+          'unique:banners,resourceURL,' . $id . ',idBanner',
+          function ($attribute, $value, $fail) {
+            if (!$this->isSupportedVideoURL($value)) {
+              $fail('La URL debe pertenecer a YouTube, TikTok, Facebook o Instagram.');
+            }
+          },
+        ],
         'state' => 'required|boolean',
       ]);
 
@@ -334,6 +358,12 @@ class BannerController extends Controller
 
       $updatedBanner = DB::transaction(function () use ($request, $id) {
         $banner = Banner::findOrFail($id);
+        if ((int) $request->input('state') === 1 || (int) $banner->state === 1) {
+          Banner::where('state', 1)
+            ->where('idBanner', '!=', $id)
+            ->update(['state' => 0]);
+        }
+
         $banner->title = $request->input('title');
         $banner->resourceURL = $request->input('resourceURL');
         $banner->state = $request->input('state');
@@ -409,9 +439,24 @@ class BannerController extends Controller
         throw new BadRequestException('El numero de ID es requerido');
       }
 
-      $banner = Banner::findOrFail($id);
-      $banner->state = !$banner->state;
-      $banner->save();
+      $banner = DB::transaction(function () use ($id) {
+        $banner = Banner::findOrFail($id);
+
+        if ($banner->state) {
+          Banner::where('state', 1)
+            ->where('idBanner', '!=', $id)
+            ->update(['state' => 0]);
+          $banner->state = 0;
+        } else {
+          Banner::where('state', 1)
+            ->where('idBanner', '!=', $id)
+            ->update(['state' => 0]);
+          $banner->state = 1;
+        }
+
+        $banner->save();
+        return $banner;
+      });
 
       return $this->successResponse($banner, 'Estado del banner actualizado correctamente', null, 200);
 
@@ -425,9 +470,9 @@ class BannerController extends Controller
   }
 
   /**
-   * Obtener el ultimo banner activo
+   * Obtener el único video activo
    * 
-   * Retorna el último banner que se encuentra en estado activo, ordenado por ID descendente.
+   * Retorna el video que se encuentra activo. Las operaciones de escritura mantienen un único video activo.
    * 
    * **Autenticación requerida:**
    * Este endpoint NO requiere autenticación (público).
@@ -443,20 +488,17 @@ class BannerController extends Controller
    *   "data": {
    *     "idBanner": 5,
    *     "title": "Gran Promoción",
-   *     "resourceURL": "https://example.com/banner_new.jpg",
+    *     "resourceURL": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
    *     "state": 1,
    *     "created_at": "2025-11-15 10:30:00",
    *     "updated_at": "2025-11-15 10:30:00"
    *   }
    * }
    */
-  public function getLastActiveBanner()
+  public function getActiveBanner()
   {
     try {
-
-      // Obteniendo el ultimo banner activo
-      $banner = Banner::where('state', 1)->orderBy('idBanner', 'desc')->first();
-
+      $banner = Banner::where('state', 1)->first();
       return $this->successResponse($banner);
 
     } catch (ValidationException $e) {
@@ -466,6 +508,57 @@ class BannerController extends Controller
     } catch (Exception $e) {
       throw new ServerErrorException('Error al obtener los banner', null, $e);
     }
+  }
+
+  /**
+   * Compatibilidad con clientes que todavía consumen el endpoint anterior.
+   */
+  public function getLastActiveBanner()
+  {
+    return $this->getActiveBanner();
+  }
+
+  private function isSupportedVideoURL($resourceURL)
+  {
+    $host = strtolower(parse_url($resourceURL, PHP_URL_HOST) ?: '');
+    $path = parse_url($resourceURL, PHP_URL_PATH) ?: '';
+    $query = [];
+    parse_str(parse_url($resourceURL, PHP_URL_QUERY) ?: '', $query);
+
+    if ($this->isURLHost($host, 'youtube.com')) {
+      return isset($query['v'])
+        || preg_match('~^/[\\w-]{11}/?$~', $path)
+        || preg_match('~^/(shorts|embed|live)/[\\w-]{11}~', $path);
+    }
+
+    if ($host === 'youtu.be' || substr($host, -strlen('.youtu.be')) === '.youtu.be') {
+      return preg_match('~^/[\\w-]{11}/?$~', $path);
+    }
+
+    if ($this->isURLHost($host, 'tiktok.com')) {
+      return preg_match('~/@[^/]+/video/\\d+~', $path);
+    }
+
+    if ($this->isURLHost($host, 'instagram.com')) {
+      return preg_match('~/(reel|p|tv)/[\\w-]+~', $path);
+    }
+
+    if ($this->isURLHost($host, 'fb.watch')) {
+      return true;
+    }
+
+    if ($this->isURLHost($host, 'facebook.com')) {
+      return isset($query['v'])
+        || preg_match('~/(videos|reel)/[^/]+~', $path)
+        || preg_match('~/share/(v|r)/[^/]+~', $path);
+    }
+
+    return false;
+  }
+
+  private function isURLHost($host, $domain)
+  {
+    return $host === $domain || substr($host, -strlen('.' . $domain)) === '.' . $domain;
   }
 
 }
