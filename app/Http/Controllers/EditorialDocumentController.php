@@ -6,6 +6,7 @@ use App\EditorialDocument;
 use App\Exceptions\BadRequestException;
 use App\Exceptions\ServerErrorException;
 use App\Http\Traits\ApiResponse;
+use App\Http\Traits\NormalizesMdxImages;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +15,7 @@ use Illuminate\Validation\ValidationException;
 class EditorialDocumentController extends Controller
 {
     use ApiResponse;
+    use NormalizesMdxImages;
 
     public function __construct()
     {
@@ -107,7 +109,7 @@ class EditorialDocumentController extends Controller
             $document = EditorialDocument::create([
                 'title' => $request->input('title'),
                 'slug' => $request->input('slug'),
-                'content' => $request->input('content', ''),
+                'content' => $this->normalizeMdxImageUrls($request->input('content', '')),
                 'state' => $request->input('state', 1),
                 'sort_order' => $request->input('sort_order', 0),
             ]);
@@ -142,7 +144,11 @@ class EditorialDocumentController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $document->update($request->only(['title', 'slug', 'content', 'state', 'sort_order']));
+            $documentData = $request->only(['title', 'slug', 'content', 'state', 'sort_order']);
+            if (array_key_exists('content', $documentData)) {
+                $documentData['content'] = $this->normalizeMdxImageUrls($documentData['content']);
+            }
+            $document->update($documentData);
 
             return $this->successResponse($document->fresh(), 'Documento actualizado correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -206,8 +212,7 @@ class EditorialDocumentController extends Controller
             $file->move($fullPath, $fileName);
 
             return $this->successResponse([
-                'path' => $relativePath . '/' . $fileName,
-                'url' => url($relativePath . '/' . $fileName),
+                'filename' => $fileName,
             ], 'Imagen subida correctamente');
         } catch (ValidationException $e) {
             throw $e;

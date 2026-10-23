@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Http\Traits\ApiResponse;
+use App\Http\Traits\NormalizesMdxImages;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use App\Exceptions\BadRequestException;
@@ -21,6 +22,7 @@ class CategoryController extends Controller
 {
 
   use ApiResponse;
+  use NormalizesMdxImages;
 
   /**
    * Constructor (middleware)
@@ -472,6 +474,7 @@ class CategoryController extends Controller
           'process',
           'contact'
         ]);
+        $detailFields = $this->normalizeMdxImageFields($detailFields);
 
         // Si hay campos de detalle para actualizar
         if (!empty(array_filter($detailFields))) {
@@ -675,7 +678,7 @@ class CategoryController extends Controller
    *   "ok": true,
    *   "message": "Imagen subida correctamente",
    *   "data": {
-   *     "url": "http://localhost/imagescontent/ciencias_123456_uniqid.jpg"
+    *     "filename": "ciencias_123456_uniqid.jpg"
    *   }
    * }
    */
@@ -715,10 +718,9 @@ class CategoryController extends Controller
       $file->move($fullPath, $fileName);
 
       // Retornar respuesta JSON
-      return $this->successResponse([
-        'path' => "{$relativePath}/{$fileName}",
-        'url' => url("{$relativePath}/{$fileName}")
-      ], 'Imagen subida correctamente');
+       return $this->successResponse([
+         'filename' => $fileName
+       ], 'Imagen subida correctamente');
 
     } catch (ValidationException $e) {
       throw $e;

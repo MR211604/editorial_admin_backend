@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 use App\Exceptions\BadRequestException;
 use App\Http\Traits\ApiResponse;
+use App\Http\Traits\NormalizesMdxImages;
 use App\PublishingDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class PublishingDetailController extends Controller
 {
 
   use ApiResponse;
+  use NormalizesMdxImages;
 
   /**
    * Constructor (middleware)
@@ -129,6 +131,9 @@ class PublishingDetailController extends Controller
       }
 
       $data = $request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id', 'language_id']);
+      if (array_key_exists('summary', $data)) {
+        $data['summary'] = $this->normalizeMdxImageUrls($data['summary']);
+      }
 
       $publishingDetail = PublishingDetail::create($data);
 
@@ -242,7 +247,11 @@ class PublishingDetailController extends Controller
         throw new NotFoundException('Detalle de publicación no encontrado');
       }
 
-      $publishingDetail->update($request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']));
+      $detailData = $request->only(['title', 'summary', 'URL', 'repository_URL', 'publishing_id']);
+      if (array_key_exists('summary', $detailData)) {
+        $detailData['summary'] = $this->normalizeMdxImageUrls($detailData['summary']);
+      }
+      $publishingDetail->update($detailData);
 
       return $this->successResponse($publishingDetail);
     } catch (ValidationException $e) {

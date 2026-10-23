@@ -50,9 +50,11 @@ class EditorialLocationController extends Controller
     public function create(Request $request)
     {
         try {
+            $request->merge(['image' => $this->normalizeImagePath($request->input('image'))]);
+
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'image' => 'required|string|max:2048',
+                'image' => ['required', 'string', 'max:2048', 'regex:/^(?:[A-Za-z0-9_-][A-Za-z0-9._-]*|img\/logos_ubicaciones\/[A-Za-z0-9_-][A-Za-z0-9._-]*)$/'],
                 'address' => 'required|string|max:500',
                 'mapsQuery' => 'required|string|max:500',
                 'state' => 'required|boolean',
@@ -85,9 +87,10 @@ class EditorialLocationController extends Controller
             }
 
             $location = EditorialLocation::findOrFail($id);
+            $request->merge(['image' => $this->normalizeImagePath($request->input('image'))]);
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'image' => 'required|string|max:2048',
+                'image' => ['required', 'string', 'max:2048', 'regex:/^(?:[A-Za-z0-9_-][A-Za-z0-9._-]*|img\/logos_ubicaciones\/[A-Za-z0-9_-][A-Za-z0-9._-]*)$/'],
                 'address' => 'required|string|max:500',
                 'mapsQuery' => 'required|string|max:500',
                 'state' => 'required|boolean',
@@ -164,13 +167,31 @@ class EditorialLocationController extends Controller
             $file->move($fullPath, $fileName);
 
             return $this->successResponse([
-                'path' => $relativePath . '/' . $fileName,
-                'url' => url($relativePath . '/' . $fileName),
+                'filename' => $fileName,
             ], 'Logo subido correctamente');
         } catch (ValidationException $e) {
             throw $e;
         } catch (Exception $e) {
             throw new ServerErrorException('Error al almacenar el logo de la ubicación', null, $e);
         }
+    }
+
+    private function normalizeImagePath($image)
+    {
+        if (!is_string($image)) {
+            return $image;
+        }
+
+        $path = parse_url($image, PHP_URL_PATH);
+        if (!is_string($path)) {
+            return $image;
+        }
+
+        $path = ltrim($path, '/');
+        $locationPathIndex = strpos($path, 'imageslocations/');
+
+        return $locationPathIndex === false
+            ? $path
+            : substr($path, $locationPathIndex + strlen('imageslocations/'));
     }
 }
