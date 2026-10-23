@@ -97,6 +97,15 @@ Route::group(['middleware' => ['api'], 'prefix' => 'documents'], function () {
     Route::post('uploadDocumentImage', 'EditorialDocumentController@uploadImage');
 });
 
+Route::group(['middleware' => ['api'], 'prefix' => 'locations'], function () {
+    Route::get('getLocations', 'EditorialLocationController@index');
+    Route::get('getActiveLocations', 'EditorialLocationController@active');
+    Route::post('createLocation', 'EditorialLocationController@create');
+    Route::post('updateLocation/{id?}', 'EditorialLocationController@update');
+    Route::post('toggleState/{id?}', 'EditorialLocationController@toggleState');
+    Route::post('uploadLocationImage', 'EditorialLocationController@uploadImage');
+});
+
 Route::group(['middleware' => ['api'], 'prefix' => 'emails'], function () {
     Route::get('getEmails', 'EmailController@index');
     Route::post('saveEmail', 'EmailController@saveEmail');

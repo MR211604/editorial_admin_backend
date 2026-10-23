@@ -237,3 +237,27 @@ values
     ('Publicacion para revista', 'publicacion-para-revista', '', 1, 3, current_timestamp, current_timestamp),
     ('Consejo editorial', 'consejo-editorial', '', 1, 4, current_timestamp, current_timestamp);
 
+create table editorial_locations
+(
+    idLocation int unsigned auto_increment
+        primary key,
+    name varchar(255) not null,
+    image varchar(2048) not null,
+    address varchar(500) not null,
+    mapsQuery varchar(500) not null,
+    state tinyint(1) default 1 not null,
+    sort_order int unsigned default 0 not null,
+    created_at timestamp null,
+    updated_at timestamp null
+);
+
+insert into editorial_locations (name, image, address, mapsQuery, state, sort_order, created_at, updated_at)
+values
+    ('Universidad Don Bosco', 'img/logos_ubicaciones/udb.png', 'Campus Soyapango y Campus Antiguo Cuscatlán', 'Universidad Don Bosco Campus Soyapango El Salvador', 1, 1, current_timestamp, current_timestamp),
+    ('Librería y papelería UCA', 'img/logos_ubicaciones/libUCA.png', 'San Salvador – Campus UCA y Antiguo Cuscatlán – SOHO Cascadas', 'Librería y papelería UCA San Salvador El Salvador', 1, 2, current_timestamp, current_timestamp),
+    ('La Ceiba', 'img/logos_ubicaciones/laceiba.png', 'La Ceiba Sucursales', 'La Ceiba librería El Salvador', 1, 3, current_timestamp, current_timestamp),
+    ('Clásicos Roskil', 'img/logos_ubicaciones/roskil.png', '4a Avenida Sur, Santa Tecla', 'Clásicos Roskil Santa Tecla El Salvador', 1, 4, current_timestamp, current_timestamp),
+    ('Gize Bakery', 'img/logos_ubicaciones/gize.png', 'Av. 14 de Julio, Reparto Los Héroes, San Salvador', 'Gize Bakery Reparto Los Héroes San Salvador El Salvador', 1, 5, current_timestamp, current_timestamp),
+    ('La Biblioteca Café', 'img/logos_ubicaciones/bibliocafe.png', 'Presidente Plaza, BINAES – Centro Histórico', 'La Biblioteca Café Presidente Plaza BINAES San Salvador', 1, 6, current_timestamp, current_timestamp),
+    ('American Coffeeshop', 'img/logos_ubicaciones/coffeeshop.png', 'Calle Chiltiupán #30, Ciudad Merliot', 'American Coffeeshop Calle Chiltiupán Ciudad Merliot El Salvador', 1, 7, current_timestamp, current_timestamp);
+
