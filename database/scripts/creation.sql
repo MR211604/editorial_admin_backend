@@ -216,3 +216,24 @@ create index user_id
 create index rol_id
     on users (rol_id);
 
+create table editorial_documents
+(
+    idDocument int unsigned auto_increment
+        primary key,
+    title varchar(255) not null,
+    slug varchar(191) not null,
+    content longtext null,
+    state tinyint(1) default 1 not null,
+    sort_order int unsigned default 0 not null,
+    created_at timestamp null,
+    updated_at timestamp null,
+    constraint editorial_documents_slug_unique unique (slug)
+);
+
+insert into editorial_documents (title, slug, content, state, sort_order, created_at, updated_at)
+values
+    ('Reglamento', 'reglamento', '', 1, 1, current_timestamp, current_timestamp),
+    ('Procedimientos de publicación', 'procedimientos-de-publicacion', '', 1, 2, current_timestamp, current_timestamp),
+    ('Publicacion para revista', 'publicacion-para-revista', '', 1, 3, current_timestamp, current_timestamp),
+    ('Consejo editorial', 'consejo-editorial', '', 1, 4, current_timestamp, current_timestamp);
+

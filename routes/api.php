@@ -86,6 +86,17 @@ Route::group(['middleware' => ['api'], 'prefix' => 'banners'], function () {
     Route::post('toggleState/{id?}', 'BannerController@toggleState');
 });
 
+Route::group(['middleware' => ['api'], 'prefix' => 'documents'], function () {
+    Route::get('getDocuments', 'EditorialDocumentController@index');
+    Route::get('getActiveDocuments', 'EditorialDocumentController@active');
+    Route::get('getDocument/{id?}', 'EditorialDocumentController@find');
+    Route::get('searchDocument/{slug?}', 'EditorialDocumentController@findBySlug');
+    Route::post('createDocument', 'EditorialDocumentController@create');
+    Route::post('updateDocument/{id?}', 'EditorialDocumentController@update');
+    Route::post('toggleState/{id?}', 'EditorialDocumentController@toggleState');
+    Route::post('uploadDocumentImage', 'EditorialDocumentController@uploadImage');
+});
+
 Route::group(['middleware' => ['api'], 'prefix' => 'emails'], function () {
     Route::get('getEmails', 'EmailController@index');
     Route::post('saveEmail', 'EmailController@saveEmail');
