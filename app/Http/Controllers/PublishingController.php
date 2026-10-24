@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
  */
 class PublishingController extends Controller
 {
+    const MAX_COVER_SIZE_BYTES = 5000000;
 
     use ApiResponse;
     use SearchFilter;
@@ -137,6 +138,17 @@ class PublishingController extends Controller
         } catch (Exception $e) {
             throw new ServerErrorException('Error al almacenar la imagen', null, $e);
         }
+    }
+
+    private function addCoverSizeLimit($validator, Request $request)
+    {
+        $validator->after(function ($validator) use ($request) {
+            $cover = $request->file('cover');
+
+            if ($cover && $cover->isValid() && $cover->getSize() > self::MAX_COVER_SIZE_BYTES) {
+                $validator->errors()->add('cover', 'La portada no debe superar 5 MB.');
+            }
+        });
     }
 
     /**
@@ -676,7 +688,7 @@ class PublishingController extends Controller
      * - `translations[].language_id` (integer, requerido): ID del idioma
      * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
      * - `authors` (array, opcional): Array de IDs de autores. Ejemplo: `[1, 2]`
-     * - `cover` (file, opcional): Imagen de portada (JPEG, PNG)
+     * - `cover` (file, opcional): Imagen de portada JPG/PNG, máximo 5.000.000 bytes
      *
      * **Parámetros del Body (para Revistas - publishing_type=2):**
      * - `publishing_type` (integer, requerido): Debe ser 2 para revistas
@@ -694,7 +706,7 @@ class PublishingController extends Controller
      * - `translations[].language_id` (integer, requerido): ID del idioma
      * - `translations[].title` (string, requerido): Título traducido (máximo 255 caracteres)
      * - `authors` (array, opcional): Array de IDs de autores
-     * - `cover` (file, opcional): Imagen de portada
+     * - `cover` (file, opcional): Imagen de portada JPG/PNG, máximo 5.000.000 bytes
      *
      * **Nota:** Si se actualiza la traducción en español (language_id=1), el título principal de la publicación también se actualiza automáticamente.
      *
@@ -777,6 +789,11 @@ class PublishingController extends Controller
 
             $updatedPublishing = Publishing::with(['authors', 'category', 'type', 'details'])->findOrFail($id);
             $publishingTypeName = PublishingType::where('idPublishingType', $request->input('publishing_type'))->firstOrFail()->name;
+            $coverRules = 'nullable|image|mimes:jpg,jpeg,png';
+            $coverMessages = [
+                'cover.image' => 'La portada debe ser una imagen válida.',
+                'cover.mimes' => 'La portada debe estar en formato JPG o PNG.',
+            ];
 
             //! Operacion para los libros
             if ($publishingTypeName == "Libro") {
@@ -801,8 +818,9 @@ class PublishingController extends Controller
                     'translations.*.title' => 'required|string|max:255',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,idAuthor',
-                    'cover' => 'nullable',
-                ]);
+                    'cover' => $coverRules,
+                ], $coverMessages);
+                $this->addCoverSizeLimit($validator, $request);
 
                 if ($validator->fails()) {
                     throw new ValidationException($validator);
@@ -889,8 +907,9 @@ class PublishingController extends Controller
                     'translations.*.title' => 'required|string|max:255',
                     'authors' => 'array',
                     'authors.*' => 'integer|exists:authors,idAuthor',
-                    'cover' => 'nullable',
-                ]);
+                    'cover' => $coverRules,
+                ], $coverMessages);
+                $this->addCoverSizeLimit($validator, $request);
 
                 if ($validator->fails()) {
                     throw new ValidationException($validator);

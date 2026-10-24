@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1
 FROM php:5.6-apache
 
+# Permitir que Laravel reciba portadas de hasta 5 MiB y valide el límite real.
+COPY php-upload.ini /usr/local/etc/php/conf.d/zz-upload-limits.ini
+
 # Repos archivados de Debian Stretch + tolerar claves/Release expirados
 RUN sed -i 's/deb.debian.org/archive.debian.org/g; s|security.debian.org|archive.debian.org|g' /etc/apt/sources.list \
     && sed -i '/stretch-updates/d' /etc/apt/sources.list \
