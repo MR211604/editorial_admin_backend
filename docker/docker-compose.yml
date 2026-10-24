@@ -4,10 +4,14 @@ services:
   app:
     build:
       context: .
+      secrets:
+        - gh_token
     ports:
       - "8080:80"
     depends_on:
       - db
+    volumes:
+      - ../../editorial_admin_backend:/var/www/html
   db:
     image: mysql:5.7.29
     ports:
@@ -18,5 +22,8 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
+secrets:
+  gh_token:
+    environment: GH_TOKEN
 volumes:
   db_data:

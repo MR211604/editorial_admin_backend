@@ -621,7 +621,7 @@ $.ajax(settings).done(function (response) {
         {
             "idBanner": 1,
             "title": "Promoción 2025",
-            "resourceURL": "https:\/\/example.com\/banner1.jpg",
+            "resourceURL": "https:\/\/www.youtube.com\/watch?v=dQw4w9WgXcQ",
             "state": 1,
             "created_at": "2025-11-15 10:30:00",
             "updated_at": "2025-11-15 10:30:00"
@@ -644,10 +644,10 @@ $.ajax(settings).done(function (response) {
 
 <!-- END_ea57fc4cbab9bc046c292cf8f114056e -->
 
-<!-- START_d0ea90067e2cd05ba7a52b2fee8957c7 -->
-## Obtener el ultimo banner activo
+<!-- START_bf584b702121e8b0d9da94badacfe133 -->
+## Obtener el único video activo
 
-Retorna el último banner que se encuentra en estado activo, ordenado por ID descendente.
+Retorna el video que se encuentra activo. Las operaciones de escritura mantienen un único video activo.
 
 **Autenticación requerida:**
 Este endpoint NO requiere autenticación (público).
@@ -656,6 +656,55 @@ Este endpoint NO requiere autenticación (público).
 curl -X GET "http://localhost/api/banners/getLastActiveBanner" \
   -H "Accept: application/json"
 ```
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/banners/getActiveBanner" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/getActiveBanner",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": true,
+    "message": "Operación exitosa",
+    "data": {
+        "idBanner": 5,
+        "title": "Gran Promoción",
+        "resourceURL": "https:\/\/www.youtube.com\/watch?v=dQw4w9WgXcQ",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}
+```
+
+### HTTP Request
+`GET api/banners/getActiveBanner`
+
+
+<!-- END_bf584b702121e8b0d9da94badacfe133 -->
+
+<!-- START_d0ea90067e2cd05ba7a52b2fee8957c7 -->
+## Compatibilidad con clientes que todavía consumen el endpoint anterior.
 
 > Example request:
 
@@ -684,16 +733,9 @@ $.ajax(settings).done(function (response) {
 
 ```json
 {
-    "ok": true,
-    "message": "Operación exitosa",
-    "data": {
-        "idBanner": 5,
-        "title": "Gran Promoción",
-        "resourceURL": "https:\/\/example.com\/banner_new.jpg",
-        "state": 1,
-        "created_at": "2025-11-15 10:30:00",
-        "updated_at": "2025-11-15 10:30:00"
-    }
+    "ok": false,
+    "error": "Error al obtener los banner",
+    "message": "Error al obtener los banner"
 }
 ```
 
@@ -713,13 +755,13 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 
 **Parámetros del Body:**
 - `title` (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: `Promoción 2025`
-- `resourceURL` (string, requerido): URL del recurso/imagen (debe ser única y válida). Ejemplo: `https://example.com/banner1.jpg`
+- `resourceURL` (string, requerido): URL única del video de YouTube, TikTok, Facebook o Instagram (máximo 255 caracteres).
 - `state` (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: `1`
 
 ```json
 {
   "title": "Promoción 2025",
-  "resourceURL": "https://example.com/banner1.jpg",
+  "resourceURL": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "state": 1
 }
 ```
@@ -729,7 +771,7 @@ curl -X POST "http://localhost/api/banners/createBanner" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Promoción 2025","resourceURL":"https://example.com/banner1.jpg","state":1}'
+  -d '{"title":"Video editorial","resourceURL":"https://www.youtube.com/watch?v=dQw4w9WgXcQ","state":1}'
 ```
 
 > Example request:
@@ -764,7 +806,7 @@ $.ajax(settings).done(function (response) {
     "data": {
         "idBanner": 1,
         "title": "Promoción 2025",
-        "resourceURL": "https:\/\/example.com\/banner1.jpg",
+        "resourceURL": "https:\/\/www.youtube.com\/watch?v=dQw4w9WgXcQ",
         "state": 1,
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 10:30:00"
@@ -791,13 +833,13 @@ Este endpoint requiere un token JWT válido en el header de autorización.
 
 **Parámetros del Body (JSON o Form Data):**
 - `title` (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: `Promoción Actualizada 2025`
-- `resourceURL` (string, requerido): URL del recurso/imagen (debe ser única y válida excepto para el ID actual). Ejemplo: `https://example.com/banner_actualizado.jpg`
+- `resourceURL` (string, requerido): URL única del video de YouTube, TikTok, Facebook o Instagram (máximo 255 caracteres).
 - `state` (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: `0`
 
 ```json
 {
   "title": "Promoción Actualizada 2025",
-  "resourceURL": "https://example.com/banner_actualizado.jpg",
+  "resourceURL": "https://www.instagram.com/reel/C0UDBvideo/",
   "state": 0
 }
 ```
@@ -807,7 +849,7 @@ curl -X POST "http://localhost/api/banners/updateBanner/1" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Promoción Actualizada 2025","resourceURL":"https://example.com/banner_actualizado.jpg","state":0}'
+  -d '{"title":"Video editorial actualizado","resourceURL":"https://www.instagram.com/reel/C0UDBvideo/","state":0}'
 ```
 
 > Example request:
@@ -842,7 +884,7 @@ $.ajax(settings).done(function (response) {
     "data": {
         "idBanner": 1,
         "title": "Promoción Actualizada 2025",
-        "resourceURL": "https:\/\/example.com\/banner_actualizado.jpg",
+        "resourceURL": "https:\/\/www.instagram.com\/reel\/C0UDBvideo\/",
         "state": 0,
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 11:30:00"
@@ -1378,7 +1420,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Imagen subida correctamente",
     "data": {
-        "url": "http:\/\/localhost\/imagescontent\/ciencias_123456_uniqid.jpg"
+        "filename": "ciencias_123456_uniqid.jpg"
     }
 }
 ```
@@ -1872,8 +1914,8 @@ Este endpoint NO requiere autenticación (público).
 - `limit` (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: `10`
 - `publishing_type` (string, opcional): Nombre del tipo de publicación (Libro, Revista). Ejemplo: `Libro`
 - `language_id` (integer, opcional): ID del idioma para las traducciones. Por defecto: 1. Ejemplo: `1`
-- `search` (string, opcional): Búsqueda por título. Ejemplo: `Laravel`
-- `category` (integer, opcional): Filtrar por ID de categoría. Ejemplo: `3`
+- `search` (string, opcional): Búsqueda por título, código ISBN o nombre/apellido del autor. Ejemplo: `Laravel`
+- `category` (integer, opcional): Filtrar por ID de categoría (incluye sus subcategorías). Ejemplo: `3`
 - `is_archived` (integer, opcional): Filtrar por estado (0=Activo, 1=Archivado). Ejemplo: `0`
 - `sort` (string, opcional): Campo para ordenar (id, title, created_at, updated_at). Ejemplo: `title:asc`
 
@@ -2544,14 +2586,15 @@ $.ajax(settings).done(function (response) {
 <!-- START_d02233462a1778f8d4210a33836160cb -->
 ## Búsqueda global
 
-Realiza una búsqueda global en libros, revistas y artículos por título.
-Solo retorna resultados de publicaciones activas (is_archived=0).
+Realiza una búsqueda global de libros por título, código ISBN o nombre/apellido del autor.
+Acepta nombre completo del autor (cada palabra puede coincidir con el nombre o el apellido) y no distingue mayúsculas ni acentos.
+Solo retorna libros activos (state=1).
 
 **Autenticación requerida:**
 Este endpoint NO requiere autenticación (público).
 
 **Parámetros de consulta (Query Parameters):**
-- `search` (string, requerido): Término de búsqueda por título. Ejemplo: `Laravel`
+- `search` (string, requerido): Término de búsqueda por título, código ISBN o nombre del autor. Ejemplo: `Laravel`
 
 ```bash
 curl -X GET "http://localhost/api/publishings/globalSearch?search=Laravel" \
@@ -2594,21 +2637,6 @@ $.ajax(settings).done(function (response) {
                 "title": "Laravel para Principiantes",
                 "URL": "laravel_para_principiantes",
                 "resource_URL": "https:\/\/example.com\/laravel.pdf"
-            }
-        ],
-        "revistas": [
-            {
-                "idPublishing": 5,
-                "title": "Revista Laravel Magazine",
-                "URL": "revista_laravel_magazine",
-                "resource_URL": "https:\/\/example.com\/magazine.pdf"
-            }
-        ],
-        "articulos": [
-            {
-                "idPublishingDetail": 10,
-                "title": "Introducción a Laravel",
-                "URL": "introduccion-a-laravel"
             }
         ]
     }
@@ -3098,5 +3126,522 @@ $.ajax(settings).done(function (response) {
 
 
 <!-- END_887a98664fab32daa6f1f4e4045eadcb -->
+
+#general
+<!-- START_dd1765791d47886081493d47230328f2 -->
+## api/documents/getDocuments
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/documents/getDocuments" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/getDocuments",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": false,
+    "error": "Error al obtener los documentos",
+    "message": "Error al obtener los documentos"
+}
+```
+
+### HTTP Request
+`GET api/documents/getDocuments`
+
+
+<!-- END_dd1765791d47886081493d47230328f2 -->
+
+<!-- START_e21b1143bc16539dfc428b7c2ef787f1 -->
+## api/documents/getActiveDocuments
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/documents/getActiveDocuments" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/getActiveDocuments",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": false,
+    "error": "Error al obtener los documentos activos",
+    "message": "Error al obtener los documentos activos"
+}
+```
+
+### HTTP Request
+`GET api/documents/getActiveDocuments`
+
+
+<!-- END_e21b1143bc16539dfc428b7c2ef787f1 -->
+
+<!-- START_25766213cdbbdde140769bb9714ce5a1 -->
+## api/documents/getDocument/{id?}
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/documents/getDocument/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/getDocument/{id?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": false,
+    "error": "Error al obtener el documento",
+    "message": "Error al obtener el documento"
+}
+```
+
+### HTTP Request
+`GET api/documents/getDocument/{id?}`
+
+
+<!-- END_25766213cdbbdde140769bb9714ce5a1 -->
+
+<!-- START_a135f7a9265e87edbabf9216d244280a -->
+## api/documents/searchDocument/{slug?}
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/documents/searchDocument/{slug?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/searchDocument/{slug?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": false,
+    "error": "Error al buscar el documento",
+    "message": "Error al buscar el documento"
+}
+```
+
+### HTTP Request
+`GET api/documents/searchDocument/{slug?}`
+
+
+<!-- END_a135f7a9265e87edbabf9216d244280a -->
+
+<!-- START_3de9f3c7667b605d6a4733f6c72a56b3 -->
+## api/documents/createDocument
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/documents/createDocument" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/createDocument",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/documents/createDocument`
+
+
+<!-- END_3de9f3c7667b605d6a4733f6c72a56b3 -->
+
+<!-- START_5a9a5959a4094f53c732642a39100953 -->
+## api/documents/updateDocument/{id?}
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/documents/updateDocument/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/updateDocument/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/documents/updateDocument/{id?}`
+
+
+<!-- END_5a9a5959a4094f53c732642a39100953 -->
+
+<!-- START_73890ee55882b279af055acd133b1174 -->
+## api/documents/toggleState/{id?}
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/documents/toggleState/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/toggleState/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/documents/toggleState/{id?}`
+
+
+<!-- END_73890ee55882b279af055acd133b1174 -->
+
+<!-- START_1173c0257c0afe519c9fd1198b0d4cd6 -->
+## api/documents/uploadDocumentImage
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/documents/uploadDocumentImage" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/uploadDocumentImage",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/documents/uploadDocumentImage`
+
+
+<!-- END_1173c0257c0afe519c9fd1198b0d4cd6 -->
+
+<!-- START_6d2785b43ea309737a283009e91b8367 -->
+## api/locations/getLocations
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/locations/getLocations" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/getLocations",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": false,
+    "error": "Error al obtener las ubicaciones",
+    "message": "Error al obtener las ubicaciones"
+}
+```
+
+### HTTP Request
+`GET api/locations/getLocations`
+
+
+<!-- END_6d2785b43ea309737a283009e91b8367 -->
+
+<!-- START_ee7b99843678865003e536b1b9bf92f3 -->
+## api/locations/getActiveLocations
+
+> Example request:
+
+```bash
+curl -X GET -G "http://localhost/api/locations/getActiveLocations" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/getActiveLocations",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+> Example response:
+
+```json
+{
+    "ok": false,
+    "error": "Error al obtener las ubicaciones activas",
+    "message": "Error al obtener las ubicaciones activas"
+}
+```
+
+### HTTP Request
+`GET api/locations/getActiveLocations`
+
+
+<!-- END_ee7b99843678865003e536b1b9bf92f3 -->
+
+<!-- START_d80ce991012069074dbafde00aff973e -->
+## api/locations/createLocation
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/locations/createLocation" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/createLocation",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/locations/createLocation`
+
+
+<!-- END_d80ce991012069074dbafde00aff973e -->
+
+<!-- START_8c12121cd509ca5ce71e61aa245745c1 -->
+## api/locations/updateLocation/{id?}
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/locations/updateLocation/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/updateLocation/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/locations/updateLocation/{id?}`
+
+
+<!-- END_8c12121cd509ca5ce71e61aa245745c1 -->
+
+<!-- START_78ed3d1a4bb57c35d7cbea7771609bbf -->
+## api/locations/toggleState/{id?}
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/locations/toggleState/{id?}" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/toggleState/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/locations/toggleState/{id?}`
+
+
+<!-- END_78ed3d1a4bb57c35d7cbea7771609bbf -->
+
+<!-- START_4dac1036f50f9be5d59fbc1b90e67957 -->
+## api/locations/uploadLocationImage
+
+> Example request:
+
+```bash
+curl -X POST "http://localhost/api/locations/uploadLocationImage" \
+    -H "Accept: application/json"
+```
+
+```javascript
+var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/uploadLocationImage",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});
+```
+
+
+### HTTP Request
+`POST api/locations/uploadLocationImage`
+
+
+<!-- END_4dac1036f50f9be5d59fbc1b90e67957 -->
 
 

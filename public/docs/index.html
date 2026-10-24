@@ -25,7 +25,7 @@
       </span>
     </a>
     <div class="tocify-wrapper">
-        <img src="images/logo.png" />
+        <img src="images/logo.png" style="object-fit: contain; width: -webkit-fill-available; height: 60px; background: #ffffff;">
                     <div class="lang-selector">
                                   <a href="#" data-language-name="bash">bash</a>
                                   <a href="#" data-language-name="javascript">javascript</a>
@@ -510,7 +510,7 @@ $.ajax(settings).done(function (response) {
         {
             "idBanner": 1,
             "title": "Promoción 2025",
-            "resourceURL": "https:\/\/example.com\/banner1.jpg",
+            "resourceURL": "https:\/\/www.youtube.com\/watch?v=dQw4w9WgXcQ",
             "state": 1,
             "created_at": "2025-11-15 10:30:00",
             "updated_at": "2025-11-15 10:30:00"
@@ -528,13 +528,51 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>GET api/banners/getBanners</code></p>
 <!-- END_ea57fc4cbab9bc046c292cf8f114056e -->
-<!-- START_d0ea90067e2cd05ba7a52b2fee8957c7 -->
-<h2>Obtener el ultimo banner activo</h2>
-<p>Retorna el último banner que se encuentra en estado activo, ordenado por ID descendente.</p>
+<!-- START_bf584b702121e8b0d9da94badacfe133 -->
+<h2>Obtener el único video activo</h2>
+<p>Retorna el video que se encuentra activo. Las operaciones de escritura mantienen un único video activo.</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint NO requiere autenticación (público).</p>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/banners/getLastActiveBanner" \
   -H "Accept: application/json"</code></pre>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/banners/getActiveBanner" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/banners/getActiveBanner",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": true,
+    "message": "Operación exitosa",
+    "data": {
+        "idBanner": 5,
+        "title": "Gran Promoción",
+        "resourceURL": "https:\/\/www.youtube.com\/watch?v=dQw4w9WgXcQ",
+        "state": 1,
+        "created_at": "2025-11-15 10:30:00",
+        "updated_at": "2025-11-15 10:30:00"
+    }
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/banners/getActiveBanner</code></p>
+<!-- END_bf584b702121e8b0d9da94badacfe133 -->
+<!-- START_d0ea90067e2cd05ba7a52b2fee8957c7 -->
+<h2>Compatibilidad con clientes que todavía consumen el endpoint anterior.</h2>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -557,16 +595,9 @@ $.ajax(settings).done(function (response) {
 <p>Example response:</p>
 </blockquote>
 <pre><code class="language-json">{
-    "ok": true,
-    "message": "Operación exitosa",
-    "data": {
-        "idBanner": 5,
-        "title": "Gran Promoción",
-        "resourceURL": "https:\/\/example.com\/banner_new.jpg",
-        "state": 1,
-        "created_at": "2025-11-15 10:30:00",
-        "updated_at": "2025-11-15 10:30:00"
-    }
+    "ok": false,
+    "error": "Error al obtener los banner",
+    "message": "Error al obtener los banner"
 }</code></pre>
 <h3>HTTP Request</h3>
 <p><code>GET api/banners/getLastActiveBanner</code></p>
@@ -579,19 +610,19 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <p><strong>Parámetros del Body:</strong></p>
 <ul>
 <li><code>title</code> (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: <code>Promoción 2025</code></li>
-<li><code>resourceURL</code> (string, requerido): URL del recurso/imagen (debe ser única y válida). Ejemplo: <code>https://example.com/banner1.jpg</code></li>
+<li><code>resourceURL</code> (string, requerido): URL única del video de YouTube, TikTok, Facebook o Instagram (máximo 255 caracteres).</li>
 <li><code>state</code> (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: <code>1</code></li>
 </ul>
 <pre><code class="language-json">{
   "title": "Promoción 2025",
-  "resourceURL": "https://example.com/banner1.jpg",
+  "resourceURL": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "state": 1
 }</code></pre>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/banners/createBanner" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Promoción 2025","resourceURL":"https://example.com/banner1.jpg","state":1}'</code></pre>
+  -d '{"title":"Video editorial","resourceURL":"https://www.youtube.com/watch?v=dQw4w9WgXcQ","state":1}'</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -619,7 +650,7 @@ $.ajax(settings).done(function (response) {
     "data": {
         "idBanner": 1,
         "title": "Promoción 2025",
-        "resourceURL": "https:\/\/example.com\/banner1.jpg",
+        "resourceURL": "https:\/\/www.youtube.com\/watch?v=dQw4w9WgXcQ",
         "state": 1,
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 10:30:00"
@@ -640,19 +671,19 @@ Este endpoint requiere un token JWT válido en el header de autorización.</p>
 <p><strong>Parámetros del Body (JSON o Form Data):</strong></p>
 <ul>
 <li><code>title</code> (string, requerido): Título del banner (máximo 255 caracteres). Ejemplo: <code>Promoción Actualizada 2025</code></li>
-<li><code>resourceURL</code> (string, requerido): URL del recurso/imagen (debe ser única y válida excepto para el ID actual). Ejemplo: <code>https://example.com/banner_actualizado.jpg</code></li>
+<li><code>resourceURL</code> (string, requerido): URL única del video de YouTube, TikTok, Facebook o Instagram (máximo 255 caracteres).</li>
 <li><code>state</code> (boolean, requerido): Estado del banner (0=Inactivo, 1=Activo). Ejemplo: <code>0</code></li>
 </ul>
 <pre><code class="language-json">{
   "title": "Promoción Actualizada 2025",
-  "resourceURL": "https://example.com/banner_actualizado.jpg",
+  "resourceURL": "https://www.instagram.com/reel/C0UDBvideo/",
   "state": 0
 }</code></pre>
 <pre><code class="language-bash">curl -X POST "http://localhost/api/banners/updateBanner/1" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci..." \
-  -d '{"title":"Promoción Actualizada 2025","resourceURL":"https://example.com/banner_actualizado.jpg","state":0}'</code></pre>
+  -d '{"title":"Video editorial actualizado","resourceURL":"https://www.instagram.com/reel/C0UDBvideo/","state":0}'</code></pre>
 <blockquote>
 <p>Example request:</p>
 </blockquote>
@@ -680,7 +711,7 @@ $.ajax(settings).done(function (response) {
     "data": {
         "idBanner": 1,
         "title": "Promoción Actualizada 2025",
-        "resourceURL": "https:\/\/example.com\/banner_actualizado.jpg",
+        "resourceURL": "https:\/\/www.instagram.com\/reel\/C0UDBvideo\/",
         "state": 0,
         "created_at": "2025-11-15 10:30:00",
         "updated_at": "2025-11-15 11:30:00"
@@ -1111,7 +1142,7 @@ $.ajax(settings).done(function (response) {
     "ok": true,
     "message": "Imagen subida correctamente",
     "data": {
-        "url": "http:\/\/localhost\/imagescontent\/ciencias_123456_uniqid.jpg"
+        "filename": "ciencias_123456_uniqid.jpg"
     }
 }</code></pre>
 <h3>HTTP Request</h3>
@@ -1496,8 +1527,8 @@ Este endpoint NO requiere autenticación (público).</p>
 <li><code>limit</code> (integer, opcional): Resultados por página (mínimo 1). Por defecto: 10. Ejemplo: <code>10</code></li>
 <li><code>publishing_type</code> (string, opcional): Nombre del tipo de publicación (Libro, Revista). Ejemplo: <code>Libro</code></li>
 <li><code>language_id</code> (integer, opcional): ID del idioma para las traducciones. Por defecto: 1. Ejemplo: <code>1</code></li>
-<li><code>search</code> (string, opcional): Búsqueda por título. Ejemplo: <code>Laravel</code></li>
-<li><code>category</code> (integer, opcional): Filtrar por ID de categoría. Ejemplo: <code>3</code></li>
+<li><code>search</code> (string, opcional): Búsqueda por título, código ISBN o nombre/apellido del autor. Ejemplo: <code>Laravel</code></li>
+<li><code>category</code> (integer, opcional): Filtrar por ID de categoría (incluye sus subcategorías). Ejemplo: <code>3</code></li>
 <li><code>is_archived</code> (integer, opcional): Filtrar por estado (0=Activo, 1=Archivado). Ejemplo: <code>0</code></li>
 <li><code>sort</code> (string, opcional): Campo para ordenar (id, title, created_at, updated_at). Ejemplo: <code>title:asc</code></li>
 </ul>
@@ -2050,13 +2081,14 @@ $.ajax(settings).done(function (response) {
 <!-- END_5d4088a4940540ba2e40f3f61016e478 -->
 <!-- START_d02233462a1778f8d4210a33836160cb -->
 <h2>Búsqueda global</h2>
-<p>Realiza una búsqueda global en libros, revistas y artículos por título.
-Solo retorna resultados de publicaciones activas (is_archived=0).</p>
+<p>Realiza una búsqueda global de libros por título, código ISBN o nombre/apellido del autor.
+Acepta nombre completo del autor (cada palabra puede coincidir con el nombre o el apellido) y no distingue mayúsculas ni acentos.
+Solo retorna libros activos (state=1).</p>
 <p><strong>Autenticación requerida:</strong>
 Este endpoint NO requiere autenticación (público).</p>
 <p><strong>Parámetros de consulta (Query Parameters):</strong></p>
 <ul>
-<li><code>search</code> (string, requerido): Término de búsqueda por título. Ejemplo: <code>Laravel</code></li>
+<li><code>search</code> (string, requerido): Término de búsqueda por título, código ISBN o nombre del autor. Ejemplo: <code>Laravel</code></li>
 </ul>
 <pre><code class="language-bash">curl -X GET "http://localhost/api/publishings/globalSearch?search=Laravel" \
   -H "Accept: application/json"</code></pre>
@@ -2091,21 +2123,6 @@ $.ajax(settings).done(function (response) {
                 "title": "Laravel para Principiantes",
                 "URL": "laravel_para_principiantes",
                 "resource_URL": "https:\/\/example.com\/laravel.pdf"
-            }
-        ],
-        "revistas": [
-            {
-                "idPublishing": 5,
-                "title": "Revista Laravel Magazine",
-                "URL": "revista_laravel_magazine",
-                "resource_URL": "https:\/\/example.com\/magazine.pdf"
-            }
-        ],
-        "articulos": [
-            {
-                "idPublishingDetail": 10,
-                "title": "Introducción a Laravel",
-                "URL": "introduccion-a-laravel"
             }
         ]
     }
@@ -2493,6 +2510,377 @@ $.ajax(settings).done(function (response) {
 <h3>HTTP Request</h3>
 <p><code>POST api/users/toggleActive/{id?}</code></p>
 <!-- END_887a98664fab32daa6f1f4e4045eadcb -->
+<h1>general</h1>
+<!-- START_dd1765791d47886081493d47230328f2 -->
+<h2>api/documents/getDocuments</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/documents/getDocuments" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/getDocuments",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": false,
+    "error": "Error al obtener los documentos",
+    "message": "Error al obtener los documentos"
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/documents/getDocuments</code></p>
+<!-- END_dd1765791d47886081493d47230328f2 -->
+<!-- START_e21b1143bc16539dfc428b7c2ef787f1 -->
+<h2>api/documents/getActiveDocuments</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/documents/getActiveDocuments" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/getActiveDocuments",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": false,
+    "error": "Error al obtener los documentos activos",
+    "message": "Error al obtener los documentos activos"
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/documents/getActiveDocuments</code></p>
+<!-- END_e21b1143bc16539dfc428b7c2ef787f1 -->
+<!-- START_25766213cdbbdde140769bb9714ce5a1 -->
+<h2>api/documents/getDocument/{id?}</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/documents/getDocument/{id?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/getDocument/{id?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": false,
+    "error": "Error al obtener el documento",
+    "message": "Error al obtener el documento"
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/documents/getDocument/{id?}</code></p>
+<!-- END_25766213cdbbdde140769bb9714ce5a1 -->
+<!-- START_a135f7a9265e87edbabf9216d244280a -->
+<h2>api/documents/searchDocument/{slug?}</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/documents/searchDocument/{slug?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/searchDocument/{slug?}",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": false,
+    "error": "Error al buscar el documento",
+    "message": "Error al buscar el documento"
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/documents/searchDocument/{slug?}</code></p>
+<!-- END_a135f7a9265e87edbabf9216d244280a -->
+<!-- START_3de9f3c7667b605d6a4733f6c72a56b3 -->
+<h2>api/documents/createDocument</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/documents/createDocument" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/createDocument",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/documents/createDocument</code></p>
+<!-- END_3de9f3c7667b605d6a4733f6c72a56b3 -->
+<!-- START_5a9a5959a4094f53c732642a39100953 -->
+<h2>api/documents/updateDocument/{id?}</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/documents/updateDocument/{id?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/updateDocument/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/documents/updateDocument/{id?}</code></p>
+<!-- END_5a9a5959a4094f53c732642a39100953 -->
+<!-- START_73890ee55882b279af055acd133b1174 -->
+<h2>api/documents/toggleState/{id?}</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/documents/toggleState/{id?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/toggleState/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/documents/toggleState/{id?}</code></p>
+<!-- END_73890ee55882b279af055acd133b1174 -->
+<!-- START_1173c0257c0afe519c9fd1198b0d4cd6 -->
+<h2>api/documents/uploadDocumentImage</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/documents/uploadDocumentImage" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/documents/uploadDocumentImage",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/documents/uploadDocumentImage</code></p>
+<!-- END_1173c0257c0afe519c9fd1198b0d4cd6 -->
+<!-- START_6d2785b43ea309737a283009e91b8367 -->
+<h2>api/locations/getLocations</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/locations/getLocations" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/getLocations",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": false,
+    "error": "Error al obtener las ubicaciones",
+    "message": "Error al obtener las ubicaciones"
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/locations/getLocations</code></p>
+<!-- END_6d2785b43ea309737a283009e91b8367 -->
+<!-- START_ee7b99843678865003e536b1b9bf92f3 -->
+<h2>api/locations/getActiveLocations</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X GET -G "http://localhost/api/locations/getActiveLocations" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/getActiveLocations",
+    "method": "GET",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<blockquote>
+<p>Example response:</p>
+</blockquote>
+<pre><code class="language-json">{
+    "ok": false,
+    "error": "Error al obtener las ubicaciones activas",
+    "message": "Error al obtener las ubicaciones activas"
+}</code></pre>
+<h3>HTTP Request</h3>
+<p><code>GET api/locations/getActiveLocations</code></p>
+<!-- END_ee7b99843678865003e536b1b9bf92f3 -->
+<!-- START_d80ce991012069074dbafde00aff973e -->
+<h2>api/locations/createLocation</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/locations/createLocation" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/createLocation",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/locations/createLocation</code></p>
+<!-- END_d80ce991012069074dbafde00aff973e -->
+<!-- START_8c12121cd509ca5ce71e61aa245745c1 -->
+<h2>api/locations/updateLocation/{id?}</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/locations/updateLocation/{id?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/updateLocation/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/locations/updateLocation/{id?}</code></p>
+<!-- END_8c12121cd509ca5ce71e61aa245745c1 -->
+<!-- START_78ed3d1a4bb57c35d7cbea7771609bbf -->
+<h2>api/locations/toggleState/{id?}</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/locations/toggleState/{id?}" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/toggleState/{id?}",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/locations/toggleState/{id?}</code></p>
+<!-- END_78ed3d1a4bb57c35d7cbea7771609bbf -->
+<!-- START_4dac1036f50f9be5d59fbc1b90e67957 -->
+<h2>api/locations/uploadLocationImage</h2>
+<blockquote>
+<p>Example request:</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "http://localhost/api/locations/uploadLocationImage" \
+    -H "Accept: application/json"</code></pre>
+<pre><code class="language-javascript">var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "http://localhost/api/locations/uploadLocationImage",
+    "method": "POST",
+    "headers": {
+        "accept": "application/json"
+    }
+}
+
+$.ajax(settings).done(function (response) {
+    console.log(response);
+});</code></pre>
+<h3>HTTP Request</h3>
+<p><code>POST api/locations/uploadLocationImage</code></p>
+<!-- END_4dac1036f50f9be5d59fbc1b90e67957 -->
       </div>
       <div class="dark-box">
                         <div class="lang-selector">

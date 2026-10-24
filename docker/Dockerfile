@@ -1,59 +1,60 @@
-FROM ubuntu:22.04
+# syntax=docker/dockerfile:1
+FROM php:5.6-apache
 
-ARG DEBIAN_FRONTEND=noninteractive
+# Repos archivados de Debian Stretch + tolerar claves/Release expirados
+RUN sed -i 's/deb.debian.org/archive.debian.org/g; s|security.debian.org|archive.debian.org|g' /etc/apt/sources.list \
+    && sed -i '/stretch-updates/d' /etc/apt/sources.list \
+    && printf '%s\n' \
+        'Acquire::Check-Valid-Until "false";' \
+        'Acquire::AllowInsecureRepositories "true";' \
+        'Acquire::AllowDowngradeToInsecureRepositories "true";' \
+        'APT::Get::AllowUnauthenticated "true";' \
+        > /etc/apt/apt.conf.d/99legacy
 
-# 1. Instalar dependencias del sistema y PHP 5.6
-RUN apt-get update -y && \
-    apt-get install -y software-properties-common apache2 git curl unzip zip nano && \
-    add-apt-repository ppa:ondrej/php -y && \
-    apt-get update -y && \
-    apt-get install -y \
-        php5.6 php5.6-cli php5.6-common php5.6-mysql php5.6-zip \
-        php5.6-gd php5.6-mbstring php5.6-curl php5.6-xml php5.6-bcmath \
-        libapache2-mod-php5.6
+RUN apt-get update && apt-get install -y --no-install-recommends --allow-unauthenticated \
+        git \
+        unzip \
+        zip \
+        libmcrypt-dev \
+        libpng-dev \
+        libjpeg-dev \
+        libfreetype6-dev \
+        libxml2-dev \
+        zlib1g-dev \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install \
+        mcrypt \
+        pdo_mysql \
+        mbstring \
+        gd \
+        zip \
+        opcache \
+    && rm -rf /var/lib/apt/lists/*
 
-# 2. Instalar Composer 1 (compatible con Laravel 5.4)
-RUN curl -sS https://getcomposer.org/installer | php && \
-    mv composer.phar /usr/local/bin/composer && \
-    composer self-update --2
+# Composer 2.2 LTS (última versión de Composer 2 compatible con PHP 5.6)
+COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# 3. Habilitar mod_rewrite y headers en Apache y configurar VirtualHost
-RUN a2enmod rewrite headers php5.6 && \
-    cat > /etc/apache2/sites-available/000-default.conf <<EOF
-<VirtualHost *:80>
-    DocumentRoot /var/www/html/public
-    
-    <Directory /var/www/html/public>
-        AllowOverride All
-        Require all granted
-        Options -Indexes
-    </Directory>
-    
-    ErrorLog \${APACHE_LOG_DIR}/error.log
-    CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOF
+# Apache
+RUN a2enmod rewrite
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# 4. Configurar directorio de trabajo y permisos
 WORKDIR /var/www/html
 
-# Limpiar el directorio por defecto de Apache
-RUN rm -rf /var/www/html/* /var/www/html/.*
+# Clonar repo privado con secret de BuildKit (el token no queda en la imagen)
+RUN --mount=type=secret,id=gh_token \
+    find /var/www/html -mindepth 1 -delete \
+    && git clone https://x-access-token:$(cat /run/secrets/gh_token)@github.com/MR211604/cms-udb-editorial.git . \
+    && git remote set-url origin https://github.com/MR211604/cms-udb-editorial.git \
+    && composer install --no-dev --optimize-autoloader --no-interaction \
+    && cp .env.example .env \
+    && php artisan key:generate
 
-# Clonar el repositorio (reemplaza con tu URL)
-RUN git clone https://github.com/MR211604/cms-udb-editorial . && \
-    composer install --no-dev --optimize-autoloader && \
-    cp .env.example .env && \
-    php artisan key:generate
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html && \
-    chown -R www-data:www-data /var/www/html/storage && \
-    chmod -R 775 /var/www/html/storage && \
-    chown -R www-data:www-data /var/www/html/public && \
-    chmod -R 755 /var/www/html/public
-# 5. Exponer solo puerto 80
 EXPOSE 80
-
-# 6. Iniciar Apache en primer plano
-CMD ["apachectl", "-D", "FOREGROUND"]
+CMD ["apache2-foreground"]
