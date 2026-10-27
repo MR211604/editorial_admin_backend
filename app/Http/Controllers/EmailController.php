@@ -235,7 +235,7 @@ class EmailController extends Controller
     } catch (ValidationException $e) {
       throw $e;
     } catch (\Exception $e) {
-      throw new ServerErrorException('Error al crear el correo', $e->getMessage(), $e);
+      throw new ServerErrorException('Error al crear el correo', null, $e);
     }
   }
 }
